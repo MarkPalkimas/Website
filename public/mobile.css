@@ -1,0 +1,189 @@
+/* General Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    scroll-behavior: smooth;
+}
+
+html, body {
+    height: 100%;
+    background: linear-gradient(to bottom, #ffffff, 171, 171, 171, 0.5);
+    color: #000;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 10px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+
+.header .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+}
+
+.header .projects-link {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Profile Photo and Intro Text Styling */
+.profile-photo {
+    margin-top: 140px;
+    width: 200px;
+    height: 240px;
+    border-radius: 50%;
+    border: 6px solid #000;
+    transition: transform 0.3s, box-shadow 0.3s;
+    object-fit: cover;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+}
+
+.intro-text {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.intro-text h2 {
+    font-size: 1.8em;
+    color: #333;
+}
+
+.intro-text p {
+    font-size: 1.1em;
+    color: #555;
+    margin-top: 8px;
+}
+
+/* About Section */
+.about-section {
+    margin: 20px auto;
+    padding: 15px;
+    width: 90%;
+    max-width: 400px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: none;
+}
+
+/* Footer and Social Links */
+.footer {
+    background-color: rgba(171, 171, 171, 0.5);
+    padding: 15px 0;
+    text-align: center;
+    width: 100%;
+    position: relative;
+}
+
+.footer p {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.social-logo {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s, filter 0.3s;
+}
+
+.social-logo:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+/* Gravity Ball Section */
+.gravity-ball-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    margin-top: 20px;
+    background-color: rgba(240, 240, 240, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gravity-btn {
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.gravity-btn:hover {
+    background-color: #005bb5;
+}
+
+.gravity-ball {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #0073e6;
+    animation: bounce 4s infinite alternate;
+}
+
+@keyframes bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(180px); }
+}
+
+/* Contact and Copyright */
+.contact-section {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 1.1em;
+    background-color: rgba(171, 171, 171, 0.5);
+}
+
+.copyright {
+    color: rgba(140, 140, 140, 0.4);
+    font-size: 0.85em;
+    margin-top: 10px;
+    opacity: 0.7;
+    position: absolute;
+    bottom: -20px;
+    width: 100%;
+    text-align: center;
+}

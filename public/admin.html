@@ -1,1 +1,152 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Mark Palkimas</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      padding-bottom: 2rem;
+    }
+    header {
+      background: #1f1f1f;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    header a.logout {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1.1rem;
+    }
+    header a.logout:hover {
+      color: #ffcc00;
+    }
+    .container {
+      padding: 2rem;
+    }
+    .card {
+      background: #1f1f1f;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .card h2 {
+      margin-bottom: 0.5rem;
+    }
+    .pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #ffcc00;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      margin-left: 0.5rem;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,204,0,0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255,204,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,204,0,0); }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #222;
+      color: #e0e0e0;
+      margin-top: 1rem;
+    }
+    table th, table td {
+      padding: 0.5rem;
+      text-align: left;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
+    <a href="https://markpalkimas.com" class="logout">Logout</a>
+  </header>
+  <div class="container">
+    <div class="card" id="logs">
+      <h2>Index Traffic Logs</h2>
+      <table id="visitor-logs">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>IP Address</th>
+            <th>Device</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Visitor log rows will be inserted here dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    // Function to parse device type from the user-agent string
+    function parseDevice(userAgent) {
+      if (/Mobi|Android/i.test(userAgent)) {
+        return "Mobile";
+      }
+      return "Desktop";
+    }
+    
+    // Fetch visitor logs from the backend and populate the table
+    function fetchVisitorLogs() {
+      fetch('/api/getVisitorLogs')
+        .then(response => response.json())
+        .then(logs => {
+          const tbody = document.querySelector('#visitor-logs tbody');
+          tbody.innerHTML = '';
+          logs.forEach(log => {
+            const device = parseDevice(log.userAgent || '');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${new Date(log.timestamp).toLocaleString()}</td>
+              <td>${log.ip}</td>
+              <td>${device}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(err => console.error('Error fetching logs:', err));
+    }
+    
+    // Log visitor data (optional for admin dashboard view)
+    function logVisitor() {
+      fetch('/api/logVisitor', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => console.log('Visitor logged:', data))
+        .catch(err => console.error('Error logging visitor:', err));
+    }
+    
+    // Fetch logs on page load and then every 10 seconds
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchVisitorLogs();
+      setInterval(fetchVisitorLogs, 10000);
+      // Optionally log this visit (if you want each admin dashboard view logged)
+      logVisitor();
+    });
+  </script>
+</body>
+</html>

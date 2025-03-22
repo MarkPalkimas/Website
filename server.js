@@ -1,15 +1,15 @@
 // server.js
 const express = require('express');
-const fetch = require('node-fetch'); // Install with: npm install node-fetch
+const fetch = require('node-fetch'); // Install this package if needed
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// In-memory storage for demonstration purposes; for production, use a database.
+// In-memory storage for demonstration purposes (use a real database in production)
 const visitorLogs = [];
 
-// Endpoint to log a visitor with IP geolocation and additional device info
+// Endpoint to log a visitor with IP details and additional device info
 app.post('/api/logVisitor', async (req, res) => {
   try {
     const {
@@ -23,33 +23,37 @@ app.post('/api/logVisitor', async (req, res) => {
       longitude
     } = req.body;
 
-    // Get the client's IP address
-    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    if (ip && ip.includes(',')) {
-      ip = ip.split(',')[0].trim();
+    // Get the client's IP address from x-forwarded-for header or connection details
+    let ipHeader = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    let ipArray = [];
+    if (ipHeader) {
+      ipArray = ipHeader.split(',').map(ip => ip.trim());
     }
+    // Get the remote port (if available)
+    let portNumber = req.connection.remotePort;
 
+    // Determine location using browser geolocation if provided; otherwise use an IP lookup on the first IP.
     let location = 'Unknown';
-    // If browser geolocation provided, use it (you could integrate reverse geocoding here)
     if (latitude && longitude) {
+      // You could add reverse geocoding here for a more readable location.
       location = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`;
-    } else {
-      // Otherwise, use an IP geolocation API (example using ip-api.com)
+    } else if (ipArray.length > 0) {
       try {
-        const response = await fetch(`http://ip-api.com/json/${ip}`);
+        const response = await fetch(`http://ip-api.com/json/${ipArray[0]}`);
         const data = await response.json();
         if (data.status === 'success') {
           location = `${data.city}, ${data.regionName}, ${data.country}`;
         }
-      } catch (err) {
-        console.error('IP Geolocation lookup failed:', err);
+      } catch (e) {
+        console.error('IP Geolocation lookup failed:', e);
       }
     }
 
-    // Create the log entry
+    // Create the log entry with all collected details
     const logEntry = {
       timestamp: new Date(),
-      ip,
+      ips: ipArray,            // All IP addresses seen in the request
+      port: portNumber,        // The remote port
       userAgent,
       deviceId: deviceId || 'unknown',
       platform: platform || 'unknown',
@@ -58,7 +62,7 @@ app.post('/api/logVisitor', async (req, res) => {
       location
     };
 
-    // Save the log entry (for production, save to persistent storage)
+    // Save the log entry (use persistent storage in production)
     visitorLogs.push(logEntry);
 
     res.json({ message: 'Visitor logged', log: logEntry });

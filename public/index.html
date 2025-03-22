@@ -16,12 +16,12 @@
     </style>
   </head>
   <body>
-    <!-- Neon Glow Container, Dimming Overlay, Quote Container, Header, Main, Footer, etc. -->
-    <!-- ... (your existing HTML content) ... -->
-    
+    <!-- Your Neon Glow Container, Dimming Overlay, Quote Container, Header, Main Content, Footer, etc. -->
+    <!-- (Keep your existing HTML structure) -->
+
     <!-- Visitor Logging Script -->
     <script>
-      // Generate or get unique device ID from localStorage
+      // Generate or retrieve a unique device ID
       function getDeviceId() {
         let deviceId = localStorage.getItem('deviceId');
         if (!deviceId) {
@@ -31,7 +31,7 @@
         return deviceId;
       }
       
-      // Log visitor data with additional device info
+      // Log visitor data with additional device information
       function logVisitor() {
         const userAgent = navigator.userAgent;
         const deviceId = getDeviceId();
@@ -58,7 +58,7 @@
               body: JSON.stringify(data)
             });
           }, (error) => {
-            // If location access denied, log without location data
+            // If location permission is denied, log without location data
             const data = { userAgent, deviceId, platform, language, screenWidth, screenHeight };
             fetch('/api/logVisitor', {
               method: 'POST',

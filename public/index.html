@@ -328,6 +328,43 @@
     <!-- Reset Button -->
     <button class="reset-btn">Reset</button>
     
+    <!-- Visitor Logging Script -->
+    <script>
+      // Log visitor data with geolocation if available
+      function logVisitor() {
+        const userAgent = navigator.userAgent;
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const data = {
+              userAgent: userAgent,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            };
+            fetch('/api/logVisitor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }, (error) => {
+            // If location access denied or error, log without location
+            fetch('/api/logVisitor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userAgent: userAgent })
+            });
+          });
+        } else {
+          // Geolocation not supported
+          fetch('/api/logVisitor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userAgent: userAgent })
+          });
+        }
+      }
+      document.addEventListener("DOMContentLoaded", logVisitor);
+    </script>
+    
     <script src="main.js"></script>
   </body>
 </html>

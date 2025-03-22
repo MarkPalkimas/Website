@@ -129,26 +129,25 @@
     </header>
     <div class="container">
       <div class="card" id="logs">
-        <h2>Visitor Traffic Logs</h2>
+        <h2>Visitor Device Summary</h2>
         <table id="visitor-logs">
           <thead>
             <tr>
-              <th>Last Timestamp</th>
-              <th>Device ID</th>
+              <th>Device MAC (ID)</th>
               <th>Device IP</th>
-              <th>Port</th>
-              <th>Device Info</th>
+              <th>Router IP</th>
               <th>Location</th>
+              <th>Operating System</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Unique device log rows will be inserted here dynamically -->
+            <!-- One row per unique device will be inserted here dynamically -->
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Modal for detailed log view -->
+    <!-- Modal for detailed log view (features remain intact) -->
     <div class="modal-overlay" id="modal-overlay">
       <div class="modal">
         <div class="modal-header">
@@ -175,11 +174,6 @@
     </div>
 
     <script>
-      // Create a combined device info string
-      function parseDeviceInfo(log) {
-        return `Platform: ${log.platform} | Lang: ${log.language} | Screen: ${log.screen}`;
-      }
-      
       // Group logs by deviceId
       function groupLogsByDevice(logs) {
         return logs.reduce((acc, log) => {
@@ -191,28 +185,35 @@
         }, {});
       }
       
-      // Populate the summary table with the latest log for each unique device
+      // Populate the summary table with one entry per device
       function populateUniqueLogs(logs) {
         const tbody = document.querySelector('#visitor-logs tbody');
         tbody.innerHTML = '';
         const grouped = groupLogsByDevice(logs);
         
         Object.keys(grouped).forEach(deviceId => {
+          // Use the latest log entry for this device
           const sortedLogs = grouped[deviceId].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           const latestLog = sortedLogs[0];
-          const deviceInfo = parseDeviceInfo(latestLog);
-          const primaryIP = latestLog.ips && latestLog.ips.length ? latestLog.ips[0] : 'Unknown';
+          // Get the primary device IP from the server log
+          const deviceIP = latestLog.ips && latestLog.ips.length ? latestLog.ips[0] : 'Unknown';
+          // Router IP is not available from client-side so it is set as "N/A"
+          const routerIP = 'N/A';
+          const location = latestLog.location || 'Unknown';
+          const os = latestLog.os || 'Unknown';
+          
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td>${new Date(latestLog.timestamp).toLocaleString()}</td>
-            <td class="clickable-device" style="color:#ffcc00;cursor:pointer;">${deviceId}</td>
-            <td>${primaryIP}</td>
-            <td>${latestLog.port || 'Unknown'}</td>
-            <td>${deviceInfo}</td>
-            <td>${latestLog.location || 'Unknown'}</td>
+            <td>${deviceId}</td>
+            <td>${deviceIP}</td>
+            <td>${routerIP}</td>
+            <td>${location}</td>
+            <td>${os}</td>
           `;
-          // On click, show all log entries for this device
-          tr.querySelector('.clickable-device').addEventListener('click', () => {
+          // Retain the ability to show detailed logs if desired
+          tr.querySelector('td').classList.add('clickable-device');
+          tr.querySelector('td').style.cursor = 'pointer';
+          tr.querySelector('td').addEventListener('click', () => {
             showDetailedLogs(deviceId, grouped[deviceId]);
           });
           tbody.appendChild(tr);
@@ -230,7 +231,8 @@
         
         logsForDevice.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         logsForDevice.forEach(log => {
-          const deviceInfo = parseDeviceInfo(log);
+          // Use the original parse for device info if needed
+          const deviceInfo = `Platform: ${log.platform || 'Unknown'} | Lang: ${log.language || 'Unknown'} | Screen: ${log.screen || 'Unknown'}`;
           const ips = log.ips && log.ips.length ? log.ips.join(', ') : 'Unknown';
           const tr = document.createElement('tr');
           tr.innerHTML = `

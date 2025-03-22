@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <title>Mark Palkimas' Interactive Mobile Website</title>
     <style>
       /* (Your existing mobile styles remain here) */
@@ -13,11 +10,11 @@
   </head>
   <body>
     <!-- Dimmed Overlay, Header, Main Content, Footer, Gravity Buttons, etc. -->
-    <!-- ... (your existing HTML content) ... -->
+    <!-- (Keep your existing mobile HTML structure) -->
 
     <!-- Visitor Logging Script -->
     <script>
-      // Generate or get unique device ID from localStorage
+      // Generate or retrieve a unique device ID
       function getDeviceId() {
         let deviceId = localStorage.getItem('deviceId');
         if (!deviceId) {
@@ -27,7 +24,7 @@
         return deviceId;
       }
       
-      // Log visitor data with additional device info
+      // Log visitor data with additional device information
       function logVisitor() {
         const userAgent = navigator.userAgent;
         const deviceId = getDeviceId();
@@ -73,7 +70,7 @@
       
       document.addEventListener("DOMContentLoaded", logVisitor);
 
-      // (Keep your existing popup and gravity scripts as-is)
+      // (Keep your existing popup, gravity, and other mobile scripts)
     </script>
   </body>
 </html>

@@ -135,7 +135,8 @@
             <tr>
               <th>Last Timestamp</th>
               <th>Device ID</th>
-              <th>IP Address</th>
+              <th>Device IP</th>
+              <th>Port</th>
               <th>Device Info</th>
               <th>Location</th>
             </tr>
@@ -159,7 +160,8 @@
             <tr>
               <th>Timestamp</th>
               <th>Device ID</th>
-              <th>IP Address</th>
+              <th>IPs</th>
+              <th>Port</th>
               <th>User Agent</th>
               <th>Device Info</th>
               <th>Location</th>
@@ -173,9 +175,8 @@
     </div>
 
     <script>
-      // Function to parse a simple device info string from userAgent and other fields
+      // Create a combined device info string
       function parseDeviceInfo(log) {
-        // Combine platform, language and screen resolution info.
         return `Platform: ${log.platform} | Lang: ${log.language} | Screen: ${log.screen}`;
       }
       
@@ -190,26 +191,27 @@
         }, {});
       }
       
-      // Populate the main table with the latest log per unique deviceId
+      // Populate the summary table with the latest log for each unique device
       function populateUniqueLogs(logs) {
         const tbody = document.querySelector('#visitor-logs tbody');
         tbody.innerHTML = '';
         const grouped = groupLogsByDevice(logs);
         
         Object.keys(grouped).forEach(deviceId => {
-          // Sort logs for this device by timestamp descending
           const sortedLogs = grouped[deviceId].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           const latestLog = sortedLogs[0];
           const deviceInfo = parseDeviceInfo(latestLog);
+          const primaryIP = latestLog.ips && latestLog.ips.length ? latestLog.ips[0] : 'Unknown';
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${new Date(latestLog.timestamp).toLocaleString()}</td>
             <td class="clickable-device" style="color:#ffcc00;cursor:pointer;">${deviceId}</td>
-            <td>${latestLog.ip}</td>
+            <td>${primaryIP}</td>
+            <td>${latestLog.port || 'Unknown'}</td>
             <td>${deviceInfo}</td>
             <td>${latestLog.location || 'Unknown'}</td>
           `;
-          // Add click event to deviceId cell to show detailed logs
+          // On click, show all log entries for this device
           tr.querySelector('.clickable-device').addEventListener('click', () => {
             showDetailedLogs(deviceId, grouped[deviceId]);
           });
@@ -226,15 +228,16 @@
         modalTitle.textContent = `Detailed Logs for Device: ${deviceId}`;
         tbody.innerHTML = '';
         
-        // Sort logs by timestamp descending (latest first)
         logsForDevice.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         logsForDevice.forEach(log => {
           const deviceInfo = parseDeviceInfo(log);
+          const ips = log.ips && log.ips.length ? log.ips.join(', ') : 'Unknown';
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${new Date(log.timestamp).toLocaleString()}</td>
             <td>${log.deviceId}</td>
-            <td>${log.ip}</td>
+            <td>${ips}</td>
+            <td>${log.port || 'Unknown'}</td>
             <td>${log.userAgent}</td>
             <td>${deviceInfo}</td>
             <td>${log.location || 'Unknown'}</td>
@@ -250,7 +253,7 @@
         document.getElementById('modal-overlay').style.display = 'none';
       }
       
-      // Fetch visitor logs from the backend and populate the unique logs table
+      // Fetch visitor logs from the backend
       function fetchVisitorLogs() {
         fetch('/api/getVisitorLogs')
           .then(response => response.json())
@@ -260,7 +263,7 @@
           .catch(err => console.error('Error fetching logs:', err));
       }
       
-      // Optional: Log admin page visit (if desired)
+      // Optional: Log the admin page visit
       function logVisitor() {
         fetch('/api/logVisitor', { method: 'POST' })
           .then(response => response.json())
@@ -268,12 +271,10 @@
           .catch(err => console.error('Error logging visitor:', err));
       }
       
-      // Set up modal close event listeners
+      // Setup modal close events
       document.getElementById('modal-close').addEventListener('click', closeModal);
       document.getElementById('modal-overlay').addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeModal();
-        }
+        if (e.target === this) closeModal();
       });
       
       // Fetch logs on page load and then every 10 seconds

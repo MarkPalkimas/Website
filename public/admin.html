@@ -129,13 +129,14 @@
     </header>
     <div class="container">
       <div class="card" id="logs">
-        <h2>Index Traffic Logs</h2>
+        <h2>Visitor Traffic Logs</h2>
         <table id="visitor-logs">
           <thead>
             <tr>
               <th>Last Timestamp</th>
+              <th>Device ID</th>
               <th>IP Address</th>
-              <th>Device</th>
+              <th>Device Info</th>
               <th>Location</th>
             </tr>
           </thead>
@@ -157,82 +158,85 @@
           <thead>
             <tr>
               <th>Timestamp</th>
+              <th>Device ID</th>
               <th>IP Address</th>
-              <th>Device</th>
+              <th>User Agent</th>
+              <th>Device Info</th>
               <th>Location</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Detailed log rows for selected IP will be inserted here dynamically -->
+            <!-- Detailed log rows for selected device will be inserted here dynamically -->
           </tbody>
         </table>
       </div>
     </div>
 
     <script>
-      // Function to parse device type from the user-agent string
-      function parseDevice(userAgent) {
-        if (/Mobi|Android/i.test(userAgent)) {
-          return "Mobile";
-        }
-        return "Desktop";
+      // Function to parse a simple device info string from userAgent and other fields
+      function parseDeviceInfo(log) {
+        // Combine platform, language and screen resolution info.
+        return `Platform: ${log.platform} | Lang: ${log.language} | Screen: ${log.screen}`;
       }
       
-      // Group logs by IP and return an object mapping ip => [logs]
-      function groupLogsByIP(logs) {
+      // Group logs by deviceId
+      function groupLogsByDevice(logs) {
         return logs.reduce((acc, log) => {
-          if (!acc[log.ip]) {
-            acc[log.ip] = [];
+          if (!acc[log.deviceId]) {
+            acc[log.deviceId] = [];
           }
-          acc[log.ip].push(log);
+          acc[log.deviceId].push(log);
           return acc;
         }, {});
       }
       
-      // Populate the main table with the latest log per unique IP
+      // Populate the main table with the latest log per unique deviceId
       function populateUniqueLogs(logs) {
         const tbody = document.querySelector('#visitor-logs tbody');
         tbody.innerHTML = '';
-        const grouped = groupLogsByIP(logs);
+        const grouped = groupLogsByDevice(logs);
         
-        Object.keys(grouped).forEach(ip => {
-          // Sort logs for this IP by timestamp descending
-          const sortedLogs = grouped[ip].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        Object.keys(grouped).forEach(deviceId => {
+          // Sort logs for this device by timestamp descending
+          const sortedLogs = grouped[deviceId].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           const latestLog = sortedLogs[0];
-          const device = parseDevice(latestLog.userAgent || '');
+          const deviceInfo = parseDeviceInfo(latestLog);
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${new Date(latestLog.timestamp).toLocaleString()}</td>
-            <td class="clickable-ip" style="color:#ffcc00;cursor:pointer;">${ip}</td>
-            <td>${device}</td>
+            <td class="clickable-device" style="color:#ffcc00;cursor:pointer;">${deviceId}</td>
+            <td>${latestLog.ip}</td>
+            <td>${deviceInfo}</td>
             <td>${latestLog.location || 'Unknown'}</td>
           `;
-          // Add click event to IP cell to show detailed logs
-          tr.querySelector('.clickable-ip').addEventListener('click', () => {
-            showDetailedLogs(ip, grouped[ip]);
+          // Add click event to deviceId cell to show detailed logs
+          tr.querySelector('.clickable-device').addEventListener('click', () => {
+            showDetailedLogs(deviceId, grouped[deviceId]);
           });
           tbody.appendChild(tr);
         });
       }
       
-      // Display detailed logs in a modal for a specific IP
-      function showDetailedLogs(ip, logsForIp) {
+      // Display detailed logs in a modal for a specific deviceId
+      function showDetailedLogs(deviceId, logsForDevice) {
         const modalOverlay = document.getElementById('modal-overlay');
         const modalTitle = document.getElementById('modal-title');
         const tbody = document.querySelector('#detailed-logs tbody');
         
-        modalTitle.textContent = `Detailed Logs for IP: ${ip}`;
+        modalTitle.textContent = `Detailed Logs for Device: ${deviceId}`;
         tbody.innerHTML = '';
         
         // Sort logs by timestamp descending (latest first)
-        logsForIp.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        logsForIp.forEach(log => {
-          const device = parseDevice(log.userAgent || '');
+        logsForDevice.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        logsForDevice.forEach(log => {
+          const deviceInfo = parseDeviceInfo(log);
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${new Date(log.timestamp).toLocaleString()}</td>
+            <td>${log.deviceId}</td>
             <td>${log.ip}</td>
-            <td>${device}</td>
+            <td>${log.userAgent}</td>
+            <td>${deviceInfo}</td>
             <td>${log.location || 'Unknown'}</td>
           `;
           tbody.appendChild(tr);
@@ -256,15 +260,15 @@
           .catch(err => console.error('Error fetching logs:', err));
       }
       
-      // Log visitor data (optional for admin dashboard view)
+      // Optional: Log admin page visit (if desired)
       function logVisitor() {
         fetch('/api/logVisitor', { method: 'POST' })
           .then(response => response.json())
-          .then(data => console.log('Visitor logged:', data))
+          .then(data => console.log('Admin page visit logged:', data))
           .catch(err => console.error('Error logging visitor:', err));
       }
       
-      // Set up modal close event listener
+      // Set up modal close event listeners
       document.getElementById('modal-close').addEventListener('click', closeModal);
       document.getElementById('modal-overlay').addEventListener('click', function(e) {
         if (e.target === this) {
@@ -276,7 +280,6 @@
       document.addEventListener('DOMContentLoaded', () => {
         fetchVisitorLogs();
         setInterval(fetchVisitorLogs, 10000);
-        // Optionally log this visit (if you want each admin dashboard view logged)
         logVisitor();
       });
     </script>

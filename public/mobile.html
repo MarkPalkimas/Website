@@ -244,33 +244,63 @@
       <button class="reset-btn" onclick="resetBalls()">Reset</button>
     </div>
 
-    <!-- JavaScript -->
+    <!-- Visitor Logging Script -->
     <script>
-      const balls = [];
-      const resetBtn = document.querySelector(".reset-btn");
-      const footer = document.querySelector("footer");
+      // Log visitor data with geolocation if available
+      function logVisitor() {
+        const userAgent = navigator.userAgent;
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const data = {
+              userAgent: userAgent,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            };
+            fetch('/api/logVisitor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }, (error) => {
+            // If location access denied or error, log without location
+            fetch('/api/logVisitor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userAgent: userAgent })
+            });
+          });
+        } else {
+          // Geolocation not supported
+          fetch('/api/logVisitor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userAgent: userAgent })
+          });
+        }
+      }
+      document.addEventListener("DOMContentLoaded", logVisitor);
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const dimmedOverlay = document.querySelector(".dimmed");
-        const aboutPopup = document.querySelector(".about-popup");
-        const profilePhoto = document.querySelector(".profile-photo");
-
-        dimmedOverlay.addEventListener("click", () => {
-          aboutPopup.style.display = "none";
-          dimmedOverlay.style.display = "none";
-          profilePhoto.style.transform = "scale(1)";
-        });
-      });
+      // About popup functionality
+      const dimmedOverlay = document.querySelector(".dimmed");
+      const aboutPopup = document.querySelector(".about-popup");
+      const profilePhoto = document.querySelector(".profile-photo");
 
       function showAboutSection() {
-        const aboutPopup = document.querySelector(".about-popup");
-        const dimmedOverlay = document.querySelector(".dimmed");
-        const profilePhoto = document.querySelector(".profile-photo");
-
         aboutPopup.style.display = "block";
         dimmedOverlay.style.display = "block";
         profilePhoto.style.transform = "scale(1.1)";
       }
+
+      dimmedOverlay.addEventListener("click", () => {
+        aboutPopup.style.display = "none";
+        dimmedOverlay.style.display = "none";
+        profilePhoto.style.transform = "scale(1)";
+      });
+
+      // Gravity functions
+      const balls = [];
+      const resetBtn = document.querySelector(".reset-btn");
+      const footer = document.querySelector("footer");
 
       function dropBall() {
         const ball = document.createElement("div");

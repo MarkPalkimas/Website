@@ -84,11 +84,9 @@
         position: relative;
         overflow: hidden;
         cursor: pointer;
-        /* Enable smooth transform without affecting layout */
         transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
       .project-card:hover {
-        /* Apply a subtle scale transform for a pop-out effect */
         transform: scale(1.02);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       }
@@ -103,7 +101,6 @@
         font-size: 1.5rem;
         margin-bottom: 6px;
         color: #333;
-        /* No transform effect on heading to avoid layout shifts */
       }
       .project-card p {
         font-size: 0.9rem;
@@ -209,17 +206,17 @@
       <h1 class="projects-header">My Projects</h1>
       <section class="projects-grid">
         <div class="project-card" onclick="window.open('https://github.com/MarkPalkimas/Website', '_blank')">
-          <img src="project1.jpg" alt="Project 1">
+          <img src="/assets/project1.jpg" alt="Project 1">
           <h3>Website Full File</h3>
           <p>My first website showcasing innovative projects, creative solutions, and technical expertise in software development.</p>
         </div>
         <div class="project-card" onclick="window.open('https://github.com/MarkPalkimas/MonOP_SmartContracts_V1-V5', '_blank')">
-          <img src="project2.png" alt="Project 2">
+          <img src="/assets/project2.png" alt="Project 2">
           <h3>MonOP SmartContracts V1-4</h3>
           <p>Five versions of my Solidity smart contract, each focused on security, encryption, speed, and optimization.</p>
         </div>
         <div class="project-card" onclick="window.open('https://github.com/MarkPalkimas/Emotion-Recognition-AI', '_blank')">
-          <img src="project3.png" alt="Project 3">
+          <img src="/assets/project3.png" alt="Project 3">
           <h3>Emotion Recognition AI</h3>
           <p>An AI model that detects key words and phrases to assess emotion and generate therapist-like responses accordingly.</p>
         </div>
@@ -230,19 +227,19 @@
       <p>Contact Me</p>
       <div class="social-links">
         <a href="https://www.instagram.com/ya.boimark" target="_blank">
-          <img src="iconmonstr-instagram-11-240.png" alt="Instagram">
+          <img src="/assets/iconmonstr-instagram-11-240.png" alt="Instagram">
         </a>
         <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
-          <img src="iconmonstr-linkedin-1-240.png" alt="LinkedIn">
+          <img src="/assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn">
         </a>
         <a href="https://github.com/MarkPalkimas" target="_blank">
-          <img src="github-logo.png" alt="GitHub">
+          <img src="/assets/github-logo.png" alt="GitHub">
         </a>
         <a href="mailto:mark.palkimas@gmail.com" target="_blank">
-          <img src="iconmonstr-gmail-1-240.png" alt="Gmail">
+          <img src="/assets/iconmonstr-gmail-1-240.png" alt="Gmail">
         </a>
         <a href="https://www.youtube.com/@markpalkimas" target="_blank">
-          <img src="iconmonstr-youtube-6-240.png" alt="YouTube">
+          <img src="/assets/iconmonstr-youtube-6-240.png" alt="YouTube">
         </a>
       </div>
       <div class="footer-bottom">

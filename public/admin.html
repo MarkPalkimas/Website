@@ -1,290 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - Mark Palkimas</title>
-    <style>
-      /* Basic Reset */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #121212;
-        color: #e0e0e0;
-        overflow-x: hidden;
-        padding-bottom: 2rem;
-      }
-      header {
-        background: #1f1f1f;
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      header .logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #ffcc00;
-      }
-      header a.logout {
-        color: #e0e0e0;
-        text-decoration: none;
-        font-size: 1.1rem;
-      }
-      header a.logout:hover {
-        color: #ffcc00;
-      }
-      .container {
-        padding: 2rem;
-      }
-      .card {
-        background: #1f1f1f;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      }
-      .card h2 {
-        margin-bottom: 0.5rem;
-      }
-      .pulse {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: #ffcc00;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-        margin-left: 0.5rem;
-      }
-      @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(255,204,0,0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(255,204,0,0); }
-        100% { box-shadow: 0 0 0 0 rgba(255,204,0,0); }
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #222;
-        color: #e0e0e0;
-        margin-top: 1rem;
-      }
-      table th, table td {
-        padding: 0.5rem;
-        text-align: left;
-        border: 1px solid #333;
-      }
-      table th {
-        background: #333;
-      }
-      /* Modal Styles */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-      .modal {
-        background: #1f1f1f;
-        padding: 1.5rem;
-        border-radius: 8px;
-        max-width: 90%;
-        max-height: 80%;
-        overflow-y: auto;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.8);
-      }
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-      .modal-header h3 {
-        margin: 0;
-      }
-      .modal-close {
-        background: #ffcc00;
-        border: none;
-        color: #121212;
-        font-size: 1.2rem;
-        padding: 0.2rem 0.5rem;
-        cursor: pointer;
-        border-radius: 4px;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="logo">Admin Dashboard <span class="pulse"></span></div>
-      <a href="https://markpalkimas.com" class="logout">Logout</a>
-    </header>
-    <div class="container">
-      <div class="card" id="logs">
-        <h2>Visitor Device Summary</h2>
-        <table id="visitor-logs">
-          <thead>
-            <tr>
-              <th>Device MAC (ID)</th>
-              <th>Device IP</th>
-              <th>Router IP</th>
-              <th>Location</th>
-              <th>Operating System</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- One row per unique device will be inserted here dynamically -->
-          </tbody>
-        </table>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Mark Palkimas</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      padding-bottom: 2rem;
+    }
+    header {
+      background: #1f1f1f;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    header a.logout {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1.1rem;
+    }
+    header a.logout:hover {
+      color: #ffcc00;
+    }
+    .container {
+      padding: 2rem;
+    }
+    .card {
+      background: #1f1f1f;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .card h2 {
+      margin-bottom: 0.5rem;
+    }
+    .pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #ffcc00;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      margin-left: 0.5rem;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,204,0,0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255,204,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,204,0,0); }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #222;
+      color: #e0e0e0;
+      margin-top: 1rem;
+    }
+    table th, table td {
+      padding: 0.5rem;
+      text-align: left;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
+    <a href="https://markpalkimas.com" class="logout">Logout</a>
+  </header>
+  <div class="container">
+    <div class="card" id="logs">
+      <h2>Index Traffic Logs</h2>
+      <table id="visitor-logs">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>IP Address</th>
+            <th>Device</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Visitor log rows will be inserted here dynamically -->
+        </tbody>
+      </table>
     </div>
-
-    <!-- Modal for detailed log view (features remain intact) -->
-    <div class="modal-overlay" id="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 id="modal-title">Detailed Logs</h3>
-          <button class="modal-close" id="modal-close">&times;</button>
-        </div>
-        <table id="detailed-logs">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Device ID</th>
-              <th>IPs</th>
-              <th>Port</th>
-              <th>User Agent</th>
-              <th>Device Info</th>
-              <th>Location</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Detailed log rows for selected device will be inserted here dynamically -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <script>
-      // Group logs by deviceId
-      function groupLogsByDevice(logs) {
-        return logs.reduce((acc, log) => {
-          if (!acc[log.deviceId]) {
-            acc[log.deviceId] = [];
-          }
-          acc[log.deviceId].push(log);
-          return acc;
-        }, {});
+  </div>
+  <script>
+    // Function to parse device type from the user-agent string
+    function parseDevice(userAgent) {
+      if (/Mobi|Android/i.test(userAgent)) {
+        return "Mobile";
       }
-      
-      // Populate the summary table with one entry per device
-      function populateUniqueLogs(logs) {
-        const tbody = document.querySelector('#visitor-logs tbody');
-        tbody.innerHTML = '';
-        const grouped = groupLogsByDevice(logs);
-        
-        Object.keys(grouped).forEach(deviceId => {
-          // Use the latest log entry for this device
-          const sortedLogs = grouped[deviceId].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-          const latestLog = sortedLogs[0];
-          // Get the primary device IP from the server log
-          const deviceIP = latestLog.ips && latestLog.ips.length ? latestLog.ips[0] : 'Unknown';
-          // Router IP is not available from client-side so it is set as "N/A"
-          const routerIP = 'N/A';
-          const location = latestLog.location || 'Unknown';
-          const os = latestLog.os || 'Unknown';
-          
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${deviceId}</td>
-            <td>${deviceIP}</td>
-            <td>${routerIP}</td>
-            <td>${location}</td>
-            <td>${os}</td>
-          `;
-          // Retain the ability to show detailed logs if desired
-          tr.querySelector('td').classList.add('clickable-device');
-          tr.querySelector('td').style.cursor = 'pointer';
-          tr.querySelector('td').addEventListener('click', () => {
-            showDetailedLogs(deviceId, grouped[deviceId]);
+      return "Desktop";
+    }
+    
+    // Fetch visitor logs from the backend and populate the table
+    function fetchVisitorLogs() {
+      fetch('/api/getVisitorLogs')
+        .then(response => response.json())
+        .then(logs => {
+          const tbody = document.querySelector('#visitor-logs tbody');
+          tbody.innerHTML = '';
+          logs.forEach(log => {
+            const device = parseDevice(log.userAgent || '');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${new Date(log.timestamp).toLocaleString()}</td>
+              <td>${log.ip}</td>
+              <td>${device}</td>
+            `;
+            tbody.appendChild(tr);
           });
-          tbody.appendChild(tr);
-        });
-      }
-      
-      // Display detailed logs in a modal for a specific deviceId
-      function showDetailedLogs(deviceId, logsForDevice) {
-        const modalOverlay = document.getElementById('modal-overlay');
-        const modalTitle = document.getElementById('modal-title');
-        const tbody = document.querySelector('#detailed-logs tbody');
-        
-        modalTitle.textContent = `Detailed Logs for Device: ${deviceId}`;
-        tbody.innerHTML = '';
-        
-        logsForDevice.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        logsForDevice.forEach(log => {
-          // Use the original parse for device info if needed
-          const deviceInfo = `Platform: ${log.platform || 'Unknown'} | Lang: ${log.language || 'Unknown'} | Screen: ${log.screen || 'Unknown'}`;
-          const ips = log.ips && log.ips.length ? log.ips.join(', ') : 'Unknown';
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${new Date(log.timestamp).toLocaleString()}</td>
-            <td>${log.deviceId}</td>
-            <td>${ips}</td>
-            <td>${log.port || 'Unknown'}</td>
-            <td>${log.userAgent}</td>
-            <td>${deviceInfo}</td>
-            <td>${log.location || 'Unknown'}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-        
-        modalOverlay.style.display = 'flex';
-      }
-      
-      // Close the modal
-      function closeModal() {
-        document.getElementById('modal-overlay').style.display = 'none';
-      }
-      
-      // Fetch visitor logs from the backend
-      function fetchVisitorLogs() {
-        fetch('/api/getVisitorLogs')
-          .then(response => response.json())
-          .then(logs => {
-            populateUniqueLogs(logs);
-          })
-          .catch(err => console.error('Error fetching logs:', err));
-      }
-      
-      // Optional: Log the admin page visit
-      function logVisitor() {
-        fetch('/api/logVisitor', { method: 'POST' })
-          .then(response => response.json())
-          .then(data => console.log('Admin page visit logged:', data))
-          .catch(err => console.error('Error logging visitor:', err));
-      }
-      
-      // Setup modal close events
-      document.getElementById('modal-close').addEventListener('click', closeModal);
-      document.getElementById('modal-overlay').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-      });
-      
-      // Fetch logs on page load and then every 10 seconds
-      document.addEventListener('DOMContentLoaded', () => {
-        fetchVisitorLogs();
-        setInterval(fetchVisitorLogs, 10000);
-        logVisitor();
-      });
-    </script>
-  </body>
+        })
+        .catch(err => console.error('Error fetching logs:', err));
+    }
+    
+    // Log visitor data (optional for admin dashboard view)
+    function logVisitor() {
+      fetch('/api/logVisitor', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => console.log('Visitor logged:', data))
+        .catch(err => console.error('Error logging visitor:', err));
+    }
+    
+    // Fetch logs on page load and then every 10 seconds
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchVisitorLogs();
+      setInterval(fetchVisitorLogs, 10000);
+      // Optionally log this visit (if you want each admin dashboard view logged)
+      logVisitor();
+    });
+  </script>
+</body>
 </html>

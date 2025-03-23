@@ -1,37 +1,45 @@
 // server.js
 const express = require('express');
-const fetch = require('node-fetch'); // Ensure this package is installed
+const fetch = require('node-fetch'); // Make sure this package is installed
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// In-memory storage for demonstration purposes (use a real database in production)
+// Serve static files from the "public" folder
+app.use(express.static('public'));
+
+// In-memory storage for visitor logs (for production, use a database)
 const visitorLogs = [];
 
-// Default route to prevent "Cannot GET /" error
+// Default route
 app.get('/', (req, res) => {
-  res.send('Server is running. Use /api/logVisitor to log visitors.');
+  res.send('Server is running. Visit /index.html, /mobile.html, /projects.html or /admin.html as needed.');
 });
 
-// Endpoint to log a visitor with IP geolocation and additional device info
+// POST endpoint to log visitor data
 app.post('/api/logVisitor', async (req, res) => {
   try {
-    const { userAgent, deviceId, platform, latitude, longitude } = req.body;
+    // Data may include: userAgent, deviceId, platform, language, screenWidth, screenHeight,
+    // latitude, longitude, and an optional client-provided public IP.
+    const { userAgent, deviceId, platform, latitude, longitude, language, screenWidth, screenHeight, ip: clientIP } = req.body;
 
-    // Get the client's IP address
-    let ipHeader = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    // Get client's IP address (use the client IP if provided, else from headers)
+    let ipHeader = clientIP || (req.headers['x-forwarded-for'] || req.connection.remoteAddress);
     let ipArray = ipHeader ? ipHeader.split(',').map(ip => ip.trim()) : [];
     let ip = ipArray.length > 0 ? ipArray[0] : 'Unknown';
 
-    // Get the remote port (if available)
+    // Get remote port (if available)
     let portNumber = req.connection.remotePort;
 
-    // Determine location using browser geolocation if provided; otherwise, use an IP lookup
+    // Determine location: use lat/long if available; otherwise, perform an IP lookup.
     let location = 'Unknown';
     if (latitude && longitude) {
-      location = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`;
+      location = `Lat: ${parseFloat(latitude).toFixed(2)}, Lon: ${parseFloat(longitude).toFixed(2)}`;
     } else if (ip !== 'Unknown') {
       try {
         const response = await fetch(`http://ip-api.com/json/${ip}`);
@@ -44,26 +52,32 @@ app.post('/api/logVisitor', async (req, res) => {
       }
     }
 
-    // Create the log entry
+    // Create a log entry
     const logEntry = {
       timestamp: new Date(),
       ip,
       ips: ipArray,
       port: portNumber,
-      userAgent,
+      userAgent: userAgent || 'unknown',
       deviceId: deviceId || 'unknown',
       platform: platform || 'unknown',
-      location,
+      language: language || 'unknown',
+      screenWidth: screenWidth || 'unknown',
+      screenHeight: screenHeight || 'unknown',
+      location
     };
 
-    // Save the log entry (use persistent storage in production)
     visitorLogs.push(logEntry);
-
     res.json({ message: 'Visitor logged', log: logEntry });
   } catch (error) {
     console.error('Error logging visitor:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+// GET endpoint to retrieve all visitor logs for the admin dashboard
+app.get('/api/getVisitorLogs', (req, res) => {
+  res.json(visitorLogs);
 });
 
 // Start the server

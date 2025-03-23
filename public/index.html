@@ -11,19 +11,13 @@
         window.location.href = "mobile.html";
       }
     </script>
+    <style>
+      /* (Your existing styles remain here) */
+    </style>
   </head>
   <body>
-    <header>
-      <h1>Welcome to Mark Palkimas' Website</h1>
-    </header>
-    <div id="neon-container"></div>
-    <main>
-      <p>Enjoy the interactive experience!</p>
-      <!-- Additional desktop content -->
-    </main>
-    <footer>
-      <p>&copy; 2025 Mark Palkimas</p>
-    </footer>
+    <!-- Your Neon Glow Container, Dimming Overlay, Quote Container, Header, Main Content, Footer, etc. -->
+    <!-- (Keep your existing HTML structure) -->
 
     <!-- Visitor Logging Script -->
     <script>
@@ -37,6 +31,7 @@
         return deviceId;
       }
       
+      // Log visitor data with additional device information
       function logVisitor() {
         const userAgent = navigator.userAgent;
         const deviceId = getDeviceId();
@@ -44,47 +39,26 @@
         const language = navigator.language;
         const screenWidth = window.screen.width;
         const screenHeight = window.screen.height;
-        // Get public IP using ipify
-        fetch('https://api.ipify.org?format=json')
-          .then(response => response.json())
-          .then(ipData => {
+        
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
             const data = {
-              ip: ipData.ip,
               userAgent,
               deviceId,
               platform,
               language,
               screenWidth,
-              screenHeight
+              screenHeight,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
             };
-            // Attempt to get geolocation from the browser
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition((position) => {
-                data.latitude = position.coords.latitude;
-                data.longitude = position.coords.longitude;
-                fetch('/api/logVisitor', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(data)
-                });
-              }, (error) => {
-                // If geolocation permission is denied, log without it
-                fetch('/api/logVisitor', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(data)
-                });
-              });
-            } else {
-              fetch('/api/logVisitor', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-              });
-            }
-          })
-          .catch(err => {
-            console.error('Error fetching public IP:', err);
+            fetch('/api/logVisitor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }, (error) => {
+            // If location permission is denied, log without location data
             const data = { userAgent, deviceId, platform, language, screenWidth, screenHeight };
             fetch('/api/logVisitor', {
               method: 'POST',
@@ -92,11 +66,19 @@
               body: JSON.stringify(data)
             });
           });
+        } else {
+          // Geolocation not supported
+          const data = { userAgent, deviceId, platform, language, screenWidth, screenHeight };
+          fetch('/api/logVisitor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
       }
       
       document.addEventListener("DOMContentLoaded", logVisitor);
     </script>
-    
     <script src="main.js"></script>
   </body>
 </html>

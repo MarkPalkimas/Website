@@ -2,75 +2,399 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
     <title>Mark Palkimas' Interactive Mobile Website</title>
     <style>
-      /* (Your existing mobile styles remain here) */
+      /* Basic Reset & Global Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f4f4f4;
+        color: #333;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Header */
+      header {
+        width: 100%;
+        padding: 1em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        color: #fff;
+        position: fixed;
+        top: 0;
+        z-index: 100;
+      }
+      .logo {
+        font-size: 1.2em;
+      }
+      .projects-link {
+        color: #bbb;
+        text-decoration: none;
+        font-size: 1em;
+        padding: 0.5em 1em;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      .projects-link:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Main Content */
+      main {
+        margin-top: 70px;
+        flex: 1;
+        padding: 1em;
+        text-align: center;
+      }
+      .profile-container {
+        margin-top: 1em;
+      }
+      .profile-photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #333;
+        transition: transform 0.3s;
+        cursor: pointer;
+        z-index: 10;
+        display: block;
+        margin: 0 auto;
+      }
+      .profile-photo:hover {
+        transform: scale(1.1);
+      }
+      .hello-mark {
+        font-size: 1.3em;
+        margin-top: 10px;
+        font-weight: bold;
+        color: #333;
+      }
+      .about-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 1em;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 80%;
+        max-width: 300px;
+        z-index: 20;
+        text-align: center;
+      }
+      .about-popup h2 {
+        margin-bottom: 0.5em;
+      }
+      .dimmed {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 15;
+      }
+
+      /* Footer */
+      footer {
+        width: 100%;
+        padding: 1em;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        z-index: 5;
+      }
+      .contact-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      .social-links {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .social-links img {
+        width: 30px;
+        height: 30px;
+        transition: transform 0.3s;
+      }
+      .social-links img:hover {
+        transform: scale(1.2);
+      }
+      .footer-content p {
+        margin-top: 10px;
+        font-size: 0.9em;
+      }
+
+      /* Gravity Section */
+      .gravity-section {
+        text-align: center;
+        padding: 1em;
+        position: relative;
+      }
+      .gravity-btn,
+      .reset-btn {
+        padding: 8px 16px;
+        cursor: pointer;
+        background-color: #0073e6;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        margin-top: 5px;
+        display: inline-block;
+      }
+      .reset-btn {
+        display: none;
+      }
+      .ball {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #0073e6;
+        top: 0;
+        left: 0;
+      }
     </style>
   </head>
   <body>
-    <!-- Dimmed Overlay, Header, Main Content, Footer, Gravity Buttons, etc. -->
-    <!-- (Keep your existing mobile HTML structure) -->
+    <!-- Dimmed Overlay -->
+    <div class="dimmed"></div>
 
-    <!-- Visitor Logging Script -->
+    <!-- Header -->
+    <header>
+      <div class="logo">Mark Palkimas</div>
+      <a href="projects.html" class="projects-link">Projects</a>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <section id="about" class="profile-container">
+        <img
+          src="profile.jpg"
+          alt="Profile Photo"
+          class="profile-photo"
+          onclick="showAboutSection()"
+        />
+        <div class="hello-mark">Hello, I'm Mark</div>
+        <div class="about-popup">
+          <h2>About Me</h2>
+          <p>
+            This section contains more detailed information about me and my
+            background.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <section class="contact-section">
+        <h2>Contact Me</h2>
+        <div class="social-links">
+          <a href="https://www.instagram.com/ya.boimark" target="_blank">
+            <img src="iconmonstr-instagram-11-240.png" alt="Instagram" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/mark-palkimas-27514a230/"
+            target="_blank"
+          >
+            <img src="iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
+          </a>
+          <a href="https://github.com/MarkPalkimas" target="_blank">
+            <img src="github-logo.png" alt="GitHub" />
+          </a>
+          <a href="mailto:mark.palkimas@gmail.com" target="_blank">
+            <img src="iconmonstr-gmail-1-240.png" alt="Gmail" />
+          </a>
+          <a href="https://www.youtube.com/@markpalkimas" target="_blank">
+            <img src="iconmonstr-youtube-6-240.png" alt="YouTube" />
+          </a>
+        </div>
+        <p>&copy; 2024 Mark Palkimas. All rights reserved.</p>
+      </section>
+    </footer>
+
+    <!-- Gravity Buttons -->
+    <div class="gravity-section">
+      <button class="gravity-btn" onclick="dropBall()">Drop Ball</button>
+      <button class="reset-btn" onclick="resetBalls()">Reset</button>
+    </div>
+
+    <!-- JavaScript -->
     <script>
-      // Generate or retrieve a unique device ID
-      function getDeviceId() {
-        let deviceId = localStorage.getItem('deviceId');
-        if (!deviceId) {
-          deviceId = 'device-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-          localStorage.setItem('deviceId', deviceId);
-        }
-        return deviceId;
-      }
-      
-      // Log visitor data with additional device information
-      function logVisitor() {
-        const userAgent = navigator.userAgent;
-        const deviceId = getDeviceId();
-        const platform = navigator.platform;
-        const language = navigator.language;
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            const data = {
-              userAgent,
-              deviceId,
-              platform,
-              language,
-              screenWidth,
-              screenHeight,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            };
-            fetch('/api/logVisitor', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data)
-            });
-          }, (error) => {
-            const data = { userAgent, deviceId, platform, language, screenWidth, screenHeight };
-            fetch('/api/logVisitor', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data)
-            });
-          });
-        } else {
-          const data = { userAgent, deviceId, platform, language, screenWidth, screenHeight };
-          fetch('/api/logVisitor', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-        }
-      }
-      
-      document.addEventListener("DOMContentLoaded", logVisitor);
+      const balls = [];
+      const resetBtn = document.querySelector(".reset-btn");
+      const footer = document.querySelector("footer");
 
-      // (Keep your existing popup, gravity, and other mobile scripts)
+      document.addEventListener("DOMContentLoaded", function () {
+        const dimmedOverlay = document.querySelector(".dimmed");
+        const aboutPopup = document.querySelector(".about-popup");
+        const profilePhoto = document.querySelector(".profile-photo");
+
+        dimmedOverlay.addEventListener("click", () => {
+          aboutPopup.style.display = "none";
+          dimmedOverlay.style.display = "none";
+          profilePhoto.style.transform = "scale(1)";
+        });
+      });
+
+      function showAboutSection() {
+        const aboutPopup = document.querySelector(".about-popup");
+        const dimmedOverlay = document.querySelector(".dimmed");
+        const profilePhoto = document.querySelector(".profile-photo");
+
+        aboutPopup.style.display = "block";
+        dimmedOverlay.style.display = "block";
+        profilePhoto.style.transform = "scale(1.1)";
+      }
+
+      function dropBall() {
+        const ball = document.createElement("div");
+        ball.className = "ball";
+        ball.style.backgroundColor = getRandomColor();
+        const size = Math.random() * 20 + 30;
+        ball.style.width = ball.style.height = size + "px";
+        ball.style.left =
+          Math.random() * (window.innerWidth - size) + "px";
+        ball.velocityY = Math.random() * 4 + 1;
+        ball.velocityX = Math.random() * 2 - 1;
+
+        document.body.appendChild(ball);
+        balls.push(ball);
+
+        resetBtn.style.display = "inline-block";
+      }
+
+      function resetBalls() {
+        balls.forEach((ball) => ball.remove());
+        balls.length = 0;
+        resetBtn.style.display = "none";
+      }
+
+      function getRandomColor() {
+        const letters = "0123456789ABCDEF";
+        let color = "#";
+        for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+
+      function updateBalls() {
+        const gravity = 0.3;
+        const restitution = 0.9;
+        const footerTop =
+          footer.getBoundingClientRect().top + window.scrollY;
+
+        balls.forEach((ball, index) => {
+          let currentTop = parseFloat(ball.style.top) || 0;
+          let currentLeft = parseFloat(ball.style.left) || 0;
+          let newTop = currentTop + ball.velocityY;
+          let newLeft = currentLeft + ball.velocityX;
+
+          if (newTop + ball.offsetHeight >= footerTop) {
+            newTop = footerTop - ball.offsetHeight;
+            ball.velocityY *= -restitution;
+          } else {
+            ball.velocityY += gravity;
+          }
+
+          if (
+            newLeft <= 0 ||
+            newLeft + ball.offsetWidth >=
+              document.documentElement.clientWidth
+          ) {
+            newLeft =
+              newLeft <= 0
+                ? 0
+                : document.documentElement.clientWidth -
+                  ball.offsetWidth;
+            ball.velocityX *= -restitution;
+          }
+
+          ball.style.top = newTop + "px";
+          ball.style.left = newLeft + "px";
+
+          for (let j = index + 1; j < balls.length; j++) {
+            const otherBall = balls[j];
+            const otherTop = parseFloat(otherBall.style.top) || 0;
+            const otherLeft = parseFloat(otherBall.style.left) || 0;
+
+            const dx =
+              newLeft +
+              ball.offsetWidth / 2 -
+              (otherLeft + otherBall.offsetWidth / 2);
+            const dy =
+              newTop +
+              ball.offsetHeight / 2 -
+              (otherTop + otherBall.offsetHeight / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDist =
+              (ball.offsetWidth + otherBall.offsetWidth) / 2;
+
+            if (distance < minDist) {
+              const overlap = minDist - distance + 0.1;
+              const resolveX = (overlap * dx) / distance / 2;
+              const resolveY = (overlap * dy) / distance / 2;
+
+              newLeft -= resolveX;
+              newTop -= resolveY;
+              otherBall.style.left =
+                otherLeft + resolveX + "px";
+              otherBall.style.top = otherTop + resolveY + "px";
+
+              const normalX = dx / distance;
+              const normalY = dy / distance;
+
+              const relativeVelocityX =
+                ball.velocityX - otherBall.velocityX;
+              const relativeVelocityY =
+                ball.velocityY - otherBall.velocityY;
+              const velocityAlongNormal =
+                relativeVelocityX * normalX +
+                relativeVelocityY * normalY;
+
+              if (velocityAlongNormal > 0) continue;
+
+              const ballMass = ball.offsetWidth / 2;
+              const otherMass = otherBall.offsetWidth / 2;
+              const impulse =
+                (2 * velocityAlongNormal) / (ballMass + otherMass);
+
+              ball.velocityX -= impulse * otherMass * normalX;
+              ball.velocityY -= impulse * otherMass * normalY;
+              otherBall.velocityX += impulse * ballMass * normalX;
+              otherBall.velocityY += impulse * ballMass * normalY;
+            }
+          }
+        });
+        requestAnimationFrame(updateBalls);
+      }
+      updateBalls();
     </script>
   </body>
 </html>

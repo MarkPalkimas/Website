@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // --- Neon Glow Effect with Smooth Color Transition ---
+  // --- Neon Glow Effect (Orb Following the Cursor) ---
   const neonContainer = document.getElementById("neon-container");
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let glowIndex = 0;
   
   function updateNeonBackground() {
-    // Create a radial gradient that smoothly transitions using CSS transition on the container
     neonContainer.style.background = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ${glowColors[glowIndex]}, transparent 70%)`;
   }
   updateNeonBackground();
@@ -39,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminPopup = document.getElementById("admin-popup");
   
   // --- Popup Controls ---
-  // Show About Popup
+  // Show About Popup when clicking profile photo or About link
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display = "block";
@@ -63,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
     adminPasswordInput.value = "";
     adminPasswordInput.type = "password";
     document.getElementById("toggle-password").textContent = "Show";
-    // Hide any previous error message
     document.getElementById("admin-error").style.display = "none";
   });
   
@@ -96,17 +94,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Use the correct admin password "admin123"
     if (adminPasswordInput.value === "admin123") {
       errorMessage.style.display = "none";
-      // Redirect or reveal admin features as needed
       window.location.href = "admin.html";
     } else {
-      // Wrong password: clear input and show error message (without closing the popup)
+      // Wrong password: clear input and show error message (popup stays open)
       adminPasswordInput.value = "";
       errorMessage.style.display = "block";
     }
   });
   
   cancelPasswordBtn.addEventListener("click", () => {
-    // Clear input and error, but simply leave the popup (user can click outside to close)
     adminPasswordInput.value = "";
     errorMessage.style.display = "none";
   });

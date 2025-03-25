@@ -53,7 +53,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 1100; /* Raised above the dimming overlay */
+        z-index: 2000; /* Raised above the dimming overlay */
         max-width: 600px;
         width: 90%;
         border-radius: 8px;
@@ -96,6 +96,7 @@
       }
       .popup-social-links {
         display: flex;
+        width: 100%;
         justify-content: space-evenly; /* Evenly space the icons */
         align-items: center;
       }
@@ -307,7 +308,6 @@
       <div class="social-popup-content">
         <p>Contact Links:</p>
         <div class="popup-social-links">
-          <!-- Social links will be cloned here dynamically -->
           <a href="https://www.instagram.com/ya.boimark" target="_blank">
             <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
           </a>
@@ -331,6 +331,8 @@
     <div class="admin-popup">
       <div class="admin-popup-content">
         <h2>Enter Admin Password</h2>
+        <!-- Error message display -->
+        <p id="admin-error" style="color: red; display: none;"></p>
         <input type="password" id="admin-password" placeholder="Password" />
         <button id="toggle-password">Show</button>
         <br />
@@ -343,5 +345,60 @@
     <button class="reset-btn">Reset</button>
     
     <script src="main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // Set the correct admin password here
+        const correctPassword = "admin123";
+        let attempts = 0;
+        const maxAttempts = 5;
+        
+        const adminPopup = document.querySelector(".admin-popup");
+        const adminPasswordInput = document.getElementById("admin-password");
+        const submitPasswordBtn = document.getElementById("submit-password");
+        const cancelPasswordBtn = document.getElementById("cancel-password");
+        const togglePasswordBtn = document.getElementById("toggle-password");
+        const errorMessage = document.getElementById("admin-error");
+        
+        // Submit button functionality
+        submitPasswordBtn.addEventListener("click", function() {
+          if (attempts >= maxAttempts) return;
+          
+          if (adminPasswordInput.value === correctPassword) {
+            // Password is correct
+            adminPopup.style.display = "none";
+            errorMessage.style.display = "none";
+            alert("Access granted");
+          } else {
+            attempts++;
+            errorMessage.style.display = "block";
+            errorMessage.textContent = "Password wrong. Attempts: " + attempts + "/" + maxAttempts;
+            adminPasswordInput.value = "";
+            if (attempts >= maxAttempts) {
+              errorMessage.textContent = "Too many attempts. Please refresh the page to try again.";
+              adminPasswordInput.disabled = true;
+              submitPasswordBtn.disabled = true;
+            }
+          }
+        });
+        
+        // Cancel button functionality
+        cancelPasswordBtn.addEventListener("click", function() {
+          adminPopup.style.display = "none";
+          errorMessage.style.display = "none";
+          adminPasswordInput.value = "";
+        });
+        
+        // Toggle password visibility
+        togglePasswordBtn.addEventListener("click", function() {
+          if (adminPasswordInput.type === "password") {
+            adminPasswordInput.type = "text";
+            togglePasswordBtn.textContent = "Hide";
+          } else {
+            adminPasswordInput.type = "password";
+            togglePasswordBtn.textContent = "Show";
+          }
+        });
+      });
+    </script>
   </body>
 </html>

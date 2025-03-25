@@ -53,7 +53,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 1010;
+        z-index: 1100; /* Raised above the dimming overlay */
         max-width: 600px;
         width: 90%;
         border-radius: 8px;
@@ -96,8 +96,7 @@
       }
       .popup-social-links {
         display: flex;
-        gap: 20px;
-        justify-content: center;
+        justify-content: space-evenly; /* Evenly space the icons */
         align-items: center;
       }
       .popup-social-links img {
@@ -309,6 +308,21 @@
         <p>Contact Links:</p>
         <div class="popup-social-links">
           <!-- Social links will be cloned here dynamically -->
+          <a href="https://www.instagram.com/ya.boimark" target="_blank">
+            <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
+          </a>
+          <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
+            <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
+          </a>
+          <a href="https://github.com/MarkPalkimas" target="_blank">
+            <img src="assets/github-logo.png" alt="GitHub" />
+          </a>
+          <a href="mailto:mark.palkimas@gmail.com" target="_blank">
+            <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
+          </a>
+          <a href="https://www.youtube.com/@markpalkimas" target="_blank">
+            <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
+          </a>
         </div>
       </div>
     </div>

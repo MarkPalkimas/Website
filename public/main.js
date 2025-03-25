@@ -1,6 +1,5 @@
-
 document.addEventListener("DOMContentLoaded", function () {
-  // --- Neon Glow Effect ---
+  // --- Neon Glow Effect with Smooth Color Transition ---
   const neonContainer = document.getElementById("neon-container");
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
@@ -8,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let glowIndex = 0;
   
   function updateNeonBackground() {
+    // Create a radial gradient that smoothly transitions using CSS transition on the container
     neonContainer.style.background = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ${glowColors[glowIndex]}, transparent 70%)`;
   }
   updateNeonBackground();
@@ -25,70 +25,63 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // --- Elements & UI Variables ---
   const profilePic = document.querySelector(".profile-photo");
-  const aboutPopup = document.querySelector(".about-popup");
   const aboutLink = document.querySelector(".about-link");
   const contactLink = document.querySelector(".contact-link");
-  const socialLinks = document.querySelector(".social-links");
-  const footer = document.querySelector(".footer");
-  const popup = document.querySelector(".social-popup");
-  const popupContent = document.querySelector(".popup-social-links");
-  const dimmedOverlay = document.querySelector(".dimmed");
   const adminBtn = document.querySelector(".admin-btn");
   const gravityBtn = document.querySelector(".gravity-btn");
   const resetBtn = document.querySelector(".reset-btn");
-  const balls = [];
+  const dimmedOverlay = document.querySelector(".dimmed");
   const quoteContainer = document.getElementById("quote-container");
   
-  // --- Admin Popup Elements ---
-  const adminPopup = document.querySelector(".admin-popup");
-  const adminPasswordInput = document.getElementById("admin-password");
-  const togglePasswordBtn = document.getElementById("toggle-password");
-  const submitPasswordBtn = document.getElementById("submit-password");
-  const cancelPasswordBtn = document.getElementById("cancel-password");
-  
-  // Physics parameters
-  const GRAVITY = 0.3;
-  const RESTITUTION = 0.8;
-  
-  function updateQuoteContainerHeight() {
-    quoteContainer.style.height = (window.innerHeight - footer.offsetHeight) + "px";
-  }
-  updateQuoteContainerHeight();
-  window.addEventListener("resize", updateQuoteContainerHeight);
-  
-  let quotesStarted = false;
-  let quoteStartTime = Date.now();
+  // Select popups by their IDs from the popups container
+  const aboutPopup = document.getElementById("about-popup");
+  const contactPopup = document.getElementById("contact-popup");
+  const adminPopup = document.getElementById("admin-popup");
   
   // --- Popup Controls ---
+  // Show About Popup
   profilePic.addEventListener("click", () => {
-    aboutPopup.style.display = "flex";
     dimmedOverlay.style.display = "block";
+    aboutPopup.style.display = "block";
   });
   aboutLink.addEventListener("click", (e) => {
     e.preventDefault();
-    aboutPopup.style.display = "flex";
     dimmedOverlay.style.display = "block";
+    aboutPopup.style.display = "block";
   });
+  // Show Contacts Popup
   contactLink.addEventListener("click", (e) => {
     e.preventDefault();
-    popup.style.display = "flex";
     dimmedOverlay.style.display = "block";
-    popupContent.innerHTML = socialLinks.innerHTML;
+    contactPopup.style.display = "block";
   });
+  // Show Admin Popup
+  adminBtn.addEventListener("click", () => {
+    dimmedOverlay.style.display = "block";
+    adminPopup.style.display = "block";
+    const adminPasswordInput = document.getElementById("admin-password");
+    adminPasswordInput.value = "";
+    adminPasswordInput.type = "password";
+    document.getElementById("toggle-password").textContent = "Show";
+    // Hide any previous error message
+    document.getElementById("admin-error").style.display = "none";
+  });
+  
+  // Hide popups if dimmed background is clicked
   dimmedOverlay.addEventListener("click", () => {
     aboutPopup.style.display = "none";
-    popup.style.display = "none";
+    contactPopup.style.display = "none";
     adminPopup.style.display = "none";
     dimmedOverlay.style.display = "none";
   });
   
   // --- Admin Popup Controls ---
-  adminBtn.addEventListener("click", () => {
-    adminPopup.style.display = "block";
-    adminPasswordInput.value = "";
-    adminPasswordInput.type = "password";
-    togglePasswordBtn.textContent = "Show";
-  });
+  const adminPasswordInput = document.getElementById("admin-password");
+  const togglePasswordBtn = document.getElementById("toggle-password");
+  const submitPasswordBtn = document.getElementById("submit-password");
+  const cancelPasswordBtn = document.getElementById("cancel-password");
+  const errorMessage = document.getElementById("admin-error");
+  
   togglePasswordBtn.addEventListener("click", () => {
     if (adminPasswordInput.type === "password") {
       adminPasswordInput.type = "text";
@@ -98,19 +91,31 @@ document.addEventListener("DOMContentLoaded", function () {
       togglePasswordBtn.textContent = "Show";
     }
   });
+  
   submitPasswordBtn.addEventListener("click", () => {
-    if (adminPasswordInput.value === "mark2005") {
+    // Use the correct admin password "admin123"
+    if (adminPasswordInput.value === "admin123") {
+      errorMessage.style.display = "none";
+      // Redirect or reveal admin features as needed
       window.location.href = "admin.html";
     } else {
-      alert("Denied.");
-      adminPopup.style.display = "none";
+      // Wrong password: clear input and show error message (without closing the popup)
+      adminPasswordInput.value = "";
+      errorMessage.style.display = "block";
     }
   });
+  
   cancelPasswordBtn.addEventListener("click", () => {
-    adminPopup.style.display = "none";
+    // Clear input and error, but simply leave the popup (user can click outside to close)
+    adminPasswordInput.value = "";
+    errorMessage.style.display = "none";
   });
   
   // --- Ball Physics & Collision ---
+  const balls = [];
+  const GRAVITY = 0.3;
+  const RESTITUTION = 0.8;
+  
   gravityBtn.addEventListener("click", () => {
     dropBall();
     resetBtn.style.display = "block";
@@ -156,12 +161,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   
   // --- Falling Quotes ---
+  let quotesStarted = false;
+  let quoteStartTime = Date.now();
+  
   function startFallingQuotes() {
     setInterval(() => {
       createFallingQuote();
     }, 10000);
     updateQuotes();
   }
+  
   function createFallingQuote() {
     const quotes = [
       "Life isn’t about what you know, It’s about what you’re able to figure out.",
@@ -187,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (quoteElem.parentElement) quoteElem.parentElement.removeChild(quoteElem);
     }, 21000);
   }
+  
   function updateQuotes() {
     const now = Date.now();
     const quotes = document.querySelectorAll(".falling-quote");
@@ -220,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ball.velocityX = -ball.velocityX * RESTITUTION;
       }
       
-      const footerTop = footer.getBoundingClientRect().top + window.scrollY;
+      const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
       if (newTop + ball.radius * 2 >= footerTop) {
         newTop = footerTop - ball.radius * 2;
         ball.velocityY = -ball.velocityY * RESTITUTION;
@@ -319,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
   updateBalls();
   
-  // --- Visitor Tracking ---
+  // --- Visitor Tracking (unchanged) ---
   function logVisitor() {
     const userAgent = navigator.userAgent;
     fetch('https://api.ipify.org?format=json')

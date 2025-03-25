@@ -55,7 +55,7 @@
         z-index: 1005;
         display: none;
       }
-      /* Popups Container */
+      /* Popups Container – ensures popups are above the overlay */
       #popups-container {
         position: fixed;
         top: 0;
@@ -101,7 +101,7 @@
         font-size: 16px;
         line-height: 1.5;
       }
-      /* Social Popup */
+      /* Social (Contacts) Popup */
       .social-popup {
         background: linear-gradient(135deg, #ffffff, #f0f0f0);
         color: #333;
@@ -312,7 +312,7 @@
     
     <!-- Popups Container -->
     <div id="popups-container">
-      <!-- About Popup (moved here so it isn’t dimmed) -->
+      <!-- About Popup (not dimmed) -->
       <div class="popup about-popup" id="about-popup">
         <div class="about-popup-content">
           <div class="about-image">
@@ -327,7 +327,7 @@
         </div>
       </div>
       
-      <!-- Social Popup for Contact Links -->
+      <!-- Contacts Popup -->
       <div class="popup social-popup" id="contact-popup">
         <div class="social-popup-content">
           <h2>Contact Links</h2>
@@ -351,7 +351,7 @@
         </div>
       </div>
       
-      <!-- Admin Popup for Password Entry -->
+      <!-- Admin Popup -->
       <div class="popup admin-popup" id="admin-popup">
         <div class="admin-popup-content">
           <h2>Admin Sign In</h2>
@@ -368,104 +368,6 @@
     <!-- Reset Button (if needed) -->
     <button class="reset-btn">Reset</button>
     
-    <script>
-      // --- Neon Effect with Smooth Color Transition ---
-      (function() {
-        const neonContainer = document.getElementById('neon-container');
-        // Array of colors to cycle through
-        const colors = ['#00d084', '#ff4081', '#448aff', '#ffeb3b'];
-        let currentIndex = 0;
-        document.addEventListener('mousemove', function(e) {
-          // Use the cursor position to gradually change the background color
-          // (For demo purposes, we simply cycle through the colors on each move)
-          currentIndex = (currentIndex + 1) % colors.length;
-          neonContainer.style.background = colors[currentIndex];
-        });
-      })();
-      
-      // --- Popup Triggering (example logic) ---
-      document.addEventListener('DOMContentLoaded', function() {
-        const dimmed = document.querySelector('.dimmed');
-        const aboutLink = document.querySelector('.about-link');
-        const contactLink = document.querySelector('.contact-link');
-        const adminBtn = document.querySelector('.admin-btn');
-        const aboutPopup = document.getElementById('about-popup');
-        const contactPopup = document.getElementById('contact-popup');
-        const adminPopup = document.getElementById('admin-popup');
-        
-        // Function to show a popup and dim background
-        function showPopup(popup) {
-          dimmed.style.display = 'block';
-          popup.style.display = 'block';
-        }
-        // Function to hide all popups and undim background
-        function hidePopups() {
-          dimmed.style.display = 'none';
-          aboutPopup.style.display = 'none';
-          contactPopup.style.display = 'none';
-          adminPopup.style.display = 'none';
-        }
-        // Example triggers (replace with your actual triggers)
-        aboutLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          hidePopups();
-          showPopup(aboutPopup);
-        });
-        contactLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          hidePopups();
-          showPopup(contactPopup);
-        });
-        adminBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          hidePopups();
-          showPopup(adminPopup);
-        });
-        // Hide popups if dimmed background is clicked
-        dimmed.addEventListener('click', hidePopups);
-      });
-      
-      // --- Admin Popup Behavior ---
-      document.addEventListener('DOMContentLoaded', function() {
-        const correctPassword = "admin123";
-        const adminPasswordInput = document.getElementById("admin-password");
-        const submitPasswordBtn = document.getElementById("submit-password");
-        const cancelPasswordBtn = document.getElementById("cancel-password");
-        const togglePasswordBtn = document.getElementById("toggle-password");
-        const errorMessage = document.getElementById("admin-error");
-        
-        // Initially hide the error message
-        errorMessage.style.display = "none";
-        
-        submitPasswordBtn.addEventListener("click", function() {
-          if (adminPasswordInput.value === correctPassword) {
-            // If correct, simply clear error and (optionally) proceed to admin area
-            errorMessage.style.display = "none";
-            // You might redirect or reveal admin features here:
-            // window.location.href = "admin.html";
-          } else {
-            // Wrong password: clear input and display error message (without closing popup)
-            adminPasswordInput.value = "";
-            errorMessage.style.display = "block";
-          }
-        });
-        
-        cancelPasswordBtn.addEventListener("click", function() {
-          // Clear error and input but keep popup open until user clicks outside
-          errorMessage.style.display = "none";
-          adminPasswordInput.value = "";
-        });
-        
-        togglePasswordBtn.addEventListener("click", function() {
-          if (adminPasswordInput.type === "password") {
-            adminPasswordInput.type = "text";
-            togglePasswordBtn.textContent = "Hide";
-          } else {
-            adminPasswordInput.type = "password";
-            togglePasswordBtn.textContent = "Show";
-          }
-        });
-      });
-    </script>
+    <script src="main.js"></script>
   </body>
 </html>

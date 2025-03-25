@@ -55,7 +55,7 @@
         z-index: 1005;
         display: none;
       }
-      /* Popups Container (ensures popups are above overlay) */
+      /* Popups Container */
       #popups-container {
         position: fixed;
         top: 0;
@@ -65,10 +65,8 @@
         z-index: 2000;
         pointer-events: none;
       }
-      /* Popup Styles */
-      .about-popup,
-      .social-popup,
-      .admin-popup {
+      /* Common Popup Styles */
+      .popup {
         display: none;
         pointer-events: auto;
         position: absolute;
@@ -78,44 +76,46 @@
         max-width: 600px;
         width: 90%;
         border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 30px;
       }
-      /* Modern About Popup */
+      /* About Popup */
       .about-popup {
         background: #fff;
         color: #333;
-        padding: 30px;
       }
-      .about-popup-content {
+      .about-popup .about-popup-content {
         display: flex;
         align-items: center;
         gap: 20px;
       }
-      .about-image {
+      .about-popup .about-image {
         flex-shrink: 0;
       }
-      .about-image img {
+      .about-popup .about-image img {
         width: 200px;
         border-radius: 8px;
       }
-      .about-text {
+      .about-popup .about-text {
         flex: 1;
         font-size: 16px;
         line-height: 1.5;
       }
       /* Social Popup */
       .social-popup {
-        background: #fff;
+        background: linear-gradient(135deg, #ffffff, #f0f0f0);
         color: #333;
-        padding: 30px;
         text-align: center;
       }
-      .social-popup-content {
+      .social-popup .social-popup-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 100%;
         gap: 30px;
+        width: 100%;
+      }
+      .social-popup h2 {
+        margin: 0;
       }
       .popup-social-links {
         display: flex;
@@ -123,27 +123,37 @@
         justify-content: space-evenly;
         align-items: center;
       }
+      .popup-social-links a {
+        flex: 1;
+      }
       .popup-social-links img {
         width: 50px;
         height: 50px;
+        display: block;
+        margin: 0 auto;
       }
       /* Admin Popup */
       .admin-popup {
         background: #f9f9f9;
         color: #333;
-        padding: 30px;
         text-align: center;
       }
-      .admin-popup-content input {
+      .admin-popup .admin-popup-content input {
         width: 80%;
         padding: 10px;
         margin: 10px 0;
         font-size: 16px;
       }
-      .admin-popup-content button {
+      .admin-popup .admin-popup-content button {
         padding: 10px 20px;
         margin: 5px;
         font-size: 16px;
+      }
+      .admin-popup .admin-popup-content #admin-error {
+        color: red;
+        margin-bottom: 10px;
+        font-size: 14px;
+        display: none;
       }
       /* Footer */
       .footer {
@@ -267,21 +277,6 @@
         <div class="intro-text">
           <h2>Hello, I'm Mark Palkimas</h2>
         </div>
-        <!-- Modern About Popup -->
-        <div class="about-popup">
-          <div class="about-popup-content">
-            <div class="about-image">
-              <!-- Update image path -->
-              <img src="assets/profile.jpg" alt="Profile Image" />
-            </div>
-            <div class="about-text">
-              <h2>About Me</h2>
-              <p>
-                I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
       <section id="portfolio" class="section">
         <!-- Portfolio content goes here -->
@@ -317,10 +312,25 @@
     
     <!-- Popups Container -->
     <div id="popups-container">
+      <!-- About Popup (moved here so it isn’t dimmed) -->
+      <div class="popup about-popup" id="about-popup">
+        <div class="about-popup-content">
+          <div class="about-image">
+            <img src="assets/profile.jpg" alt="Profile Image" />
+          </div>
+          <div class="about-text">
+            <h2>About Me</h2>
+            <p>
+              I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
+            </p>
+          </div>
+        </div>
+      </div>
+      
       <!-- Social Popup for Contact Links -->
-      <div class="social-popup">
+      <div class="popup social-popup" id="contact-popup">
         <div class="social-popup-content">
-          <h2>Contact Links:</h2>
+          <h2>Contact Links</h2>
           <div class="popup-social-links">
             <a href="https://www.instagram.com/ya.boimark" target="_blank">
               <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
@@ -342,11 +352,10 @@
       </div>
       
       <!-- Admin Popup for Password Entry -->
-      <div class="admin-popup">
+      <div class="popup admin-popup" id="admin-popup">
         <div class="admin-popup-content">
-          <h2>Enter Admin Password</h2>
-          <!-- Error message display -->
-          <p id="admin-error" style="color: red; display: none; margin-bottom: 10px;"></p>
+          <h2>Admin Sign In</h2>
+          <p id="admin-error">Wrong password</p>
           <input type="password" id="admin-password" placeholder="Password" />
           <button id="toggle-password">Show</button>
           <br />
@@ -354,70 +363,99 @@
           <button id="cancel-password">Cancel</button>
         </div>
       </div>
-      
-      <!-- About Popup (moved here to be above the overlay) -->
-      <div class="about-popup">
-        <div class="about-popup-content">
-          <div class="about-image">
-            <img src="assets/profile.jpg" alt="Profile Image" />
-          </div>
-          <div class="about-text">
-            <h2>About Me</h2>
-            <p>
-              I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
     
-    <!-- Reset Button -->
+    <!-- Reset Button (if needed) -->
     <button class="reset-btn">Reset</button>
     
-    <script src="main.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        // Set the correct admin password here
-        const correctPassword = "admin123";
-        let attempts = 0;
-        const maxAttempts = 5;
+      // --- Neon Effect with Smooth Color Transition ---
+      (function() {
+        const neonContainer = document.getElementById('neon-container');
+        // Array of colors to cycle through
+        const colors = ['#00d084', '#ff4081', '#448aff', '#ffeb3b'];
+        let currentIndex = 0;
+        document.addEventListener('mousemove', function(e) {
+          // Use the cursor position to gradually change the background color
+          // (For demo purposes, we simply cycle through the colors on each move)
+          currentIndex = (currentIndex + 1) % colors.length;
+          neonContainer.style.background = colors[currentIndex];
+        });
+      })();
+      
+      // --- Popup Triggering (example logic) ---
+      document.addEventListener('DOMContentLoaded', function() {
+        const dimmed = document.querySelector('.dimmed');
+        const aboutLink = document.querySelector('.about-link');
+        const contactLink = document.querySelector('.contact-link');
+        const adminBtn = document.querySelector('.admin-btn');
+        const aboutPopup = document.getElementById('about-popup');
+        const contactPopup = document.getElementById('contact-popup');
+        const adminPopup = document.getElementById('admin-popup');
         
-        const adminPopup = document.querySelector(".admin-popup");
+        // Function to show a popup and dim background
+        function showPopup(popup) {
+          dimmed.style.display = 'block';
+          popup.style.display = 'block';
+        }
+        // Function to hide all popups and undim background
+        function hidePopups() {
+          dimmed.style.display = 'none';
+          aboutPopup.style.display = 'none';
+          contactPopup.style.display = 'none';
+          adminPopup.style.display = 'none';
+        }
+        // Example triggers (replace with your actual triggers)
+        aboutLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          hidePopups();
+          showPopup(aboutPopup);
+        });
+        contactLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          hidePopups();
+          showPopup(contactPopup);
+        });
+        adminBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          hidePopups();
+          showPopup(adminPopup);
+        });
+        // Hide popups if dimmed background is clicked
+        dimmed.addEventListener('click', hidePopups);
+      });
+      
+      // --- Admin Popup Behavior ---
+      document.addEventListener('DOMContentLoaded', function() {
+        const correctPassword = "admin123";
         const adminPasswordInput = document.getElementById("admin-password");
         const submitPasswordBtn = document.getElementById("submit-password");
         const cancelPasswordBtn = document.getElementById("cancel-password");
         const togglePasswordBtn = document.getElementById("toggle-password");
         const errorMessage = document.getElementById("admin-error");
         
-        // Submit button functionality
+        // Initially hide the error message
+        errorMessage.style.display = "none";
+        
         submitPasswordBtn.addEventListener("click", function() {
-          if (attempts >= maxAttempts) return;
-          
           if (adminPasswordInput.value === correctPassword) {
-            // Password is correct – leave the popup open or proceed as needed
+            // If correct, simply clear error and (optionally) proceed to admin area
             errorMessage.style.display = "none";
-            alert("Access granted");
+            // You might redirect or reveal admin features here:
+            // window.location.href = "admin.html";
           } else {
-            attempts++;
-            errorMessage.style.display = "block";
-            errorMessage.textContent = "Wrong password. Attempts: " + attempts + "/" + maxAttempts;
+            // Wrong password: clear input and display error message (without closing popup)
             adminPasswordInput.value = "";
-            if (attempts >= maxAttempts) {
-              errorMessage.textContent = "Too many attempts. Please refresh the page to try again.";
-              adminPasswordInput.disabled = true;
-              submitPasswordBtn.disabled = true;
-            }
+            errorMessage.style.display = "block";
           }
         });
         
-        // Cancel button functionality
         cancelPasswordBtn.addEventListener("click", function() {
-          // Simply clear the error and input without hiding the popup
+          // Clear error and input but keep popup open until user clicks outside
           errorMessage.style.display = "none";
           adminPasswordInput.value = "";
         });
         
-        // Toggle password visibility
         togglePasswordBtn.addEventListener("click", function() {
           if (adminPasswordInput.type === "password") {
             adminPasswordInput.type = "text";

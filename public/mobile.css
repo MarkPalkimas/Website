@@ -1,127 +1,158 @@
-/* --------------- reset & globals --------------- */
+/* Reset & Layout */
 * {
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
 html, body {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 body {
-  background: #111;
-  color: #fff;
-  position: relative;
+  background: #1a1a1a;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
 }
 
-/* --------------- neon glow overlay --------------- */
-#neon-overlay {
-  position: fixed; top: 0; left: 0;
+/* Neon overlay */
+#neon-container {
+  position: fixed;
+  top: 0; left: 0;
   width: 100%; height: 100%;
   pointer-events: none;
   transition: background .2s ease;
 }
+.dimmed {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 900;
+}
 
-/* --------------- header --------------- */
+/* Header */
 .header {
-  position: fixed; top: 0; left: 0;
+  position: fixed;
+  top: 0; left: 0;
   width: 100%; height: 50px;
-  background: #222; display: flex;
-  align-items: center; justify-content: space-between;
-  padding: 0 16px; z-index: 10;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 1000;
 }
 .logo {
   font-size: 1rem;
 }
 .menu-btn {
-  background: none; border: none;
-  color: #fff; font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #eee;
+  font-size: 1.5rem;
+}
+.nav-menu {
+  position: absolute;
+  top: 50px; right: 0;
+  background: #333;
+  width: 200px;
+  display: none;
+  z-index: 1001;
+}
+.nav-menu.open {
+  display: block;
+}
+.nav-menu ul {
+  list-style: none;
+}
+.nav-menu li {
+  border-bottom: 1px solid #444;
+}
+.nav-menu a,
+.nav-menu button {
+  display: block;
+  padding: 12px;
+  color: #eee;
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+}
+.nav-menu a:hover,
+.nav-menu button:hover {
+  background: #444;
 }
 
-/* --------------- side menu --------------- */
-.side-menu {
-  position: fixed; top: 0; right: -100%;
-  width: 80%; height: 100%;
-  background: #1a1a1a; padding: 16px;
-  transition: right .3s ease;
-  z-index: 20; overflow-y: auto;
+/* Main */
+.content {
+  flex: 1;
+  padding: 70px 16px 16px;
+  text-align: center;
 }
-.side-menu.open {
-  right: 0;
-}
-.close-menu {
-  background: none; border: none;
-  color: #fff; font-size: 1.5rem;
-  display: block; margin-left: auto;
-}
-.side-menu ul {
-  list-style: none; margin-top: 16px;
-}
-.side-menu li {
-  margin-bottom: 24px;
-}
-.side-menu h2 {
-  font-size: 1.1rem; margin-bottom: 6px;
-}
-.side-menu p {
-  font-size: 0.9rem; line-height: 1.3;
-}
-
-/* --------------- main content --------------- */
-.main {
-  display: flex; align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding-top: 50px;
-}
-.profile-section {
-  text-align: center; padding: 0 16px;
-}
-.avatar-wrapper {
-  width: 50vw; height: 50vw;
-  max-width: 200px; max-height: 200px;
-  margin: 0 auto;
-  border: 4px solid #444;
+.profile-photo {
+  width: 60vw;
+  max-width: 150px;
+  height: auto;
   border-radius: 50%;
-  overflow: hidden;
+  border: 4px solid #444;
+  cursor: pointer;
+  transition: transform .3s;
+  margin: 0 auto;
 }
-.avatar {
-  width: 100%; height: 100%;
-  object-fit: cover;
+.content h2 {
+  margin-top: 12px;
+  font-size: 1.2em;
 }
-.profile-section h1 {
-  margin: 16px 0;
-  font-size: 1.4rem;
-  line-height: 1.2;
+.actions {
+  margin-top: 16px;
+}
+.gravity-btn,
+.reset-btn {
+  padding: 10px 20px;
+  margin: 8px;
+  border: none;
+  border-radius: 5px;
+  background: #00d084;
+  color: #fff;
+  cursor: pointer;
+}
+.reset-btn {
+  display: none;
+}
+
+/* Footer */
+.footer {
+  background: #222;
+  padding: 16px;
+  text-align: center;
 }
 .social-links {
-  display: flex; justify-content: center;
-  gap: 16px; margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
 }
 .social-links img {
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
 }
 
-/* --------------- drop-ball & canvas --------------- */
-.action-btn {
-  background: #00d084; border: none;
-  padding: 12px 24px; border-radius: 24px;
-  font-size: 1rem; color: #fff;
-  cursor: pointer; margin-bottom: 16px;
-}
-.canvas-container {
-  width: 100%; height: 40vh;
-  position: relative;
-}
-#physics-canvas {
-  width: 100%; height: 100%;
-  touch-action: none;
-}
-
-/* --------------- footer --------------- */
-.footer {
-  position: fixed; bottom: 0; left: 0;
-  width: 100%; text-align: center;
-  padding: 8px; background: rgba(0,0,0,0.5);
-  font-size: 0.8rem;
+/* Popups */
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  padding: 20px;
+  z-index: 1002;
+  width: 90%;
+  max-width: 300px;
 }

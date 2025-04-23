@@ -2,69 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Mark Palkimas — Mobile</title>
-  <link rel="stylesheet" href="mobile.css"/>
-  <!-- Matter.js for ball physics -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script defer src="app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mark Palkimas – Mobile</title>
+  <link rel="stylesheet" href="mobile.css" />
+  <script>
+    // If desktop, send back to index
+    if (!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      window.location.href = 'index.html';
+    }
+  </script>
 </head>
 <body>
-  <!-- neon glow overlay -->
-  <div id="neon-overlay"></div>
+  <div id="neon-container"></div>
+  <div class="dimmed"></div>
 
-  <!-- fixed header -->
   <header class="header">
     <div class="logo">Mark Palkimas</div>
-    <button id="menu-btn" class="menu-btn">☰</button>
+    <button class="menu-btn">☰</button>
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="#about" class="about-link">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="#contact" class="contact-link">Contact</a></li>
+        <li><button class="admin-btn">Admin</button></li>
+      </ul>
+    </nav>
   </header>
 
-  <!-- slide-out side menu -->
-  <nav id="side-menu" class="side-menu">
-    <button id="close-menu" class="close-menu">✕</button>
-    <ul>
-      <li>
-        <h2>About Me</h2>
-        <p>I'm an ambitious student passionate about technology and innovation.</p>
-      </li>
-      <li>
-        <h2>Contact</h2>
-        <div class="social-links">
-          <a href="https://www.instagram.com/ya.boimark"     target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"></a>
-          <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"></a>
-          <a href="https://github.com/MarkPalkimas"          target="_blank"><img src="assets/github-logo.png" alt="GitHub"></a>
-          <a href="mailto:mark.palkimas@gmail.com"           target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"></a>
-          <a href="https://www.youtube.com/@markpalkimas"     target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"></a>
-        </div>
-      </li>
-      <li><a href="admin.html" class="admin-link">Admin</a></li>
-    </ul>
-  </nav>
-
-  <!-- main mobile content -->
-  <main class="main">
-    <section class="profile-section">
-      <div class="avatar-wrapper">
-        <img src="assets/profile.jpg" alt="Profile photo" class="avatar"/>
-      </div>
-      <h1>Hello, I’m Mark Palkimas</h1>
-      <div class="social-links">
-        <a href="https://www.instagram.com/ya.boimark"     target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"></a>
-        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"></a>
-        <a href="https://github.com/MarkPalkimas"          target="_blank"><img src="assets/github-logo.png" alt="GitHub"></a>
-        <a href="mailto:mark.palkimas@gmail.com"           target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"></a>
-        <a href="https://www.youtube.com/@markpalkimas"     target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"></a>
-      </div>
-      <button id="drop-ball-btn" class="action-btn">Drop Ball</button>
-      <div class="canvas-container">
-        <canvas id="physics-canvas"></canvas>
-      </div>
+  <main class="content">
+    <section id="about" class="section">
+      <img src="assets/profile.jpg" alt="Profile Photo" class="profile-photo" />
+      <h2>Hello, I'm Mark Palkimas</h2>
+    </section>
+    <section class="actions">
+      <button class="gravity-btn">Drop Ball</button>
+      <button class="reset-btn">Reset</button>
     </section>
   </main>
 
-  <!-- fixed footer -->
   <footer class="footer">
-    © 2024 Mark Palkimas
+    <div class="social-links">
+      <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"/></a>
+      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"/></a>
+      <a href="https://github.com/MarkPalkimas" target="_blank"><img src="assets/github-logo.png" alt="GitHub"/></a>
+      <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"/></a>
+      <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"/></a>
+    </div>
+    <p class="copyright">© 2024 Mark Palkimas</p>
   </footer>
+
+  <div id="popups-container">
+    <div class="popup about-popup" id="about-popup">
+      <div class="about-popup-content">
+        <h2>About Me</h2>
+        <p>I'm an ambitious student passionate about technology and innovation.</p>
+      </div>
+    </div>
+    <div class="popup social-popup" id="contact-popup">
+      <h2>Contact Links</h2>
+      <div class="popup-social-links">
+        <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"/></a>
+        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"/></a>
+        <a href="https://github.com/MarkPalkimas" target="_blank"><img src="assets/github-logo.png" alt="GitHub"/></a>
+        <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"/></a>
+        <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"/></a>
+      </div>
+    </div>
+    <div class="popup admin-popup" id="admin-popup">
+      <h2>Admin Sign In</h2>
+      <p id="admin-error">Wrong password</p>
+      <input type="password" id="admin-password" placeholder="Password" />
+      <button id="toggle-password">Show</button>
+      <button id="submit-password">Submit</button>
+      <button id="cancel-password">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const neon = document.getElementById('neon-container');
+      neon.style.display = 'none';
+      document.addEventListener('touchstart', () => {
+        neon.style.display = 'block';
+      }, { once: true });
+      document.documentElement.style.overscrollBehavior = 'none';
+      document.body.style.overflow = 'hidden';
+    });
+  </script>
+
+  <script src="main.js"></script>
 </body>
 </html>

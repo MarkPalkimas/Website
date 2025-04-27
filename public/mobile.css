@@ -1,36 +1,60 @@
-/* Mobile-specific overrides */
+/* ==========================
+   Mobile Overrides & Tweaks
+   Inspired by palkimas.com:
+   • Centered, minimalist hero :contentReference[oaicite:0]{index=0}
+   • Simple separators :contentReference[oaicite:1]{index=1}
+   ========================== */
+
+/* Header */
 .header-mobile {
   position: relative;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
   padding: 1rem;
   background: #111;
+  color: #eee;
   z-index: 10;
 }
 .menu-toggle,
 .admin-toggle {
+  position: absolute;
+  top: 1rem;
   background: none;
   border: none;
   color: #eee;
   font-size: 1.5rem;
-  margin-left: 0.75rem;
   cursor: pointer;
 }
+.menu-toggle { left: 1rem; }
+.admin-toggle { right: 1rem; }
+
+/* Site Title */
+.site-title {
+  margin-top: 2.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* About Popup */
 .about-popup {
   display: none;
   position: absolute;
-  top: 3.5rem;
-  right: 1rem;
+  top: 4rem;
   background: #222;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  width: 75%;
+  width: 80%;
+  text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 .about-popup.active {
   display: block;
 }
 
+/* Hero / Profile */
 .hero {
   display: flex;
   justify-content: center;
@@ -44,6 +68,15 @@
   border: 3px solid #eee;
 }
 
+/* Separator */
+.separator {
+  border: none;
+  height: 1px;
+  background: #333;
+  margin: 1.5rem 0;
+}
+
+/* Contact Icons */
 .contact-icons {
   display: flex;
   justify-content: center;
@@ -53,13 +86,14 @@
 .contact-icons img {
   width: 36px;
   height: 36px;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 .contact-icons img:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
+  opacity: 0.8;
 }
 
-/* Draggable balls */
+/* Draggable Balls (unchanged) */
 .balls-container {
   position: fixed;
   inset: 0;
@@ -76,12 +110,11 @@
   pointer-events: all;
 }
 
-/* Footer button */
+/* Footer */
 footer {
-  position: fixed;
-  bottom: 1rem;
-  width: 100%;
   text-align: center;
+  padding: 1.5rem 0;
+  background: #111;
 }
 .footer-btn {
   display: inline-block;
@@ -90,9 +123,14 @@ footer {
   color: #fff;
   border-radius: 0.5rem;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
   transition: opacity 0.2s;
 }
 .footer-btn:hover {
   opacity: 0.9;
+}
+.footer-note {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #666;
 }

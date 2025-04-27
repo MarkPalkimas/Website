@@ -7,173 +7,117 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #0ff;          /* neon cyan */
-      --accent: #ff0080;        /* neon pink */
-      --bg: #1a1a1a;            /* very dark background */
-      --text: #eee;             /* light text */
+      --primary: #0ff;           /* neon cyan */
+      --accent:  #ff0080;        /* neon pink */
+      --bg:      #1a1a1a;        /* dark background */
+      --text:    #eee;           /* light text */
     }
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
     }
     body {
       background: var(--bg);
       color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      overflow-x: hidden;
+      display: flex; flex-direction: column;
+      min-height: 100vh; overflow-x: hidden;
     }
     header {
-      position: sticky;
-      top: 0;
+      position: sticky; top: 0;
       background: rgba(0,0,0,0.8);
-      color: var(--text);
-      padding: 1rem;
-      display: flex;
+      padding: 1rem; display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.5);
       z-index: 10;
     }
     header .logo {
-      font-weight: 600;
-      font-size: 1.2rem;
+      font-weight: 600; font-size: 1.2rem;
     }
     header .projects-link {
-      color: var(--text);
-      text-decoration: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
+      color: var(--text); text-decoration: none;
+      padding: 0.5rem 1rem; border-radius: 6px;
       transition: background 0.3s;
     }
     header .projects-link:hover {
       background: rgba(255,255,255,0.1);
     }
     main {
-      flex: 1;
-      padding: 1rem;
-      margin-top: 4rem;
+      flex: 1; padding: 1rem; margin-top: 4rem;
     }
     .profile-container {
-      text-align: center;
-      position: relative;
+      text-align: center; position: relative;
       margin-bottom: 2rem;
     }
     .profile-photo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--primary);
-      transition: transform 0.3s;
-      cursor: pointer;
+      width: 120px; height: 120px; border-radius: 50%;
+      object-fit: cover; border: 3px solid var(--primary);
+      transition: transform 0.3s; cursor: pointer;
     }
-    .profile-photo:hover {
-      transform: scale(1.05);
-    }
+    .profile-photo:hover { transform: scale(1.05); }
     .profile-name {
-      margin-top: 1rem;
-      font-size: 1.4rem;
+      margin-top: 1rem; font-size: 1.4rem;
       font-weight: 600;
     }
     .about-popup {
-      display: none;
-      position: absolute;
-      top: 75%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #222;
-      color: var(--text);
-      padding: 1rem;
-      border-radius: 8px;
+      display: none; position: absolute;
+      top: 75%; left: 50%; transform: translateX(-50%);
+      background: #222; color: var(--text);
+      padding: 1rem; border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.7);
-      width: 80%;
-      max-width: 260px;
-      z-index: 20;
+      width: 80%; max-width: 260px; z-index: 20;
     }
     .dimmed {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 15;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 15;
       cursor: pointer;
     }
     .gravity-section {
-      text-align: center;
-      margin: 2rem 0;
+      text-align: center; margin: 2rem 0;
     }
     .button {
-      display: inline-block;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: opacity 0.3s, transform 0.2s, box-shadow 0.2s;
+      display: inline-block; background: var(--accent);
+      color: #fff; border: none; padding: 0.6rem 1.2rem;
+      border-radius: 6px; font-size: 0.95rem;
+      cursor: pointer; transition: opacity 0.3s,
+        transform 0.2s, box-shadow 0.2s;
       margin: 0.5rem;
     }
-    /* “Drop Ball” slightly hidden until hover */
-    .gravity-btn {
-      opacity: 0.5;
-    }
+    /* “Drop Ball” starts faint */
+    .gravity-btn { opacity: 0.5; }
     .gravity-btn:hover {
-      opacity: 1;
-      transform: translateY(-2px);
+      opacity: 1; transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
     .reset-btn {
-      background: #555;
-      display: none;
+      background: #555; display: none;
       opacity: 0.8;
     }
-    .reset-btn:hover {
-      opacity: 1;
-    }
+    .reset-btn:hover { opacity: 1; }
     footer {
-      background: rgba(0,0,0,0.8);
+      background: var(--bg);
       color: var(--text);
-      padding: 1.5rem 1rem;
-      text-align: center;
+      padding: 1.5rem 1rem; text-align: center;
     }
     .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
+      display: flex; justify-content: center;
+      gap: 1rem; margin-top: 1rem;
     }
     .social-links img {
-      width: 32px;
-      height: 32px;
-      /* use original colored icons */
-      filter: none;
-      transition: transform 0.3s;
+      width: 32px; height: 32px;
+      filter: none; transition: transform 0.3s;
     }
     .social-links img:hover {
       transform: scale(1.2);
     }
     .falling-quote {
-      position: absolute;
-      font-size: 0.9rem;
-      background: rgba(30,30,30,0.9);
-      color: #ddd;
-      padding: 0.4rem 0.6rem;
-      border-radius: 4px;
+      position: absolute; font-size: 0.9rem;
+      background: rgba(30,30,30,0.9); color: #ddd;
+      padding: 0.4rem 0.6rem; border-radius: 4px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.7);
     }
-    .ball {
-      position: absolute;
-      border-radius: 50%;
-    }
-    @keyframes fall {
-      to { transform: translateY(120vh); }
-    }
+    .ball { position: absolute; border-radius: 50%; }
+    @keyframes fall { to { transform: translateY(120vh); } }
   </style>
 </head>
 <body>
@@ -186,8 +130,9 @@
 
   <main>
     <section class="profile-container">
-      <img src="assets/profile.jpg" alt="Profile Photo" class="profile-photo" onclick="toggleAbout()">
-      <div class="profile-name">Hello, I'm Mark</div>
+      <img src="assets/profile.jpg" alt="Profile Photo"
+           class="profile-photo" onclick="toggleAbout()">
+      <div class="profile-name">Hello, I’m Mark</div>
       <div class="about-popup">
         <h2>About Me</h2>
         <p>This section contains more detailed information about me and my professional background.</p>
@@ -203,11 +148,21 @@
   <footer>
     <h2>Contact Me</h2>
     <div class="social-links">
-      <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"></a>
-      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"></a>
-      <a href="https://github.com/MarkPalkimas" target="_blank"><img src="assets/github-logo.png" alt="GitHub"></a>
-      <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"></a>
-      <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"></a>
+      <a href="https://www.instagram.com/ya.boimark" target="_blank">
+        <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram">
+      </a>
+      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
+        <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn">
+      </a>
+      <a href="https://github.com/MarkPalkimas" target="_blank">
+        <img src="assets/github-logo.png" alt="GitHub">
+      </a>
+      <a href="mailto:mark.palkimas@gmail.com" target="_blank">
+        <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail">
+      </a>
+      <a href="https://www.youtube.com/@markpalkimas" target="_blank">
+        <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube">
+      </a>
     </div>
     <p>&copy; 2024 Mark Palkimas. All rights reserved.</p>
   </footer>
@@ -223,7 +178,7 @@
       document.querySelector('.dimmed').style.display = 'none';
     }
 
-    // Physics & quotes (same engine as desktop)
+    // Physics & quotes
     const balls = [];
     const GRAVITY = 0.3, REST = 0.8;
     const resetBtn = document.querySelector('.reset-btn');
@@ -233,127 +188,161 @@
     function dropBall() {
       const ball = document.createElement('div');
       const d = 40 + Math.random()*30;
+      Object.assign(ball.style, {
+        width: d + 'px',
+        height: d + 'px',
+        left: Math.random()*(window.innerWidth-d) + 'px',
+        top: '0px',
+        backgroundColor: '#' + Math.random().toString(16).slice(2,8)
+      });
       ball.className = 'ball';
-      ball.style.width = ball.style.height = d + 'px';
-      ball.style.left = Math.random()*(window.innerWidth-d) + 'px';
-      ball.style.top = '0px';
       ball.radius = d/2;
-      ball.mass = ball.radius*ball.radius;
-      ball.velocityX = Math.random()*2-1;
-      ball.velocityY = Math.random()*4+1;
-      ball.style.backgroundColor = '#' + Math.random().toString(16).slice(2,8);
+      ball.mass   = ball.radius * ball.radius;
+      ball.velocityX = Math.random()*2 - 1;
+      ball.velocityY = Math.random()*4 + 1;
       document.body.appendChild(ball);
       balls.push(ball);
       resetBtn.style.display = 'inline-block';
-      if (!quotesStarted) { startQuotes(); quotesStarted=true; }
+      if (!quotesStarted) { startQuotes(); quotesStarted = true; }
     }
+
     function resetBalls() {
-      balls.forEach(b=>b.remove());
-      balls.length=0;
-      resetBtn.style.display='none';
+      balls.forEach(b => b.remove());
+      balls.length = 0;
+      resetBtn.style.display = 'none';
     }
+
     function startQuotes() {
-      setInterval(createQuote,10000);
+      setInterval(createQuote, 10000);
       animateQuotes();
     }
+
     function createQuote() {
       const qs = [
-        "Life isn’t about what you know, it’s about what you’re able to figure out.",
+        "Life isn’t about what you know, It’s about what you’re able to figure out.",
         "The best time to plant a tree is 20 years ago, the second best time is today.",
+        "The rich get richer because the poor see every opportunity as a scam",
         "Money is not the key to happiness, it is the key to pursuing opportunities.",
         "Cold water feels warm when your hands are freezing.",
         "Regret is proof you cared. But growth is proof you learned."
       ];
       const q = document.createElement('div');
-      q.className='falling-quote';
+      q.className = 'falling-quote';
       q.innerText = qs[Math.floor(Math.random()*qs.length)];
       const left0 = Math.random()*(window.innerWidth-260);
-      q.dataset.initialLeft=left0;
-      q.dataset.amp=10+Math.random()*20;
-      q.dataset.phase=Math.random()*2*Math.PI;
-      q.style.left=left0+'px';
-      q.style.top='-50px';
-      q.style.animation='fall 20s linear forwards';
+      q.dataset.initialLeft = left0;
+      q.dataset.amp         = 10 + Math.random()*20;
+      q.dataset.phase       = Math.random()*2*Math.PI;
+      Object.assign(q.style, {
+        left: left0 + 'px',
+        top:  '-50px',
+        animation: 'fall 20s linear forwards'
+      });
       document.body.appendChild(q);
-      setTimeout(()=>q.remove(),21000);
+      setTimeout(() => q.remove(), 21000);
     }
+
     function animateQuotes() {
-      const now=Date.now();
-      document.querySelectorAll('.falling-quote').forEach(q=>{
-        const t=(now-quoteTime)/1000;
-        const off= q.dataset.amp*Math.sin(t+ +q.dataset.phase);
-        q.style.left = ( +q.dataset.initialLeft + off )+'px';
+      const now = Date.now();
+      document.querySelectorAll('.falling-quote').forEach(q => {
+        const t   = (now - quoteTime)/1000;
+        const off = q.dataset.amp * Math.sin(t + +q.dataset.phase);
+        q.style.left = (+q.dataset.initialLeft + off) + 'px';
       });
       requestAnimationFrame(animateQuotes);
     }
+
     function updateBalls() {
-      balls.forEach(b=>{
-        b.velocityY+=GRAVITY;
-        let x=+b.style.left, y=+b.style.top,
-            nx=x+b.velocityX, ny=y+b.velocityY;
-        // walls
-        if (nx<=0||nx+2*b.radius>=window.innerWidth) {
-          b.velocityX=-b.velocityX*REST;
-          nx=Math.max(0,Math.min(nx,window.innerWidth-2*b.radius));
+      balls.forEach(b => {
+        b.velocityY += GRAVITY;
+        let x  = +b.style.left,
+            y  = +b.style.top,
+            nx = x + b.velocityX,
+            ny = y + b.velocityY;
+
+        // Walls
+        if (nx <= 0 || nx + 2*b.radius >= window.innerWidth) {
+          b.velocityX = -b.velocityX * REST;
+          nx = Math.max(0, Math.min(nx, window.innerWidth - 2*b.radius));
         }
-        // floor
-        const ft=footerEl.getBoundingClientRect().top+window.scrollY;
-        if (ny+2*b.radius>=ft) {
-          ny=ft-2*b.radius;
-          b.velocityY=-b.velocityY*REST;
-          b.velocityX*=REST;
+
+        // Floor (viewport bottom minus footer)
+        const floorY = window.innerHeight - footerEl.offsetHeight;
+        if (ny + 2*b.radius >= floorY) {
+          ny = floorY - 2*b.radius;
+          b.velocityY = -b.velocityY * REST;
+          b.velocityX *= REST;
         }
-        b.style.left=nx+'px'; b.style.top=ny+'px';
+
+        b.style.left = nx + 'px';
+        b.style.top  = ny + 'px';
       });
-      collideBalls(); collideBallQuote();
+      collideBalls();
+      collideBallQuote();
       requestAnimationFrame(updateBalls);
     }
-    function collideBalls(){
-      for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){
-        const A=balls[i],B=balls[j],
-              xA=+A.style.left+A.radius,yA=+A.style.top+A.radius,
-              xB=+B.style.left+B.radius,yB=+B.style.top+B.radius,
-              dx=xB-xA,dy=yB-yA,dist=Math.hypot(dx,dy);
-        if(dist<A.radius+B.radius&&dist>0){
-          const nx=dx/dist,ny=dy/dist,tx=-ny,ty=nx,
-                vAn=A.velocityX*nx+A.velocityY*ny,
-                vAt=A.velocityX*tx+A.velocityY*ty,
-                vBn=B.velocityX*nx+B.velocityY*ny,
-                vBt=B.velocityX*tx+B.velocityY*ty,
-                vAnAfter=(vAn*(A.mass-B.mass)+2*B.mass*vBn)/(A.mass+B.mass),
-                vBnAfter=(vBn*(B.mass-A.mass)+2*A.mass*vAn)/(A.mass+B.mass);
-          A.velocityX=vAnAfter*nx+vAt*tx; A.velocityY=vAnAfter*ny+vAt*ty;
-          B.velocityX=vBnAfter*nx+vBt*tx; B.velocityY=vBnAfter*ny+vBt*ty;
-          const overlap=A.radius+B.radius-dist,
-                sepX=nx*overlap/2,sepY=ny*overlap/2;
-          A.style.left=+A.style.left-sepX+'px';
-          A.style.top=+A.style.top-sepY+'px';
-          B.style.left=+B.style.left+sepX+'px';
-          B.style.top=+B.style.top+sepY+'px';
+
+    function collideBalls() {
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i+1; j < balls.length; j++) {
+          const A = balls[i], B = balls[j];
+          const xA = +A.style.left + A.radius,
+                yA = +A.style.top  + A.radius,
+                xB = +B.style.left + B.radius,
+                yB = +B.style.top  + B.radius;
+          const dx = xB - xA, dy = yB - yA, dist = Math.hypot(dx,dy);
+          if (dist < A.radius + B.radius && dist > 0) {
+            const nx = dx/dist, ny = dy/dist,
+                  tx = -ny, ty = nx;
+            const vAn = A.velocityX*nx + A.velocityY*ny,
+                  vAt = A.velocityX*tx + A.velocityY*ty,
+                  vBn = B.velocityX*nx + B.velocityY*ny,
+                  vBt = B.velocityX*tx + B.velocityY*ty;
+            const vAnAfter = (vAn*(A.mass-B.mass) + 2*B.mass*vBn) / (A.mass+B.mass),
+                  vBnAfter = (vBn*(B.mass-A.mass) + 2*A.mass*vAn) / (A.mass+B.mass);
+
+            A.velocityX = vAnAfter*nx + vAt*tx;
+            A.velocityY = vAnAfter*ny + vAt*ty;
+            B.velocityX = vBnAfter*nx + vBt*tx;
+            B.velocityY = vBnAfter*ny + vBt*ty;
+
+            // Separate overlap
+            const overlap = A.radius+B.radius - dist,
+                  sepX    = nx*overlap/2,
+                  sepY    = ny*overlap/2;
+            A.style.left = (+A.style.left - sepX) + 'px';
+            A.style.top  = (+A.style.top  - sepY) + 'px';
+            B.style.left = (+B.style.left + sepX) + 'px';
+            B.style.top  = (+B.style.top  + sepY) + 'px';
+          }
         }
       }
     }
-    function collideBallQuote(){
-      balls.forEach(b=>{
-        const cx=+b.style.left+b.radius,cy=+b.style.top+b.radius;
-        document.querySelectorAll('.falling-quote').forEach(q=>{
-          const r=q.getBoundingClientRect(),
-                qx=r.left,qy=r.top+window.scrollY,
-                qw=r.width,qh=r.height;
-          if(b.velocityY>0&&cy<qy){
-            const px=Math.max(qx,Math.min(cx,qx+qw)),
-                  py=Math.max(qy,Math.min(cy,qy+qh)),
-                  d=Math.hypot(cx-px,cy-py);
-            if(d<b.radius){
-              b.velocityX=-b.velocityX*REST;
-              b.velocityY=-b.velocityY*REST;
-              q.style.transform='scale(1.2)';
-              setTimeout(()=>q.style.transform='scale(1)',200);
+
+    function collideBallQuote() {
+      balls.forEach(b => {
+        const cx = +b.style.left + b.radius,
+              cy = +b.style.top  + b.radius;
+        document.querySelectorAll('.falling-quote').forEach(q => {
+          const r  = q.getBoundingClientRect(),
+                qx = r.left, qy = r.top,
+                qw = r.width, qh = r.height;
+          if (b.velocityY > 0 && cy < qy) {
+            const px = Math.max(qx, Math.min(cx, qx+qw)),
+                  py = Math.max(qy, Math.min(cy, qy+qh)),
+                  d  = Math.hypot(cx-px, cy-py);
+            if (d < b.radius) {
+              b.velocityX = -b.velocityX * REST;
+              b.velocityY = -b.velocityY * REST;
+              q.style.transform = 'scale(1.2)';
+              setTimeout(() => q.style.transform = 'scale(1)', 200);
             }
           }
         });
       });
     }
+
+    // kick it off
     updateBalls();
   </script>
 </body>

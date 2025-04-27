@@ -13,19 +13,20 @@
 </head>
 
 <body>
-  <!-- Draggable balls -->
+  <!-- Draggable balls (unchanged functionality) -->
   <div class="balls-container">
     <div class="drop-ball" style="top: 80px; left: 40px"></div>
     <div class="drop-ball" style="top: 120px; left: 140px"></div>
     <div class="drop-ball" style="top: 60px; left: 240px"></div>
   </div>
 
-  <!-- Header with About & Admin toggles -->
+  <!-- Header with About & Admin toggles, plus centered site title -->
   <header class="header-mobile">
     <button class="menu-toggle" aria-label="Toggle About">☰</button>
     <button class="admin-toggle" aria-label="Admin">⚙️</button>
+    <h1 class="site-title">Hello, I’m Mark Palkimas.</h1>
     <div class="about-popup">
-      <p>Hi, I’m Mark—a software engineer building sleek, modern web experiences.</p>
+      <p>Hi—I build sleek, modern web experiences. Welcome!</p>
     </div>
   </header>
 
@@ -40,6 +41,8 @@
       />
     </section>
 
+    <hr class="separator"/>
+
     <section class="contact-icons">
       <a href="https://github.com/MarkPalkimas" target="_blank" aria-label="GitHub">
         <img src="assets/github-icon.png" alt="GitHub" />
@@ -53,9 +56,12 @@
     </section>
   </main>
 
-  <!-- Footer (Contact button, etc.) -->
+  <hr class="separator"/>
+
+  <!-- Footer (Contact button remains) -->
   <footer>
     <a href="contact.html" class="footer-btn">Contact</a>
+    <p class="footer-note">© 2025 Mark Palkimas</p>
   </footer>
 </body>
 </html>

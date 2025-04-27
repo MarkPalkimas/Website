@@ -1,9 +1,4 @@
-/* ==========================
-   Mobile Overrides & Tweaks
-   Inspired by palkimas.com:
-   • Centered, minimalist hero :contentReference[oaicite:0]{index=0}
-   • Simple separators :contentReference[oaicite:1]{index=1}
-   ========================== */
+/* ========= Mobile-specific styling ========= */
 
 /* Header */
 .header-mobile {
@@ -68,7 +63,7 @@
   border: 3px solid #eee;
 }
 
-/* Separator */
+/* Separator line */
 .separator {
   border: none;
   height: 1px;
@@ -76,7 +71,7 @@
   margin: 1.5rem 0;
 }
 
-/* Contact Icons */
+/* Contact Icons (exactly three) */
 .contact-icons {
   display: flex;
   justify-content: center;
@@ -93,7 +88,7 @@
   opacity: 0.8;
 }
 
-/* Draggable Balls (unchanged) */
+/* Dynamic Balls Container (initially empty) */
 .balls-container {
   position: fixed;
   inset: 0;
@@ -110,27 +105,22 @@
   pointer-events: all;
 }
 
-/* Footer */
-footer {
-  text-align: center;
-  padding: 1.5rem 0;
-  background: #111;
-}
-.footer-btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
+/* Drop-Ball Button */
+.drop-ball-btn {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   background: #ff5722;
   color: #fff;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.2s;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s, opacity 0.2s;
 }
-.footer-btn:hover {
-  opacity: 0.9;
-}
-.footer-note {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: #666;
+.drop-ball-btn:hover {
+  transform: scale(1.1);
 }

@@ -2,63 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+  />
   <title>Mark Palkimas — Mobile</title>
-  <!-- Shared CSS -->
-  <link rel="stylesheet" href="../css/app.css" />
-  <!-- Firebase SDKs (replace with your config) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <script defer src="../js/main.js"></script>
+  <link rel="stylesheet" href="app.css" />
+  <link rel="stylesheet" href="mobile.css" />
+  <script defer src="main.js"></script>
 </head>
-<body class="font-sans text-light bg-dark">
-  <!-- Floating draggable balls -->
+
+<body>
+  <!-- Draggable balls -->
   <div class="balls-container">
-    <div class="drop-ball" style="top: 80px; left: 40px;"></div>
-    <div class="drop-ball" style="top: 120px; left: 140px;"></div>
-    <div class="drop-ball" style="top: 60px; left: 240px;"></div>
+    <div class="drop-ball" style="top: 80px; left: 40px"></div>
+    <div class="drop-ball" style="top: 120px; left: 140px"></div>
+    <div class="drop-ball" style="top: 60px; left: 240px"></div>
   </div>
 
-  <!-- Header + About toggle -->
+  <!-- Header with About & Admin toggles -->
   <header class="header-mobile">
     <button class="menu-toggle" aria-label="Toggle About">☰</button>
+    <button class="admin-toggle" aria-label="Admin">⚙️</button>
     <div class="about-popup">
       <p>Hi, I’m Mark—a software engineer building sleek, modern web experiences.</p>
     </div>
   </header>
 
-  <!-- Hero/Profile -->
+  <!-- Profile & Contact -->
   <main>
     <section class="hero">
-      <img src="../images/profile.jpg" alt="Profile Photo" class="profile-photo" loading="lazy" />
+      <img
+        src="assets/profile.jpg"
+        alt="Profile Photo"
+        class="profile-photo"
+        loading="lazy"
+      />
     </section>
 
-    <!-- Contact Icons -->
     <section class="contact-icons">
       <a href="https://github.com/MarkPalkimas" target="_blank" aria-label="GitHub">
-        <img src="../images/github-icon.png" alt="GitHub" />
+        <img src="assets/github-icon.png" alt="GitHub" />
       </a>
       <a href="https://www.linkedin.com/in/MarkPalkimas" target="_blank" aria-label="LinkedIn">
-        <img src="../images/linkedin-icon.png" alt="LinkedIn" />
+        <img src="assets/linkedin-icon.png" alt="LinkedIn" />
       </a>
       <a href="mailto:youremail@example.com" aria-label="Email">
-        <img src="../images/email-icon.png" alt="Email" />
+        <img src="assets/email-icon.png" alt="Email" />
       </a>
-    </section>
-
-    <!-- Contact Form (Firestore) -->
-    <section class="contact-form">
-      <h2>Send a Message</h2>
-      <form id="message-form">
-        <input type="text" id="name" placeholder="Your Name" required />
-        <input type="email" id="email" placeholder="Your Email" required />
-        <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
-        <button type="submit">Submit</button>
-      </form>
-      <p id="form-status"></p>
     </section>
   </main>
 
-  <footer></footer>
+  <!-- Footer (Contact button, etc.) -->
+  <footer>
+    <a href="contact.html" class="footer-btn">Contact</a>
+  </footer>
 </body>
 </html>

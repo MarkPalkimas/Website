@@ -13,14 +13,10 @@
 </head>
 
 <body>
-  <!-- Draggable balls (unchanged functionality) -->
-  <div class="balls-container">
-    <div class="drop-ball" style="top: 80px; left: 40px"></div>
-    <div class="drop-ball" style="top: 120px; left: 140px"></div>
-    <div class="drop-ball" style="top: 60px; left: 240px"></div>
-  </div>
+  <!-- Dynamic container for balls (starts empty) -->
+  <div class="balls-container"></div>
 
-  <!-- Header with About & Admin toggles, plus centered site title -->
+  <!-- Header with About & Admin toggles -->
   <header class="header-mobile">
     <button class="menu-toggle" aria-label="Toggle About">☰</button>
     <button class="admin-toggle" aria-label="Admin">⚙️</button>
@@ -30,7 +26,7 @@
     </div>
   </header>
 
-  <!-- Profile & Contact -->
+  <!-- Hero & Profile -->
   <main>
     <section class="hero">
       <img
@@ -43,6 +39,7 @@
 
     <hr class="separator"/>
 
+    <!-- Exactly three contact icons -->
     <section class="contact-icons">
       <a href="https://github.com/MarkPalkimas" target="_blank" aria-label="GitHub">
         <img src="assets/github-icon.png" alt="GitHub" />
@@ -58,10 +55,9 @@
 
   <hr class="separator"/>
 
-  <!-- Footer (Contact button remains) -->
+  <!-- Drop-ball button replaces old Contact button -->
   <footer>
-    <a href="contact.html" class="footer-btn">Contact</a>
-    <p class="footer-note">© 2025 Mark Palkimas</p>
+    <button class="drop-ball-btn" aria-label="Drop Ball">Drop</button>
   </footer>
 </body>
 </html>

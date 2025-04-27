@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
   <title>Mark Palkimas - Mobile</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -13,12 +13,7 @@
       --accent: #ff0080;
       --neon-colors: lime, yellow, orange, red, magenta, blue;
     }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body {
       background: var(--bg);
       color: var(--text);
@@ -27,10 +22,10 @@
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      -webkit-tap-highlight-color: transparent;
     }
     header {
-      position: sticky;
-      top: 0;
+      position: sticky; top: 0;
       background: rgba(0,0,0,0.8);
       padding: 1rem;
       display: flex;
@@ -47,7 +42,6 @@
       transition: background 0.3s;
     }
     header .projects-link:hover { background: rgba(255,255,255,0.1); }
-
     main {
       flex: 1;
       padding: 1rem;
@@ -105,16 +99,13 @@
     }
     canvas#lightning-canvas {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       pointer-events: none;
       z-index: 8;
     }
     footer {
-      background: var(--footer-bg);
-      margin-top: 20px;
+      margin-top: 45px;
       padding: 1.5rem 1rem;
       text-align: center;
       position: relative;
@@ -191,14 +182,8 @@
 
   <script>
     // About popup handlers
-    function toggleAbout() {
-      document.querySelector('.about-popup').style.display = 'block';
-      document.querySelector('.dimmed').style.display = 'block';
-    }
-    function hideAbout() {
-      document.querySelector('.about-popup').style.display = 'none';
-      document.querySelector('.dimmed').style.display = 'none';
-    }
+    function toggleAbout() { document.querySelector('.about-popup').style.display = 'block'; document.querySelector('.dimmed').style.display = 'block'; }
+    function hideAbout() { document.querySelector('.about-popup').style.display = 'none'; document.querySelector('.dimmed').style.display = 'none'; }
 
     // Ball physics and effects
     const balls = [];
@@ -261,7 +246,7 @@
       document.body.appendChild(q);
       setTimeout(() => q.remove(), 21000);
     }
-
+    setInterval(createQuote, 10000);
     function animateQuotes() {
       const now = Date.now();
       document.querySelectorAll('.falling-quote').forEach(q => {
@@ -270,54 +255,55 @@
       });
       requestAnimationFrame(animateQuotes);
     }
-
-    setInterval(createQuote, 10000);
     animateQuotes();
 
-    // Lightning canvas
+    // Lightning with glow and deeper branching
     const canvas = document.getElementById('lightning-canvas');
     const ctx = canvas.getContext('2d');
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize);
     resize();
     function drawLightning() {
-      const startX = Math.random() * canvas.width;
-      const startY = 0;
-      const endX = startX + (Math.random() - 0.5) * 200;
-      const endY = canvas.height * (0.3 + Math.random() * 0.4);
-      ctx.strokeStyle = neonColors[Math.floor(Math.random() * neonColors.length)];
+      const sx = Math.random() * canvas.width;
+      const sy = 0;
+      const ex = sx + (Math.random() - 0.5) * 300;
+      const ey = canvas.height * (0.3 + Math.random() * 0.4);
+      const col = neonColors[Math.floor(Math.random() * neonColors.length)];
+      ctx.save();
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = col;
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = col;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      function branch(x1,y1,x2,y2,depth) {
-        if (depth > 4) { ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); return; }
-        const mx = (x1 + x2)/2 + (Math.random() - 0.5)*(100/(depth+1));
-        const my = (y1 + y2)/2 + (Math.random() - 0.5)*(100/(depth+1));
+      (function branch(x1,y1,x2,y2,depth) {
+        if (depth > 6) { ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); return; }
+        const mx = (x1 + x2)/2 + (Math.random() - 0.5) * (150/(depth+1));
+        const my = (y1 + y2)/2 + (Math.random() - 0.5) * (150/(depth+1));
         branch(x1,y1,mx,my,depth+1);
         branch(mx,my,x2,y2,depth+1);
-      }
-      branch(startX,startY,endX,endY,0);
+      })(sx,sy,ex,ey,0);
       ctx.stroke();
+      ctx.restore();
       setTimeout(() => ctx.clearRect(0,0,canvas.width,canvas.height), 200);
     }
     setInterval(drawLightning, 5000 + Math.random()*10000);
 
     // Core physics loop
     function animateBalls() {
-      const footerTop = footerEl.getBoundingClientRect().top + window.scrollY;
+      const ftop = footerEl.getBoundingClientRect().top + window.scrollY;
       balls.forEach(b => {
         b.vy += GRAVITY;
         let x = parseFloat(b.style.left);
         let y = parseFloat(b.style.top);
         let nx = x + b.vx;
         let ny = y + b.vy;
-        // walls
         if (nx <= 0 || nx + b.offsetWidth >= window.innerWidth) {
           b.vx *= -REST;
           nx = Math.max(0, Math.min(nx, window.innerWidth - b.offsetWidth));
         }
-        // floor
-        if (ny + b.offsetHeight >= footerTop) {
-          ny = footerTop - b.offsetHeight;
+        if (ny + b.offsetHeight >= ftop) {
+          ny = ftop - b.offsetHeight;
           b.vy *= -REST;
           b.vx *= REST;
         }
@@ -341,14 +327,12 @@
           const dist = Math.hypot(dx, dy);
           const r = (A.offsetWidth + B.offsetWidth)/2;
           if (dist < r && dist > 0) {
-            // simple elastic collision
             const nx = dx/dist, ny = dy/dist;
             const p = 2*(A.vx*nx + A.vy*ny - B.vx*nx - B.vy*ny) / (A.mass + B.mass);
             A.vx -= p * B.mass * nx;
             A.vy -= p * B.mass * ny;
             B.vx += p * A.mass * nx;
             B.vy += p * A.mass * ny;
-            // separate
             const overlap = r - dist;
             A.style.left = (parseFloat(A.style.left) - nx*overlap/2) + 'px';
             A.style.top  = (parseFloat(A.style.top) - ny*overlap/2) + 'px';

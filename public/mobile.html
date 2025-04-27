@@ -145,7 +145,7 @@
     /* ========================================================= */
     footer {
       background: var(--footer-bg);
-      margin-top: 280px; /* moved up by 20px */
+      margin-top: 260px; /* moved up another 20px */
       padding: 1.5rem 1rem;
       text-align: center;
       position: relative;
@@ -261,7 +261,6 @@
     const REST = 0.8;
     const resetBtn = document.querySelector('.reset-btn');
     const footerEl = document.querySelector('footer');
-    const neonColors = ['lime','yellow','orange','red','magenta','blue'];
     let quoteTime = Date.now();
 
     // Lightning control
@@ -273,7 +272,7 @@
     function resize(){
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      HORIZON = canvas.height * 0.5; // define horizon at mid-screen
+      HORIZON = canvas.height * 0.5;
     }
     window.addEventListener('resize', resize);
     resize();
@@ -291,7 +290,6 @@
     function drawLightning(){
       const photo = document.querySelector('.profile-photo').getBoundingClientRect();
       const sx = photo.left + photo.width/2, sy = photo.top + photo.height/2;
-      // choose a random strike point below horizon
       const ex = Math.random() * canvas.width;
       const ey = HORIZON + Math.random() * (canvas.height - HORIZON);
       const segments = [];
@@ -314,16 +312,15 @@
       ctx.globalCompositeOperation = 'lighter';
       ctx.strokeStyle = col;
 
-      // ripple out segments
+      // ripple segments faster (20ms per segment)
       segments.forEach((seg, i) => {
-        const delay = i * 30;
+        const delay = i * 20;
         lightningTimers.push(setTimeout(() => {
           ctx.beginPath();
           ctx.moveTo(seg.x1, seg.y1);
           ctx.lineTo(seg.x2, seg.y2);
           ctx.lineWidth = 2;
           ctx.stroke();
-          // glow pass
           ctx.lineWidth = 6;
           ctx.globalAlpha = 0.2;
           ctx.stroke();
@@ -332,7 +329,7 @@
       });
 
       // clear after ripple
-      const clearDelay = segments.length * 30 + 200;
+      const clearDelay = segments.length * 20 + 150;
       lightningTimers.push(setTimeout(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
@@ -340,12 +337,11 @@
     }
 
     function scheduleLightning(){
-      const burstCount = 3 + Math.floor(Math.random() * 6); // 3–8 strikes per burst
+      const burstCount = 3 + Math.floor(Math.random() * 6);
       for(let i=0; i<burstCount; i++){
         lightningTimers.push(setTimeout(drawLightning, i * 100));
       }
-      const next = 2000 + Math.random() * 3000; // 2–5 seconds until next burst
-      lightningTimers.push(setTimeout(scheduleLightning, next));
+      lightningTimers.push(setTimeout(scheduleLightning, 2000 + Math.random() * 3000));
     }
 
     function dropBall(){
@@ -367,7 +363,7 @@
       resetBtn.style.display = 'inline-block';
       if(balls.length===1){
         animateBalls();
-        scheduleLightning(); // start lightning bursts
+        scheduleLightning();
       }
     }
 
@@ -375,10 +371,8 @@
       balls.forEach(b=>b.remove());
       balls.length = 0;
       resetBtn.style.display = 'none';
-      // stop all pending lightning timers
       lightningTimers.forEach(id => clearTimeout(id));
       lightningTimers.length = 0;
-      // clear any lightning on canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 

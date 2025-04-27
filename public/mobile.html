@@ -37,7 +37,7 @@
     }
 
     /* ========================================================= */
-    /* Header                                                     */
+    /* Header                                                    */
     /* ========================================================= */
     header {
       position: sticky;
@@ -65,7 +65,7 @@
     }
 
     /* ========================================================= */
-    /* Main & Profile                                             */
+    /* Main & Profile                                            */
     /* ========================================================= */
     main {
       flex: 1;
@@ -128,7 +128,7 @@
     }
 
     /* ========================================================= */
-    /* Canvas Lightning                                           */
+    /* Canvas Lightning                                          */
     /* ========================================================= */
     canvas#lightning-canvas {
       position: absolute;
@@ -141,15 +141,20 @@
     }
 
     /* ========================================================= */
-    /* Footer & Contact                                           */
+    /* Footer & Contact                                          */
     /* ========================================================= */
     footer {
       background: var(--footer-bg);
-      margin-top: 300px; /* pushed further down */
+      margin-top: 280px; /* moved up by 20px */
       padding: 1.5rem 1rem;
       text-align: center;
       position: relative;
       z-index: 5;
+    }
+    footer p {
+      color: #888;        /* blended copyright */
+      font-size: 0.8rem;
+      margin-top: 1rem;
     }
     .social-links {
       display: flex;
@@ -184,7 +189,7 @@
     .reset-btn:hover { opacity: 1; }
 
     /* ========================================================= */
-    /* Quotes & Balls                                              */
+    /* Quotes & Balls                                            */
     /* ========================================================= */
     .falling-quote {
       position: absolute;
@@ -259,6 +264,90 @@
     const neonColors = ['lime','yellow','orange','red','magenta','blue'];
     let quoteTime = Date.now();
 
+    // Lightning control
+    const lightningTimers = [];
+    const canvas = document.getElementById('lightning-canvas');
+    const ctx = canvas.getContext('2d');
+    let HORIZON = 0;
+
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      HORIZON = canvas.height * 0.5; // define horizon at mid-screen
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function getCurrentNeonColor(){
+      const t = (Date.now()%8000)/8000;
+      if(t<0.16) return 'lime';
+      if(t<0.33) return 'yellow';
+      if(t<0.5) return 'orange';
+      if(t<0.66) return 'red';
+      if(t<0.83) return 'magenta';
+      return 'blue';
+    }
+
+    function drawLightning(){
+      const photo = document.querySelector('.profile-photo').getBoundingClientRect();
+      const sx = photo.left + photo.width/2, sy = photo.top + photo.height/2;
+      // choose a random strike point below horizon
+      const ex = Math.random() * canvas.width;
+      const ey = HORIZON + Math.random() * (canvas.height - HORIZON);
+      const segments = [];
+
+      (function branch(x1,y1,x2,y2,depth){
+        if(depth>6){
+          segments.push({x1,y1,x2,y2});
+          return;
+        }
+        const mx = (x1+x2)/2 + (Math.random()-0.5)*(150/(depth+1));
+        const my = (y1+y2)/2 + (Math.random()-0.5)*(150/(depth+1));
+        branch(x1,y1,mx,my,depth+1);
+        branch(mx,my,x2,y2,depth+1);
+      })(sx, sy, ex, ey, 0);
+
+      const col = getCurrentNeonColor();
+      ctx.save();
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = col;
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = col;
+
+      // ripple out segments
+      segments.forEach((seg, i) => {
+        const delay = i * 30;
+        lightningTimers.push(setTimeout(() => {
+          ctx.beginPath();
+          ctx.moveTo(seg.x1, seg.y1);
+          ctx.lineTo(seg.x2, seg.y2);
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // glow pass
+          ctx.lineWidth = 6;
+          ctx.globalAlpha = 0.2;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }, delay));
+      });
+
+      // clear after ripple
+      const clearDelay = segments.length * 30 + 200;
+      lightningTimers.push(setTimeout(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }, clearDelay));
+    }
+
+    function scheduleLightning(){
+      const burstCount = 3 + Math.floor(Math.random() * 6); // 3–8 strikes per burst
+      for(let i=0; i<burstCount; i++){
+        lightningTimers.push(setTimeout(drawLightning, i * 100));
+      }
+      const next = 2000 + Math.random() * 3000; // 2–5 seconds until next burst
+      lightningTimers.push(setTimeout(scheduleLightning, next));
+    }
+
     function dropBall(){
       const b = document.createElement('div');
       const sz = 30 + Math.random()*30;
@@ -276,13 +365,21 @@
       document.body.appendChild(b);
       balls.push(b);
       resetBtn.style.display = 'inline-block';
-      if(balls.length===1) animateBalls();
+      if(balls.length===1){
+        animateBalls();
+        scheduleLightning(); // start lightning bursts
+      }
     }
 
     function resetBalls(){
       balls.forEach(b=>b.remove());
       balls.length = 0;
       resetBtn.style.display = 'none';
+      // stop all pending lightning timers
+      lightningTimers.forEach(id => clearTimeout(id));
+      lightningTimers.length = 0;
+      // clear any lightning on canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     // Falling Quotes
@@ -308,67 +405,33 @@
       requestAnimationFrame(animateQuotes);
     })();
 
-    // Current neon color helper
-    function getCurrentNeonColor(){
-      const t = (Date.now()%8000)/8000;
-      if(t<0.16) return 'lime';
-      if(t<0.33) return 'yellow';
-      if(t<0.5) return 'orange';
-      if(t<0.66) return 'red';
-      if(t<0.83) return 'magenta';
-      return 'blue';
-    }
-
-    // Lightning Setup
-    const canvas = document.getElementById('lightning-canvas'), ctx = canvas.getContext('2d');
-    function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize',resize); resize();
-
-    function drawMultipleLightning(){ for(let i=0;i<5;i++) setTimeout(drawLightning, i*200); }
-    function scheduleLightning(){ setTimeout(()=>{ drawMultipleLightning(); scheduleLightning(); }, 1000 + Math.random()*1000); }
-
-    function drawLightning(){
-      const photo = document.querySelector('.profile-photo').getBoundingClientRect();
-      const sx = photo.left + photo.width/2, sy = photo.top + photo.height/2;
-      const angle = Math.random()*2*Math.PI;
-      const len = canvas.height*(0.3+Math.random()*0.4);
-      const ex = sx + Math.cos(angle)*len, ey = sy + Math.sin(angle)*len;
-      const col = getCurrentNeonColor();
-      ctx.save();
-      ctx.shadowBlur = 30; ctx.shadowColor = col;
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = col; ctx.lineWidth = 2;
-      ctx.beginPath();
-      (function branch(x1,y1,x2,y2,depth){
-        if(depth>6){ ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); return; }
-        const mx = (x1+x2)/2 + (Math.random()-0.5)*(150/(depth+1));
-        const my = (y1+y2)/2 + (Math.random()-0.5)*(150/(depth+1));
-        branch(x1,y1,mx,my,depth+1);
-        branch(mx,my,x2,y2,depth+1);
-      })(sx,sy,ex,ey,0);
-      ctx.stroke();
-      // extra glow pass
-      ctx.lineWidth = 6; ctx.globalAlpha = 0.2; ctx.stroke(); ctx.globalAlpha = 1;
-      ctx.restore();
-      setTimeout(()=>ctx.clearRect(0,0,canvas.width,canvas.height),300);
-    }
-    scheduleLightning();
-
     // Physics loop
     function animateBalls(){
       const ftop = footerEl.getBoundingClientRect().top + window.scrollY;
       balls.forEach(b=>{
         b.vy += GRAVITY;
-        let x = parseFloat(b.style.left), y = parseFloat(b.style.top), nx = x + b.vx, ny = y + b.vy;
-        if(nx<=0||nx+b.offsetWidth>=window.innerWidth){ b.vx*=-REST; nx=Math.max(0,Math.min(nx,window.innerWidth-b.offsetWidth)); }
-        if(ny+b.offsetHeight>=ftop){ ny=ftop-b.offsetHeight; b.vy*=-REST; b.vx*=REST; }
-        b.style.left = nx+'px'; b.style.top = ny+'px';
+        let x = parseFloat(b.style.left), y = parseFloat(b.style.top);
+        let nx = x + b.vx, ny = y + b.vy;
+        if(nx<=0||nx+b.offsetWidth>=window.innerWidth){
+          b.vx*=-REST;
+          nx=Math.max(0,Math.min(nx,window.innerWidth-b.offsetWidth));
+        }
+        if(ny+b.offsetHeight>=ftop){
+          ny=ftop-b.offsetHeight;
+          b.vy*=-REST;
+          b.vx*=REST;
+        }
+        b.style.left = nx+'px';
+        b.style.top = ny+'px';
       });
       for(let i=0;i<balls.length;i++){
         for(let j=i+1;j<balls.length;j++){
-          const A=balls[i], B=balls[j], ax=parseFloat(A.style.left)+A.offsetWidth/2,
-                ay=parseFloat(A.style.top)+A.offsetHeight/2, bx=parseFloat(B.style.left)+B.offsetWidth/2,
-                by=parseFloat(B.style.top)+B.offsetHeight/2, dx=bx-ax, dy=by-ay,
+          const A=balls[i], B=balls[j],
+                ax=parseFloat(A.style.left)+A.offsetWidth/2,
+                ay=parseFloat(A.style.top)+A.offsetHeight/2,
+                bx=parseFloat(B.style.left)+B.offsetWidth/2,
+                by=parseFloat(B.style.top)+B.offsetHeight/2,
+                dx=bx-ax, dy=by-ay,
                 dist=Math.hypot(dx,dy), r=(A.offsetWidth+B.offsetWidth)/2;
           if(dist<r&&dist>0){
             const nx=dx/dist, ny=dy/dist,

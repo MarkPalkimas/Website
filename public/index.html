@@ -44,85 +44,7 @@
         text-decoration: none;
         color: #eee;
       }
-      /* Popup & Overlay Styles */
-      .about-popup,
-      .social-popup,
-      .admin-popup {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1010;
-        max-width: 600px;
-        width: 90%;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      }
-      /* Modern About Popup */
-      .about-popup {
-        background: #fff;
-        color: #333;
-        padding: 30px;
-      }
-      .about-popup-content {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
-      .about-image {
-        flex-shrink: 0;
-      }
-      .about-image img {
-        width: 200px;
-        border-radius: 8px;
-      }
-      .about-text {
-        flex: 1;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-      /* Social Popup - White background so icons stand out */
-      .social-popup {
-        background: #fff;
-        color: #333;
-        padding: 30px;
-        text-align: center;
-      }
-      .social-popup-content {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-      }
-      .popup-social-links {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        align-items: center;
-      }
-      .popup-social-links img {
-        width: 50px;
-        height: 50px;
-      }
-      /* Admin Popup */
-      .admin-popup {
-        background: #f9f9f9;
-        color: #333;
-        padding: 30px;
-        text-align: center;
-      }
-      .admin-popup-content input {
-        width: 80%;
-        padding: 10px;
-        margin: 10px 0;
-        font-size: 16px;
-      }
-      .admin-popup-content button {
-        padding: 10px 20px;
-        margin: 5px;
-        font-size: 16px;
-      }
-      /* Dimming Overlay */
+      /* Dimmed Background Overlay */
       .dimmed {
         position: fixed;
         top: 0;
@@ -131,6 +53,106 @@
         height: 100%;
         background: rgba(0, 0, 0, 0.7);
         z-index: 1005;
+        display: none;
+      }
+      /* Popups Container – ensures popups are above the overlay */
+      #popups-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2000;
+        pointer-events: none;
+      }
+      /* Common Popup Styles */
+      .popup {
+        display: none;
+        pointer-events: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 600px;
+        width: 90%;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 30px;
+      }
+      /* About Popup */
+      .about-popup {
+        background: #fff;
+        color: #333;
+      }
+      .about-popup .about-popup-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .about-popup .about-image {
+        flex-shrink: 0;
+      }
+      .about-popup .about-image img {
+        width: 200px;
+        border-radius: 8px;
+      }
+      .about-popup .about-text {
+        flex: 1;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      /* Social (Contacts) Popup */
+      .social-popup {
+        background: linear-gradient(135deg, #ffffff, #f0f0f0);
+        color: #333;
+        text-align: center;
+      }
+      .social-popup .social-popup-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        width: 100%;
+      }
+      .social-popup h2 {
+        margin: 0;
+      }
+      .popup-social-links {
+        display: flex;
+        width: 100%;
+        justify-content: space-evenly;
+        align-items: center;
+      }
+      .popup-social-links a {
+        flex: 1;
+      }
+      .popup-social-links img {
+        width: 50px;
+        height: 50px;
+        display: block;
+        margin: 0 auto;
+      }
+      /* Admin Popup */
+      .admin-popup {
+        background: #f9f9f9;
+        color: #333;
+        text-align: center;
+      }
+      .admin-popup .admin-popup-content input {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 16px;
+      }
+      .admin-popup .admin-popup-content button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+      }
+      .admin-popup .admin-popup-content #admin-error {
+        color: red;
+        margin-bottom: 10px;
+        font-size: 14px;
         display: none;
       }
       /* Footer */
@@ -166,7 +188,7 @@
       .reset-btn:hover {
         background-color: #c21010;
       }
-      /* Neon Glow Effect */
+      /* Neon Glow Effect – the orb follows the cursor */
       #neon-container {
         position: fixed;
         top: 0;
@@ -255,21 +277,6 @@
         <div class="intro-text">
           <h2>Hello, I'm Mark Palkimas</h2>
         </div>
-        <!-- Modern About Popup -->
-        <div class="about-popup">
-          <div class="about-popup-content">
-            <div class="about-image">
-              <!-- Update image path -->
-              <img src="assets/profile.jpg" alt="Profile Image" />
-            </div>
-            <div class="about-text">
-              <h2>About Me</h2>
-              <p>
-                I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
       <section id="portfolio" class="section">
         <!-- Portfolio content goes here -->
@@ -303,29 +310,62 @@
       </div>
     </footer>
     
-    <!-- Social Popup for Contact Links -->
-    <div class="social-popup">
-      <div class="social-popup-content">
-        <p>Contact Links:</p>
-        <div class="popup-social-links">
-          <!-- Social links will be cloned here dynamically -->
+    <!-- Popups Container -->
+    <div id="popups-container">
+      <!-- About Popup (not dimmed) -->
+      <div class="popup about-popup" id="about-popup">
+        <div class="about-popup-content">
+          <div class="about-image">
+            <img src="assets/profile.jpg" alt="Profile Image" />
+          </div>
+          <div class="about-text">
+            <h2>About Me</h2>
+            <p>
+              I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contacts Popup -->
+      <div class="popup social-popup" id="contact-popup">
+        <div class="social-popup-content">
+          <h2>Contact Links</h2>
+          <div class="popup-social-links">
+            <a href="https://www.instagram.com/ya.boimark" target="_blank">
+              <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
+            </a>
+            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
+              <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
+            </a>
+            <a href="https://github.com/MarkPalkimas" target="_blank">
+              <img src="assets/github-logo.png" alt="GitHub" />
+            </a>
+            <a href="mailto:mark.palkimas@gmail.com" target="_blank">
+              <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
+            </a>
+            <a href="https://www.youtube.com/@markpalkimas" target="_blank">
+              <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Admin Popup -->
+      <div class="popup admin-popup" id="admin-popup">
+        <div class="admin-popup-content">
+          <h2>Admin Sign In</h2>
+          <p id="admin-error">Wrong password</p>
+          <input type="password" id="admin-password" placeholder="Password" />
+          <button id="toggle-password">Show</button>
+          <br />
+          <button id="submit-password">Submit</button>
+          <button id="cancel-password">Cancel</button>
         </div>
       </div>
     </div>
     
-    <!-- Admin Popup for Password Entry -->
-    <div class="admin-popup">
-      <div class="admin-popup-content">
-        <h2>Enter Admin Password</h2>
-        <input type="password" id="admin-password" placeholder="Password" />
-        <button id="toggle-password">Show</button>
-        <br />
-        <button id="submit-password">Submit</button>
-        <button id="cancel-password">Cancel</button>
-      </div>
-    </div>
-    
-    <!-- Reset Button -->
+    <!-- Reset Button (if needed) -->
     <button class="reset-btn">Reset</button>
     
     <script src="main.js"></script>

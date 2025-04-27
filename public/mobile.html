@@ -25,6 +25,7 @@
       flex-direction: column;
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
     }
     header {
       position: sticky;
@@ -34,7 +35,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 10;
+      z-index: 50;
     }
     header .logo {
       font-weight: 600;
@@ -50,6 +51,7 @@
     header .projects-link:hover {
       background: rgba(255,255,255,0.1);
     }
+
     main {
       flex: 1;
       padding: 1rem;
@@ -60,7 +62,7 @@
       text-align: center;
       margin-bottom: 2rem;
       position: relative;
-      z-index: 5;
+      z-index: 10;
     }
     .profile-photo {
       width: 120px;
@@ -89,24 +91,55 @@
     .about-popup {
       display: none;
       position: absolute;
-      top: 75%; left: 50%;
+      top: 75%;
+      left: 50%;
       transform: translateX(-50%);
       background: #222;
       color: var(--text);
       padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.7);
-      width: 80%; max-width: 260px;
-      z-index: 10;
+      width: 80%;
+      max-width: 260px;
+      z-index: 20;
     }
     .dimmed {
       display: none;
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.6);
-      z-index: 9;
+      z-index: 15;
       cursor: pointer;
     }
+
+    /* Footer & Contact */
+    footer {
+      background: var(--bg);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: relative;
+      z-index: 5;
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .social-links img {
+      width: 32px;
+      height: 32px;
+      transition: transform 0.3s;
+    }
+    .social-links img:hover {
+      transform: scale(1.2);
+    }
+    .gravity-footer {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Buttons */
     .gravity-btn, .reset-btn {
       display: inline-block;
       background: var(--accent);
@@ -118,38 +151,25 @@
       cursor: pointer;
       transition: opacity 0.3s, transform 0.2s;
       margin: 0.5rem;
+      z-index: 10;
     }
-    .gravity-btn { opacity: 0.5; }
-    .gravity-btn:hover { opacity: 1; transform: translateY(-2px); }
+    .gravity-btn {
+      opacity: 0.5;
+    }
+    .gravity-btn:hover {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
     .reset-btn {
       background: #555;
       opacity: 0.8;
       display: none;
     }
-    .reset-btn:hover { opacity: 1; }
-    footer {
-      background: var(--bg);
-      padding: 1.5rem 1rem;
-      text-align: center;
-      position: relative;
-      z-index: 1;
+    .reset-btn:hover {
+      opacity: 1;
     }
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .social-links img {
-      width: 32px; height: 32px;
-      filter: none;
-      transition: transform 0.3s;
-    }
-    .social-links img:hover { transform: scale(1.2); }
-    .gravity-footer {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+
+    /* Quotes */
     .falling-quote {
       position: absolute;
       font-size: 0.9rem;
@@ -158,23 +178,36 @@
       padding: 0.4rem 0.6rem;
       border-radius: 4px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+      z-index: 5;
     }
-    .ball { position: absolute; border-radius: 50%; }
+
+    /* Balls */
+    .ball {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 5;
+    }
+
+    /* Neon Streaks */
     .streak {
       position: absolute;
-      width: 100px;
+      width: 150px;
       height: 2px;
       background: currentColor;
-      opacity: 0.8;
+      opacity: 0.9;
       filter: blur(2px);
       transform: translateX(-150px) rotate(20deg);
       animation: streakAnim 1s ease-out forwards;
-      z-index: 2;
+      z-index: 5;
     }
     @keyframes streakAnim {
       to { transform: translateX(120vw) rotate(20deg); opacity: 0; }
     }
-    @keyframes fall { to { transform: translateY(120vh); } }
+
+    /* Ball fall helper */
+    @keyframes fall {
+      to { transform: translateY(120vh); }
+    }
   </style>
 </head>
 <body>
@@ -199,11 +232,21 @@
   <footer>
     <h2>Contact Me</h2>
     <div class="social-links">
-      <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"></a>
-      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"></a>
-      <a href="https://github.com/MarkPalkimas" target="_blank"><img src="assets/github-logo.png" alt="GitHub"></a>
-      <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"></a>
-      <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"></a>
+      <a href="https://www.instagram.com/ya.boimark" target="_blank">
+        <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram">
+      </a>
+      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
+        <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn">
+      </a>
+      <a href="https://github.com/MarkPalkimas" target="_blank">
+        <img src="assets/github-logo.png" alt="GitHub">
+      </a>
+      <a href="mailto:mark.palkimas@gmail.com" target="_blank">
+        <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail">
+      </a>
+      <a href="https://www.youtube.com/@markpalkimas" target="_blank">
+        <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube">
+      </a>
     </div>
     <div class="gravity-footer">
       <button class="gravity-btn" onclick="dropBall()">Drop Ball</button>
@@ -213,6 +256,7 @@
   </footer>
 
   <script>
+    // About popup
     function toggleAbout() {
       document.querySelector('.about-popup').style.display = 'block';
       document.querySelector('.dimmed').style.display = 'block';
@@ -222,87 +266,153 @@
       document.querySelector('.dimmed').style.display = 'none';
     }
 
+    // Physics & Effects
     const balls = [];
     const GRAVITY = 0.3, REST = 0.8;
     const resetBtn = document.querySelector('.reset-btn');
     const footerEl = document.querySelector('footer');
     const neonColors = ['lime','yellow','orange','red','magenta','blue'];
-    let quotesStarted = false, quoteTime = Date.now();
+    let effectsStarted = false, quoteTime = Date.now();
 
     function dropBall() {
+      // create ball
       const b = document.createElement('div');
-      const d = 40 + Math.random()*30;
+      const d = 30 + Math.random()*30;
       Object.assign(b.style, {
-        width: d+'px', height: d+'px',
-        left: Math.random()*(window.innerWidth-d)+'px',
-        top: '10px',
-        backgroundColor: '#'+Math.random().toString(16).slice(2,8)
+        width: d + 'px',
+        height: d + 'px',
+        left: Math.random()*(window.innerWidth - d) + 'px',
+        top: '50px',
+        backgroundColor: '#' + Math.random().toString(16).slice(2,8)
       });
-      b.className = 'ball'; b.radius = d/2; b.mass = b.radius*b.radius;
-      b.velocityX = Math.random()*2-1; b.velocityY = 2 + Math.random()*2;
-      document.body.appendChild(b); balls.push(b);
+      b.className = 'ball';
+      b.radius = d/2;
+      b.mass = b.radius * b.radius;
+      b.velX = Math.random()*2 - 1;
+      b.velY = 2 + Math.random()*2;
+
+      document.body.appendChild(b);
+      balls.push(b);
       resetBtn.style.display = 'inline-block';
-      if (!quotesStarted) { startEffects(); quotesStarted = true; }
+
+      if (!effectsStarted) {
+        startEffects();
+        effectsStarted = true;
+      }
     }
 
-    function resetBalls() { balls.forEach(x=>x.remove()); balls.length=0; resetBtn.style.display='none'; }
+    function resetBalls() {
+      balls.forEach(b => b.remove());
+      balls.length = 0;
+      resetBtn.style.display = 'none';
+    }
 
     function startEffects() {
       setInterval(createQuote, 10000);
       setInterval(createStreak, 10000 + Math.random()*10000);
       animateQuotes();
-      updateBalls();
+      animateBalls();
     }
 
     function createQuote() {
-      const arr=[
+      const msgs = [
         "Life isn’t about what you know, it’s about what you’re able to figure out.",
         "The best time to plant a tree is 20 years ago, the second best time is today.",
         "Money is not the key to happiness, it is the key to pursuing opportunities.",
         "Cold water feels warm when your hands are freezing.",
         "Regret is proof you cared. But growth is proof you learned."
       ];
-      const q=document.createElement('div'); q.className='falling-quote';
-      q.innerText=arr[Math.floor(Math.random()*arr.length)];
-      const left0=Math.random()*(window.innerWidth-260);
-      q.dataset.initialLeft=left0; q.dataset.amp=10+Math.random()*20; q.dataset.phase=Math.random()*2*Math.PI;
-      Object.assign(q.style,{ left:left0+'px', top:'-50px', animation:'fall 20s linear forwards' });
-      document.body.appendChild(q); setTimeout(()=>q.remove(),21000);
+      const q = document.createElement('div');
+      q.className = 'falling-quote';
+      q.innerText = msgs[Math.floor(Math.random()*msgs.length)];
+      const left0 = Math.random()*(window.innerWidth - 260);
+      q.dataset.initialLeft = left0;
+      q.dataset.amp = 10 + Math.random()*20;
+      q.dataset.phase = Math.random()*2*Math.PI;
+      Object.assign(q.style, {
+        left: left0 + 'px',
+        top: '-50px',
+        animation: 'fall 20s linear forwards'
+      });
+      document.body.appendChild(q);
+      setTimeout(()=> q.remove(), 21000);
     }
 
     function animateQuotes() {
-      const now=Date.now(); document.querySelectorAll('.falling-quote').forEach(q=>{
-        const t=(now-quoteTime)/1000;
-        q.style.left=(+q.dataset.initialLeft + q.dataset.amp*Math.sin(t+ +q.dataset.phase))+'px';
-      }); requestAnimationFrame(animateQuotes);
+      const now = Date.now();
+      document.querySelectorAll('.falling-quote').forEach(q => {
+        const t = (now - quoteTime)/1000;
+        q.style.left = (+q.dataset.initialLeft + q.dataset.amp*Math.sin(t + +q.dataset.phase)) + 'px';
+      });
+      requestAnimationFrame(animateQuotes);
     }
 
     function createStreak() {
-      const streak = document.createElement('div'); streak.className='streak';
+      const s = document.createElement('div');
+      s.className = 'streak';
       const top = 20 + Math.random()*60;
-      const col = neonColors[Math.floor(Math.random()*neonColors.length)];
-      streak.style.top = top + 'vh'; streak.style.color = col;
-      streak.style.transform = 'translateX(-150px) rotate('+(10+Math.random()*20)+'deg)';
-      document.body.appendChild(streak); setTimeout(()=>streak.remove(),1500);
+      const c = neonColors[Math.floor(Math.random()*neonColors.length)];
+      s.style.top = top + 'vh';
+      s.style.color = c;
+      s.style.transform = `translateX(-150px) rotate(${10 + Math.random()*20}deg)`;
+      document.body.appendChild(s);
+      setTimeout(()=> s.remove(), 1500);
     }
 
-    function updateBalls() {
-      balls.forEach(b=>{
-        b.velocityY += GRAVITY; let x=+b.style.left, y=+b.style.top;
-        let nx=x+b.velocityX, ny=y+b.velocityY;
-        if(nx<=0||nx+2*b.radius>=window.innerWidth) {
-          b.velocityX=-b.velocityX*REST; nx=Math.max(0,Math.min(nx,window.innerWidth-2*b.radius));
+    function animateBalls() {
+      const footerTop = footerEl.getBoundingClientRect().top + window.scrollY;
+      balls.forEach(b => {
+        b.velY += GRAVITY;
+        let x = +b.style.left, y = +b.style.top;
+        let nx = x + b.velX, ny = y + b.velY;
+
+        // wall bounce
+        if (nx <= 0 || nx + 2*b.radius >= window.innerWidth) {
+          b.velX *= -REST;
+          nx = Math.max(0, Math.min(nx, window.innerWidth - 2*b.radius));
         }
-        const floorY=footerEl.getBoundingClientRect().top + window.scrollY;
-        if(ny+2*b.radius>=floorY) {
-          ny=floorY-2*b.radius; b.velocityY=-b.velocityY*REST; b.velocityX*=REST;
+        // floor bounce
+        if (ny + 2*b.radius >= footerTop) {
+          ny = footerTop - 2*b.radius;
+          b.velY *= -REST;
+          b.velX *= REST;
         }
-        b.style.left=nx+'px'; b.style.top=ny+'px';
-      }); handleCollisions(); requestAnimationFrame(updateBalls);
+
+        b.style.left = nx + 'px';
+        b.style.top  = ny + 'px';
+      });
+
+      handleCollisions();
+      requestAnimationFrame(animateBalls);
     }
 
     function handleCollisions() {
-      for(let i=0;i<balls.length;i++){ for(let j=i+1;j<balls.length;j++){ const A=balls[i],B=balls[j]; const xA=+A.style.left+A.radius,yA=+A.style.top+A.radius; const xB=+B.style.left+B.radius,yB=+B.style.top+B.radius; const dx=xB-xA,dy=yB-yA,dist=Math.hypot(dx,dy); if(dist<A.radius+B.radius&&dist>0){ const nx_=dx/dist,ny_=dy/dist,tx_=-ny_,ty_=nx_; const vAn=A.velocityX*nx_+A.velocityY*ny_,vAt=A.velocityX*tx_+A.velocityY*ty_,vBn=B.velocityX*nx_+B.velocityY*ny_,vBt=B.velocityX*tx_+B.velocityY*ty_; const vAnAfter=(vAn*(A.mass-B.mass)+2*B.mass*vBn)/(A.mass+B.mass),vBnAfter=(vBn*(B.mass-A.mass)+2*A.mass*vAn)/(A.mass+B.mass); A.velocityX=vAnAfter*nx_+vAt*tx_; A.velocityY=vAnAfter*ny_+vAt*ty_; B.velocityX=vBnAfter*nx_+vBt*tx_; B.velocityY=vBnAfter*ny_+vBt*ty_; const overlap=A.radius+B.radius-dist,sepX=nx_*overlap/2,sepY=ny_*overlap/2; A.style.left=(+A.style.left-sepX)+'px'; A.style.top=(+A.style.top-sepY)+'px'; B.style.left=(+B.style.left+sepX)+'px'; B.style.top=(+B.style.top+sepY)+'px'; }}}}
+      for (let i=0; i<balls.length; i++) {
+        for (let j=i+1; j<balls.length; j++) {
+          const A = balls[i], B = balls[j];
+          const xA = +A.style.left + A.radius, yA = +A.style.top + A.radius;
+          const xB = +B.style.left + B.radius, yB = +B.style.top + B.radius;
+          const dx = xB - xA, dy = yB - yA, dist = Math.hypot(dx, dy);
+          if (dist < A.radius + B.radius && dist > 0) {
+            const nx = dx/dist, ny = dy/dist, tx = -ny, ty = nx;
+            const vAn = A.velX*nx + A.velY*ny, vAt = A.velX*tx + A.velY*ty;
+            const vBn = B.velX*nx + B.velY*ny, vBt = B.velX*tx + B.velY*ty;
+            const vAnAfter = (vAn*(A.mass - B.mass) + 2*B.mass*vBn)/(A.mass + B.mass);
+            const vBnAfter = (vBn*(B.mass - A.mass) + 2*A.mass*vAn)/(A.mass + B.mass);
+            A.velX = vAnAfter*nx + vAt*tx;
+            A.velY = vAnAfter*ny + vAt*ty;
+            B.velX = vBnAfter*nx + vBt*tx;
+            B.velY = vBnAfter*ny + vBt*ty;
+            const overlap = A.radius + B.radius - dist;
+            const sepX = nx*overlap/2, sepY = ny*overlap/2;
+            A.style.left = (+A.style.left - sepX) + 'px';
+            A.style.top  = (+A.style.top  - sepY) + 'px';
+            B.style.left = (+B.style.left + sepX) + 'px';
+            B.style.top  = (+B.style.top  + sepY) + 'px';
+          }
+        }
+      }
+    }
   </script>
 </body>
 </html>

@@ -2,69 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mark Palkimas — Mobile</title>
-  <link rel="stylesheet" href="mobile.css"/>
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../css/app.css" />
+  <!-- Firebase SDKs (replace with your config) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script defer src="../js/main.js"></script>
 </head>
-<body>
-  <header class="header">
-    <div class="logo">Mark Palkimas</div>
-    <button class="menu-btn">☰</button>
-    <nav class="nav-menu">
-      <ul>
-        <li><a href="#about" class="about-link">About</a></li>
-        <li><a href="#contact" class="contact-link">Contact</a></li>
-        <li><button class="admin-btn">Admin</button></li>
-      </ul>
-    </nav>
+<body class="font-sans text-light bg-dark">
+  <!-- Floating draggable balls -->
+  <div class="balls-container">
+    <div class="drop-ball" style="top: 80px; left: 40px;"></div>
+    <div class="drop-ball" style="top: 120px; left: 140px;"></div>
+    <div class="drop-ball" style="top: 60px; left: 240px;"></div>
+  </div>
+
+  <!-- Header + About toggle -->
+  <header class="header-mobile">
+    <button class="menu-toggle" aria-label="Toggle About">☰</button>
+    <div class="about-popup">
+      <p>Hi, I’m Mark—a software engineer building sleek, modern web experiences.</p>
+    </div>
   </header>
 
-  <main class="content">
-    <section id="about" class="section">
-      <div class="avatar-wrapper">
-        <img src="assets/profile.jpg" alt="Profile photo" class="avatar"/>
-      </div>
-      <h1>Hello, I’m Mark Palkimas</h1>
-      <div class="social-links">
-        <a href="https://www.instagram.com/ya.boimark" target="_blank">IG</a>
-        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">LI</a>
-        <a href="https://github.com/MarkPalkimas" target="_blank">GH</a>
-        <a href="mailto:mark.palkimas@gmail.com">Email</a>
-      </div>
+  <!-- Hero/Profile -->
+  <main>
+    <section class="hero">
+      <img src="../images/profile.jpg" alt="Profile Photo" class="profile-photo" loading="lazy" />
     </section>
 
-    <section class="actions">
-      <button class="gravity-btn">Drop Ball</button>
-      <button class="reset-btn">Reset</button>
+    <!-- Contact Icons -->
+    <section class="contact-icons">
+      <a href="https://github.com/MarkPalkimas" target="_blank" aria-label="GitHub">
+        <img src="../images/github-icon.png" alt="GitHub" />
+      </a>
+      <a href="https://www.linkedin.com/in/MarkPalkimas" target="_blank" aria-label="LinkedIn">
+        <img src="../images/linkedin-icon.png" alt="LinkedIn" />
+      </a>
+      <a href="mailto:youremail@example.com" aria-label="Email">
+        <img src="../images/email-icon.png" alt="Email" />
+      </a>
+    </section>
+
+    <!-- Contact Form (Firestore) -->
+    <section class="contact-form">
+      <h2>Send a Message</h2>
+      <form id="message-form">
+        <input type="text" id="name" placeholder="Your Name" required />
+        <input type="email" id="email" placeholder="Your Email" required />
+        <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+      <p id="form-status"></p>
     </section>
   </main>
 
-  <footer class="footer">
-    © 2024 Mark Palkimas
-  </footer>
-
-  <div class="dimmed"></div>
-  <div id="popups-container">
-    <div class="popup about-popup" id="about-popup">
-      <h2>About Me</h2>
-      <p>I'm an ambitious student ...</p>
-    </div>
-    <div class="popup social-popup" id="contact-popup">
-      <h2>Contact</h2>
-      <div class="popup-social-links">
-        <!-- icons -->
-      </div>
-    </div>
-    <div class="popup admin-popup" id="admin-popup">
-      <h2>Admin Sign In</h2>
-      <p id="admin-error" style="color:red;display:none;">Wrong password</p>
-      <input type="password" id="admin-password" placeholder="Password"/>
-      <button id="toggle-password">Show</button>
-      <button id="submit-password">Submit</button>
-      <button id="cancel-password">Cancel</button>
-    </div>
-  </div>
-
-  <script src="main.js"></script>
+  <footer></footer>
 </body>
 </html>

@@ -143,14 +143,15 @@
     /* ========================================================= */
     /* Footer & Contact                                          */
     /* ========================================================= */
-    footer {
-      background: var(--footer-bg);
-      margin-top: 260px; /* moved up another 20px */
-      padding: 1.5rem 1rem;
-      text-align: center;
-      position: relative;
-      z-index: 5;
-    }
+   footer {
+  background: var(--footer-bg);
+  margin-top: 260px;   /* your baseline spacing */
+  padding: 1.5rem 1rem;
+  text-align: center;
+  position: relative;   /* required for top to take effect */
+  top: -5px;            /* nudge everything up by 5px */
+  z-index: 5;
+}
     footer p {
       color: #888;        /* blended copyright */
       font-size: 0.8rem;

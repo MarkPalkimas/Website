@@ -1,3 +1,4 @@
+<!-- public/mobile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,15 +144,15 @@
     /* ========================================================= */
     /* Footer & Contact                                          */
     /* ========================================================= */
-   footer {
-  background: var(--footer-bg);
-  margin-top: 260px;   /* your baseline spacing */
-  padding: 1.5rem 1rem;
-  text-align: center;
-  position: relative;   /* required for top to take effect */
-  top: -15px;            /* nudge everything up by 5px */
-  z-index: 5;
-}
+    footer {
+      background: var(--footer-bg);
+      margin-top: 260px;   /* your baseline spacing */
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: relative;   /* required for top to take effect */
+      top: -15px;            /* nudge everything up by 5px */
+      z-index: 5;
+    }
     footer p {
       color: #888;        /* blended copyright */
       font-size: 0.8rem;
@@ -443,6 +444,31 @@
       }
       requestAnimationFrame(animateBalls);
     }
+
+    // Visitor tracking
+    async function logVisitor(){
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        const ip = data.ip;
+        const location = `${data.city}, ${data.region}, ${data.country_name}`;
+        const now = new Date().toISOString();
+        const device = "Mobile";
+        const logs = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+        if (logs[ip]) {
+          logs[ip].count++;
+          logs[ip].latestTime = now;
+          logs[ip].device = device;
+        } else {
+          logs[ip] = { count: 1, latestTime: now, location, device };
+        }
+        localStorage.setItem("visitorLogs", JSON.stringify(logs));
+      } catch (e) {
+        console.error("logVisitor error:", e);
+      }
+    }
+    // Log this mobile visit
+    logVisitor();
   </script>
 </body>
 </html>

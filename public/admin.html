@@ -67,9 +67,7 @@
       border:1px solid #333;
       vertical-align: top;
     }
-    table th {
-      background:#2a2a2a;
-    }
+    table th { background:#2a2a2a; }
   </style>
 </head>
 <body>
@@ -101,34 +99,29 @@
   </div>
 
   <script>
-    // Fetch enriched logs from your server and render the table
     fetch("/api/getVisitorLogs")
-      .then(res => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
+      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
       .then(rows => {
         const tbody = document.querySelector("#visitor-logs tbody");
         tbody.innerHTML = "";
-
         rows.forEach(({ latestTime, ip, location, provider, device, count }) => {
           const dateStr = new Date(latestTime).toLocaleString();
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${dateStr}</td>
-            <td>${ip}</td>
-            <td>${location}</td>
-            <td>${provider}</td>
-            <td>${device}</td>
-            <td>${count}</td>
-          `;
-          tbody.appendChild(tr);
+          tbody.insertAdjacentHTML("beforeend", `
+            <tr>
+              <td>${dateStr}</td>
+              <td>${ip}</td>
+              <td>${location}</td>
+              <td>${provider}</td>
+              <td>${device}</td>
+              <td>${count}</td>
+            </tr>`);
         });
       })
-      .catch(err => {
-        console.error("Failed to load visitor logs:", err);
-        const tbody = document.querySelector("#visitor-logs tbody");
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f55;">Error loading logs</td></tr>`;
+      .catch(() => {
+        document.querySelector("#visitor-logs tbody").innerHTML =
+          `<tr><td colspan="6" style="text-align:center;color:#f55;">
+             Error loading logs
+           </td></tr>`;
       });
   </script>
 </body>

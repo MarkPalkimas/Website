@@ -381,25 +381,30 @@ document.addEventListener("DOMContentLoaded", function () {
     requestAnimationFrame(updateQuotes);
   }
 
-  // --- Visitor Tracking via localStorage ---
+   // --- Visitor Tracking via ipapi.co ---
   async function logVisitor() {
     try {
-      const res  = await fetch("https://ipapi.co/json/");
+      const res = await fetch("https://ipapi.co/json/");
       const data = await res.json();
-      const ip       = data.ip;
-      const location = `${data.city}, ${data.region}, ${data.country_name}`;
-      const now      = new Date().toISOString();
-      const logs     = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
-      if (logs[ip]) {
-        logs[ip].count++;
-        logs[ip].latestTime = now;
+      const ip = data.ip;
+      const location = `${data.city || 'N/A'}, ${data.region || 'N/A'}, ${data.country_name || 'N/A'}`;
+      const isp = data.org || "Unknown ISP";
+      const now = new Date().toISOString();
+
+      const logs = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+      if (!logs[ip]) {
+        logs[ip] = { location, isp, firstSeen: now, visits: 1 };
       } else {
-        logs[ip] = { count: 1, latestTime: now, location };
+        logs[ip].visits++;
+        logs[ip].lastSeen = now;
       }
+
       localStorage.setItem("visitorLogs", JSON.stringify(logs));
-    } catch (e) {
-      console.error("logVisitor error:", e);
+      console.log("Visitor logged:", logs[ip]);
+    } catch (err) {
+      console.error("Failed to fetch visitor location", err);
     }
   }
+
   logVisitor();
-});
+

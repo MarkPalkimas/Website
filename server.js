@@ -1,4 +1,13 @@
 // server.js
+import fs from "fs";
+import { Reader } from "@maxmind/geoip2-node";
+
+// ● Load the MMDB files into memory once
+const cityBuffer = fs.readFileSync("./db/GeoLite2-City.mmdb");
+const asnBuffer  = fs.readFileSync("./db/GeoLite2-ASN.mmdb");
+
+const cityReader = Reader.openBuffer(cityBuffer);
+const asnReader  = Reader.openBuffer(asnBuffer);
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

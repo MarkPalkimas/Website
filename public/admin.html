@@ -51,9 +51,9 @@
       margin-left:.5rem;
     }
     @keyframes pulse {
-      0% { box-shadow:0 0 0 0 rgba(255,204,0,0.7); }
-      70% { box-shadow:0 0 0 10px rgba(255,204,0,0); }
-      100% { box-shadow:0 0 0 0 rgba(255,204,0,0); }
+      0%   { box-shadow:0 0 0 0    rgba(255,204,0,0.7); }
+      70%  { box-shadow:0 0 0 10px rgba(255,204,0,0); }
+      100% { box-shadow:0 0 0 0    rgba(255,204,0,0); }
     }
     table {
       width:100%;
@@ -66,6 +66,7 @@
       padding:.5rem;
       text-align:left;
       border:1px solid #333;
+      vertical-align: top;
     }
     table th {
       background:#2a2a2a;
@@ -87,7 +88,8 @@
           <tr>
             <th>Latest Visit</th>
             <th>IP Address</th>
-            <th>Page(s)</th>
+            <th>Location</th>
+            <th>Provider</th>
             <th>Device</th>
             <th>Count</th>
           </tr>
@@ -116,54 +118,74 @@
     };
     // ————————————————————————
 
-    // Initialize Firebase & get a reference to /visits
-    const app      = initializeApp(firebaseConfig);
-    const db       = getDatabase(app);
+    // Initialize Firebase
+    const app       = initializeApp(firebaseConfig);
+    const db        = getDatabase(app);
     const visitsRef = ref(db, 'visits');
 
-    // Whenever visits change, regroup by IP and repaint the table
     onValue(visitsRef, snapshot => {
-      const raw  = snapshot.val() || {};
-      const agg  = {};  // aggregator: ip → { count, latestTime, pages:Set }
+      const raw = snapshot.val() || {};
 
-      // build aggregator
+      // 1) Aggregate by IP
+      const agg = {};
       Object.values(raw).forEach(({ ip, timestamp, page }) => {
         if (!agg[ip]) {
           agg[ip] = { count:0, latestTime:0, pages: new Set() };
         }
         agg[ip].count++;
-        if (timestamp > agg[ip].latestTime) {
-          agg[ip].latestTime = timestamp;
-        }
+        agg[ip].latestTime = Math.max(agg[ip].latestTime, timestamp);
         agg[ip].pages.add(page);
       });
 
-      // turn into sorted array
+      // 2) Build rows array
       const rows = Object.entries(agg).map(([ip, { count, latestTime, pages }]) => ({
         ip,
         count,
         latestTime,
-        pages: Array.from(pages).sort(),
+        pages: Array.from(pages),
       }))
       .sort((a, b) => b.latestTime - a.latestTime);
 
-      // render
-      const tbody = document.querySelector("#visitor-logs tbody");
-      tbody.innerHTML = "";
-      rows.forEach(({ ip, count, latestTime, pages }) => {
-        const dateStr = new Date(latestTime).toLocaleString();
-        // simple device detection from page paths
-        const device = pages.some(p => p.includes('mobile')) ? 'Mobile' : 'Desktop';
-        const pageList = pages.join(', ');
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${dateStr}</td>
-          <td>${ip}</td>
-          <td>${pageList}</td>
-          <td>${device}</td>
-          <td>${count}</td>
-        `;
-        tbody.appendChild(tr);
+      // 3) Enrich each IP with geo & ISP lookup
+      const lookups = rows.map(row => {
+        return fetch(`https://ip-api.com/json/${row.ip}?fields=status,country,regionName,city,isp`)
+          .then(res => res.json())
+          .then(info => {
+            if (info.status === 'success') {
+              row.location = `${info.city}, ${info.regionName}, ${info.country}`;
+              row.provider = info.isp;
+            } else {
+              row.location = 'Unknown';
+              row.provider = 'Unknown';
+            }
+            return row;
+          })
+          .catch(() => {
+            row.location = 'Unknown';
+            row.provider = 'Unknown';
+            return row;
+          });
+      });
+
+      Promise.all(lookups).then(enrichedRows => {
+        const tbody = document.querySelector("#visitor-logs tbody");
+        tbody.innerHTML = "";
+
+        enrichedRows.forEach(({ ip, count, latestTime, pages, location, provider }) => {
+          const dateStr = new Date(latestTime).toLocaleString();
+          const device  = pages.some(p => p.includes('mobile')) ? 'Mobile' : 'Desktop';
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${dateStr}</td>
+            <td>${ip}</td>
+            <td>${location}</td>
+            <td>${provider}</td>
+            <td>${device}</td>
+            <td>${count}</td>
+          `;
+          tbody.appendChild(tr);
+        });
       });
     });
   </script>

@@ -1,4 +1,6 @@
 // public/main.js
+// Improved physics to prevent balls sticking together by resolving overlaps
+
 document.addEventListener("DOMContentLoaded", function () {
   // --- Neon Glow Effect (Smooth multi-color ripple) ---
   const neonContainer = document.getElementById("neon-container");
@@ -111,70 +113,46 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminPopup   = document.getElementById("admin-popup");
 
   // --- Popup Controls ---
-  profilePic.addEventListener("click", () => {
+  function openPopup(popup) {
     dimmedOverlay.style.display = "block";
-    aboutPopup.style.display    = "block";
-  });
-  aboutLink.addEventListener("click", e => {
-    e.preventDefault();
-    dimmedOverlay.style.display = "block";
-    aboutPopup.style.display    = "block";
-  });
-  contactLink.addEventListener("click", e => {
-    e.preventDefault();
-    dimmedOverlay.style.display = "block";
-    contactPopup.style.display  = "block";
-  });
+    popup.style.display = "block";
+  }
+  function closeAllPopups() {
+    dimmedOverlay.style.display = "none";
+    aboutPopup.style.display = contactPopup.style.display = adminPopup.style.display = "none";
+  }
+
+  profilePic.addEventListener("click", () => openPopup(aboutPopup));
+  aboutLink.addEventListener("click", e => { e.preventDefault(); openPopup(aboutPopup); });
+  contactLink.addEventListener("click", e => { e.preventDefault(); openPopup(contactPopup); });
   adminBtn.addEventListener("click", () => {
-    dimmedOverlay.style.display = "block";
-    adminPopup.style.display    = "block";
-    const pw = document.getElementById("admin-password");
-    pw.value = ""; pw.type = "password";
+    openPopup(adminPopup);
+    const pw = document.getElementById("admin-password"); pw.value = ""; pw.type = "password";
     document.getElementById("toggle-password").textContent = "Show";
     document.getElementById("admin-error").style.display = "none";
   });
-  dimmedOverlay.addEventListener("click", () => {
-    aboutPopup.style.display    = "none";
-    contactPopup.style.display  = "none";
-    adminPopup.style.display    = "none";
-    dimmedOverlay.style.display = "none";
-  });
+  dimmedOverlay.addEventListener("click", closeAllPopups);
 
   // --- Admin Popup Controls ---
-  const adminPasswordInput = document.getElementById("admin-password");
-  const togglePasswordBtn  = document.getElementById("toggle-password");
-  const submitPasswordBtn  = document.getElementById("submit-password");
-  const cancelPasswordBtn  = document.getElementById("cancel-password");
-  const errorMessage       = document.getElementById("admin-error");
-
-  togglePasswordBtn.addEventListener("click", () => {
-    if (adminPasswordInput.type === "password") {
-      adminPasswordInput.type         = "text";
-      togglePasswordBtn.textContent = "Hide";
-    } else {
-      adminPasswordInput.type         = "password";
-      togglePasswordBtn.textContent = "Show";
-    }
+  document.getElementById("toggle-password").addEventListener("click", () => {
+    const input = document.getElementById("admin-password");
+    if (input.type === "password") { input.type = "text"; this.textContent = "Hide"; }
+    else { input.type = "password"; this.textContent = "Show"; }
   });
-
-  submitPasswordBtn.addEventListener("click", async () => {
-    const buf     = new TextEncoder().encode(adminPasswordInput.value);
+  document.getElementById("submit-password").addEventListener("click", async () => {
+    const buf     = new TextEncoder().encode(document.getElementById("admin-password").value);
     const hashBuf = await crypto.subtle.digest("SHA-256", buf);
-    const hash    = Array.from(new Uint8Array(hashBuf))
-                         .map(b => b.toString(16).padStart(2,"0"))
-                         .join("");
+    const hash    = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,"0")).join("");
     const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
-    if (hash === storedHash) {
-      errorMessage.style.display = "none";
-      window.location.href       = "admin.html";
-    } else {
-      adminPasswordInput.value   = "";
-      errorMessage.style.display = "block";
+    if (hash === storedHash) window.location.href = "admin.html";
+    else {
+      document.getElementById("admin-password").value = "";
+      document.getElementById("admin-error").style.display = "block";
     }
   });
-  cancelPasswordBtn.addEventListener("click", () => {
-    adminPasswordInput.value   = "";
-    errorMessage.style.display = "none";
+  document.getElementById("cancel-password").addEventListener("click", () => {
+    document.getElementById("admin-password").value = "";
+    document.getElementById("admin-error").style.display = "none";
   });
 
   // --- Ball Physics & Collision ---
@@ -187,10 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
     wavesActive = true;
     dropBall();
     resetBtn.style.display = "block";
-    if (!quotesStarted) {
-      startFallingQuotes();
-      quotesStarted = true;
-    }
+    if (!quotesStarted) { startFallingQuotes(); quotesStarted = true; }
   });
   resetBtn.addEventListener("click", () => {
     wavesActive = false;
@@ -201,32 +176,35 @@ document.addEventListener("DOMContentLoaded", function () {
   function dropBall() {
     const ball = document.createElement("div");
     ball.className = "ball";
-    ball.style.backgroundColor = getRandomColor();
     const diameter = Math.random() * 30 + 40;
-    ball.style.width = diameter + "px";
-    ball.style.height = diameter + "px";
-    ball.style.left = Math.random() * (window.innerWidth - diameter) + "px";
-    ball.style.top = "0px";
+
+    // Initialize state
     ball.radius = diameter / 2;
-    ball.mass = Math.pow(ball.radius, 2);
-    ball.velocityX = Math.random() * 2 - 1;
-    ball.velocityY = Math.random() * 4 + 1;
+    ball.mass   = Math.pow(ball.radius, 2);
+    ball.x = Math.random() * (window.innerWidth - diameter);
+    ball.y = 0;
+    ball.vx = Math.random() * 2 - 1;
+    ball.vy = Math.random() * 4 + 1;
+
+    // Style
+    ball.style.width  = diameter + "px";
+    ball.style.height = diameter + "px";
+    ball.style.left   = ball.x + "px";
+    ball.style.top    = ball.y + "px";
+    ball.style.backgroundColor = getRandomColor();
+
     document.body.appendChild(ball);
     balls.push(ball);
   }
 
   function resetBalls() {
-    balls.forEach(ball => ball.remove());
+    balls.forEach(b => b.remove());
     balls.length = 0;
   }
 
   function getRandomColor() {
     const letters = "89ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * letters.length)];
-    }
-    return color;
+    return "#" + Array.from({length:6}, () => letters[Math.floor(Math.random()*letters.length)]).join("");
   }
 
   // --- Falling Quotes ---
@@ -235,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function startFallingQuotes() {
     setInterval(createFallingQuote, 10000);
-    updateQuotes();
+    requestAnimationFrame(updateQuotes);
   }
 
   function createFallingQuote() {
@@ -247,86 +225,72 @@ document.addEventListener("DOMContentLoaded", function () {
       "Cold water feels warm when your hands are freezing.",
       "Regret is proof you cared. But growth is proof you learned."
     ];
-    const quoteText = quotes[Math.floor(Math.random() * quotes.length)];
-    const quoteElem = document.createElement("div");
-    quoteElem.className = "falling-quote";
-    quoteElem.innerText = quoteText;
-
-    // ← INLINE STYLES TO ENSURE VISIBILITY
-    quoteElem.style.position      = "absolute";
-    quoteElem.style.color         = "#eee";
-    quoteElem.style.fontSize      = "1.5rem";
-    quoteElem.style.opacity       = "0.9";
-    quoteElem.style.pointerEvents = "none";
-    quoteElem.style.zIndex        = "11";
-
-    const initLeft = Math.random() * (window.innerWidth - 300);
-    quoteElem.dataset.initialLeft = initLeft;
-    quoteElem.dataset.amp         = Math.random() * 20 + 10;
-    quoteElem.dataset.phase       = Math.random() * 2 * Math.PI;
-    quoteElem.style.left          = initLeft + "px";
-    quoteElem.style.top           = "-50px";
-    quoteElem.style.animation     = "fall 20s linear forwards";
-
-    quoteContainer.appendChild(quoteElem);
-    setTimeout(() => {
-      if (quoteElem.parentElement) quoteElem.remove();
-    }, 21000);
+    const text = quotes[Math.floor(Math.random()*quotes.length)];
+    const elem = document.createElement("div");
+    elem.className = "falling-quote";
+    elem.innerText = text;
+    Object.assign(elem.style, {
+      position: "absolute",
+      color: "#eee",
+      fontSize: "1.5rem",
+      opacity: "0.9",
+      pointerEvents: "none",
+      zIndex: "11",
+      left: (Math.random()*(window.innerWidth-300)) + "px",
+      top: "-50px",
+      animation: "fall 20s linear forwards"
+    });
+    quoteContainer.appendChild(elem);
+    setTimeout(() => elem.remove(), 21000);
   }
 
   function updateQuotes() {
-    const now = Date.now();
-    document.querySelectorAll(".falling-quote").forEach(quote => {
-      const initLeft = parseFloat(quote.dataset.initialLeft) || 0;
-      const amp      = parseFloat(quote.dataset.amp)         || 0;
-      const phase    = parseFloat(quote.dataset.phase)       || 0;
-      const t        = (now - quoteStartTime) / 1000;
-      quote.style.left = initLeft + amp * Math.sin(t + phase) + "px";
+    const t = (Date.now() - quoteStartTime) / 1000;
+    document.querySelectorAll(".falling-quote").forEach(q => {
+      const init = parseFloat(q.dataset.initialLeft) || parseFloat(q.style.left);
+      const amp = parseFloat(q.dataset.amp) || (Math.random()*20+10);
+      const phase = parseFloat(q.dataset.phase) || (Math.random()*Math.PI*2);
+      q.style.left = init + amp * Math.sin(t + phase) + "px";
     });
     requestAnimationFrame(updateQuotes);
   }
 
   function updateBalls() {
-    balls.forEach(ball => {
-      // apply gravity
-      ball.velocityY += GRAVITY;
-
-      // update positions
-      let newTop  = parseFloat(ball.style.top) + ball.velocityY;
-      let newLeft = parseFloat(ball.style.left) + ball.velocityX;
+    const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
+    balls.forEach(b => {
+      // gravity
+      b.vy += GRAVITY;
+      // position update
+      b.x += b.vx;
+      b.y += b.vy;
 
       // wall collisions
-      if (newLeft <= 0 || newLeft + ball.radius * 2 >= window.innerWidth) {
-        ball.velocityX *= -RESTITUTION;
-        newLeft = Math.min(Math.max(newLeft, 0), window.innerWidth - ball.radius * 2);
+      if (b.x <= 0 || b.x + b.radius*2 >= window.innerWidth) {
+        b.vx *= -RESTITUTION;
+        b.x = Math.min(Math.max(b.x, 0), window.innerWidth - b.radius*2);
       }
-
-      // floor collision at footer
-      const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
-      if (newTop + ball.radius * 2 >= footerTop) {
-        ball.velocityY *= -RESTITUTION;
-        ball.velocityX *= RESTITUTION;
-        newTop = footerTop - ball.radius * 2;
+      // floor
+      if (b.y + b.radius*2 >= footerTop) {
+        b.vy *= -RESTITUTION;
+        b.vx *= RESTITUTION;
+        b.y = footerTop - b.radius*2;
       }
 
       // wave push
       if (wavesActive) {
-        const bx = newLeft + ball.radius;
-        const by = newTop  + ball.radius;
-        const dx = bx - waveData.centerX;
-        const dy = by - waveData.centerY;
+        const dx = (b.x + b.radius) - waveData.centerX;
+        const dy = (b.y + b.radius) - waveData.centerY;
         const dist = Math.hypot(dx, dy);
-        if (Math.abs(dist - waveData.radiusPx) < waveData.thicknessPx / 2) {
-          // push outward
-          ball.velocityX += (dx / dist) * WAVE_FORCE;
-          ball.velocityY += (dy / dist) * WAVE_FORCE;
+        if (Math.abs(dist - waveData.radiusPx) < waveData.thicknessPx/2) {
+          b.vx += (dx/dist) * WAVE_FORCE;
+          b.vy += (dy/dist) * WAVE_FORCE;
         }
       }
 
-      ball.style.top  = newTop + "px";
-      ball.style.left = newLeft + "px";
+      // apply to DOM
+      b.style.left = b.x + "px";
+      b.style.top  = b.y + "px";
     });
-
     handleBallCollisions();
     handleBallQuoteCollisions();
     requestAnimationFrame(updateBalls);
@@ -334,46 +298,53 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function handleBallCollisions() {
     for (let i = 0; i < balls.length; i++) {
-      for (let j = i + 1; j < balls.length; j++) {
+      for (let j = i+1; j < balls.length; j++) {
         const a = balls[i], b = balls[j];
-        const dx = (parseFloat(b.style.left) + b.radius) - (parseFloat(a.style.left) + a.radius);
-        const dy = (parseFloat(b.style.top)  + b.radius) - (parseFloat(a.style.top)  + a.radius);
+        const dx = (b.x + b.radius) - (a.x + a.radius);
+        const dy = (b.y + b.radius) - (a.y + a.radius);
         const dist = Math.hypot(dx, dy);
-        if (dist < a.radius + b.radius) {
-          const nx = dx / dist, ny = dy / dist;
-          const p  = 2 * (a.velocityX * nx + a.velocityY * ny - b.velocityX * nx - b.velocityY * ny) /
-                     (a.mass + b.mass);
-          a.velocityX -= p * b.mass * nx;
-          a.velocityY -= p * b.mass * ny;
-          b.velocityX += p * a.mass * nx;
-          b.velocityY += p * a.mass * ny;
+        const minDist = a.radius + b.radius;
+        if (dist < minDist) {
+          // resolve overlap
+          const overlap = (minDist - dist) / 2;
+          const nx = dx/dist, ny = dy/dist;
+          a.x -= nx * overlap;
+          a.y -= ny * overlap;
+          b.x += nx * overlap;
+          b.y += ny * overlap;
+          // update velocities
+          const p = 2 * ((a.vx*nx + a.vy*ny) - (b.vx*nx + b.vy*ny)) / (a.mass + b.mass);
+          a.vx -= p * b.mass * nx;
+          a.vy -= p * b.mass * ny;
+          b.vx += p * a.mass * nx;
+          b.vy += p * a.mass * ny;
         }
       }
     }
   }
 
   function handleBallQuoteCollisions() {
-    document.querySelectorAll(".falling-quote").forEach(quote => {
-      const rect = quote.getBoundingClientRect();
-      balls.forEach(ball => {
-        const bx = parseFloat(ball.style.left) + ball.radius;
-        const by = parseFloat(ball.style.top)  + ball.radius;
-        const closestX = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
-        const closestY = Math.max(rect.top,  Math.min(by, rect.top  + rect.height));
-        const d = Math.hypot(bx - closestX, by - closestY);
-        if (d < ball.radius && ball.velocityY > 0) {
-          ball.velocityY *= -RESTITUTION;
-          quote.style.transform = "scale(1.2)";
-          setTimeout(() => quote.style.transform = "scale(1)", 200);
+    document.querySelectorAll(".falling-quote").forEach(q => {
+      const rect = q.getBoundingClientRect();
+      balls.forEach(b => {
+        const bx = b.x + b.radius;
+        const by = b.y + b.radius;
+        const cx = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
+        const cy = Math.max(rect.top,  Math.min(by, rect.top + rect.height));
+        const d = Math.hypot(bx - cx, by - cy);
+        if (d < b.radius && b.vy > 0) {
+          b.vy *= -RESTITUTION;
+          q.style.transform = "scale(1.2)";
+          setTimeout(() => q.style.transform = "scale(1)", 200);
         }
       });
     });
   }
 
   window.addEventListener("scroll", () => {
-    const dir = window.scrollY > (this.lastScroll || 0) ? 1 : -1;
+    const dir = window.scrollY > (this.lastScroll||0) ? 1 : -1;
     this.lastScroll = window.scrollY;
-    balls.forEach(b => b.velocityY += dir * 0.5);
+    balls.forEach(b => b.vy += dir * 0.5);
   });
 
   updateBalls();

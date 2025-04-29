@@ -3,10 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const neonContainer = document.getElementById("neon-container");
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
-
-  // Waves only active when you press the drop-ball button:
-  let wavesActive = false;
-  let waveData = { centerX: 0, centerY: 0, radiusPx: 0, thicknessPx: 0 };
   const glowColors = [
     "#5EBD3E",
     "#FFB900",
@@ -15,14 +11,13 @@ document.addEventListener("DOMContentLoaded", function () {
     "#973999",
     "#009CDF"
   ];
-  const maxDim = () => Math.max(window.innerWidth, window.innerHeight);
 
-  // Parse hex to [r,g,b]
+  // Parse a hex string like "#FF5733" into [r,g,b]
   function parseHexColor(hex) {
     const num = parseInt(hex.slice(1), 16);
     return [ (num >> 16) & 255, (num >> 8) & 255, num & 255 ];
   }
-  // Interpolate between two [r,g,b]
+  // Linearly interpolate between two [r,g,b] at fraction t
   function lerpColor(a, b, t) {
     const r  = Math.round(a[0] + (b[0] - a[0]) * t);
     const g  = Math.round(a[1] + (b[1] - a[1]) * t);
@@ -30,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return `rgb(${r},${g},${bl})`;
   }
 
+  // Track mouse position
   document.addEventListener("mousemove", e => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -38,9 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
   let startTime = null;
   function animateNeon(time) {
     if (startTime === null) startTime = time;
-    const elapsed   = time - startTime;
+    const elapsed = time - startTime;
 
-    // Color cycling
+    // Color cycle timing
     const segmentMs = 2000;
     const cycleMs   = segmentMs * glowColors.length;
     const progress  = (elapsed % cycleMs) / segmentMs;
@@ -51,46 +47,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const baseColor = lerpColor(colA, colB, frac);
     const ringColor = baseColor.replace("rgb", "rgba").replace(")", ",0.5)");
 
-    // Ripple timing & size
-    const ringPeriod  = 3000;              // faster ripple
-    const ringProg    = (elapsed % ringPeriod) / ringPeriod;
-    const ringRadiusP = ringProg * 100;    // percent for CSS
-    const ringWidthP  = 3;                 // percent thickness
-    // convert to pixels for physics
-    const ringRadiusPx = (ringRadiusP / 100) * maxDim();
-    const ringWidthPx  = (ringWidthP  / 100) * maxDim();
+    // Ripple timing: a bit faster than before
+    const ringPeriod = 3000;            // faster ripple
+    const ringProg   = (elapsed % ringPeriod) / ringPeriod;
+    const ringRadius = ringProg * 100;  // full-screen reach
+    const ringWidth  = 3;               // keep a thin ring
 
-    // Record wave data if active
-    if (wavesActive) {
-      waveData = {
-        centerX: mouseX,
-        centerY: mouseY,
-        radiusPx: ringRadiusPx,
-        thicknessPx: ringWidthPx
-      };
-    }
-
-    // Base glow: fades out by 35%
+    // Base glow: solid at center, fading to transparent by 35%
     const baseGlow = `radial-gradient(
       circle at ${mouseX}px ${mouseY}px,
       ${baseColor} 0%,
       transparent 35%
     )`;
 
-    let background = baseGlow;
+    // Ripple ring: transparent until ringRadius, then semi-transparent colored ring
+    const ringGlow = `radial-gradient(
+      circle at ${mouseX}px ${mouseY}px,
+      transparent ${ringRadius}%,
+      ${ringColor} ${ringRadius + ringWidth}%,
+      transparent ${ringRadius + ringWidth}%
+    )`;
 
-    // Only draw the ripple ring when waves are active
-    if (wavesActive) {
-      const ringGlow = `radial-gradient(
-        circle at ${mouseX}px ${mouseY}px,
-        transparent ${ringRadiusP}%,
-        ${ringColor} ${ringRadiusP + ringWidthP}%,
-        transparent ${ringRadiusP + ringWidthP}%
-      )`;
-      background += `, ${ringGlow}`;
-    }
-
-    neonContainer.style.background = background;
+    neonContainer.style.background = `${baseGlow}, ${ringGlow}`;
     requestAnimationFrame(animateNeon);
   }
   requestAnimationFrame(animateNeon);
@@ -109,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const contactPopup = document.getElementById("contact-popup");
   const adminPopup   = document.getElementById("admin-popup");
 
-  // --- Popup Controls ---
+  // Popup controls
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display    = "block";
@@ -139,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     dimmedOverlay.style.display = "none";
   });
 
-  // --- Admin Popup Controls ---
+  // Admin popup logic
   const adminPasswordInput = document.getElementById("admin-password");
   const togglePasswordBtn  = document.getElementById("toggle-password");
   const submitPasswordBtn  = document.getElementById("submit-password");
@@ -180,14 +158,12 @@ document.addEventListener("DOMContentLoaded", function () {
     errorMessage.style.display = "none";
   });
 
-  // --- Ball Physics & Collision ---
+  // Ball physics & collision
   const balls = [];
   const GRAVITY = 0.3;
   const RESTITUTION = 0.8;
-  const WAVE_FORCE = 0.5;
 
   gravityBtn.addEventListener("click", () => {
-    wavesActive = true;
     dropBall();
     resetBtn.style.display = "block";
     if (!quotesStarted) {
@@ -196,7 +172,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
   resetBtn.addEventListener("click", () => {
-    wavesActive = false;
     resetBalls();
     resetBtn.style.display = "none";
   });
@@ -232,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return color;
   }
 
-  // --- Falling Quotes ---
+  // Falling quotes
   let quotesStarted = false;
   let quoteStartTime = Date.now();
 
@@ -281,39 +256,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateBalls() {
     balls.forEach(ball => {
-      // apply gravity
       ball.velocityY += GRAVITY;
-
-      // update positions
       let newTop  = parseFloat(ball.style.top) + ball.velocityY;
       let newLeft = parseFloat(ball.style.left) + ball.velocityX;
 
-      // wall collisions
       if (newLeft <= 0 || newLeft + ball.radius * 2 >= window.innerWidth) {
         ball.velocityX *= -RESTITUTION;
         newLeft = Math.min(Math.max(newLeft, 0), window.innerWidth - ball.radius * 2);
       }
 
-      // floor collision at footer
       const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
       if (newTop + ball.radius * 2 >= footerTop) {
         ball.velocityY *= -RESTITUTION;
         ball.velocityX *= RESTITUTION;
         newTop = footerTop - ball.radius * 2;
-      }
-
-      // wave push
-      if (wavesActive) {
-        const bx = newLeft + ball.radius;
-        const by = newTop  + ball.radius;
-        const dx = bx - waveData.centerX;
-        const dy = by - waveData.centerY;
-        const dist = Math.hypot(dx, dy);
-        if (Math.abs(dist - waveData.radiusPx) < waveData.thicknessPx / 2) {
-          // push outward
-          ball.velocityX += (dx / dist) * WAVE_FORCE;
-          ball.velocityY += (dy / dist) * WAVE_FORCE;
-        }
       }
 
       ball.style.top  = newTop + "px";
@@ -330,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
       for (let j = i + 1; j < balls.length; j++) {
         const a = balls[i], b = balls[j];
         const dx = (parseFloat(b.style.left) + b.radius) - (parseFloat(a.style.left) + a.radius);
-        const dy = (parseFloat(b.style.top)  + b.radius) - (parseFloat(a.style.top)  + a.radius);
+        const dy = (parseFloat(b.style.top) + b.radius)  - (parseFloat(a.style.top) + a.radius);
         const dist = Math.hypot(dx, dy);
         if (dist < a.radius + b.radius) {
           const nx = dx / dist, ny = dy / dist;
@@ -350,9 +306,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const rect = quote.getBoundingClientRect();
       balls.forEach(ball => {
         const bx = parseFloat(ball.style.left) + ball.radius;
-        const by = parseFloat(ball.style.top)  + ball.radius;
+        const by = parseFloat(ball.style.top) + ball.radius;
         const closestX = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
-        const closestY = Math.max(rect.top,  Math.min(by, rect.top  + rect.height));
+        const closestY = Math.max(rect.top,  Math.min(by, rect.top + rect.height));
         const d = Math.hypot(bx - closestX, by - closestY);
         if (d < ball.radius && ball.velocityY > 0) {
           ball.velocityY *= -RESTITUTION;
@@ -371,7 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   updateBalls();
 
-  // --- Visitor Tracking via localStorage ---
+  // Visitor tracking
   async function logVisitor() {
     try {
       const res  = await fetch("https://ipapi.co/json/");

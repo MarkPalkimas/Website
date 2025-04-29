@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return `rgb(${r},${g},${bl})`;
   }
 
-  // Keep track of mouse for gradient center
+  // Track mouse position
   document.addEventListener("mousemove", e => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -34,33 +34,39 @@ document.addEventListener("DOMContentLoaded", function () {
   let startTime = null;
   function animateNeon(time) {
     if (startTime === null) startTime = time;
-    const elapsed   = time - startTime;
+    const elapsed = time - startTime;
+
+    // Color cycle timing
     const segmentMs = 2000;
     const cycleMs   = segmentMs * glowColors.length;
     const progress  = (elapsed % cycleMs) / segmentMs;
     const idx       = Math.floor(progress);
     const frac      = progress - idx;
-
-    // Interpolate between current pair of colors
-    const colA = parseHexColor(glowColors[idx]);
-    const colB = parseHexColor(glowColors[(idx + 1) % glowColors.length]);
+    const colA      = parseHexColor(glowColors[idx]);
+    const colB      = parseHexColor(glowColors[(idx + 1) % glowColors.length]);
     const baseColor = lerpColor(colA, colB, frac);
     const ringColor = baseColor.replace("rgb", "rgba").replace(")", ",0.5)");
 
-    // Compute an outward‐moving ring (slower & half-size)
-    const ringPeriod  = 4000;            // slower ripple
-    const ringProg    = (elapsed % ringPeriod) / ringPeriod;
-    const ringRadius  = ringProg * 50;   // half size
-    const ringWidth   = 3;               // thinner ring
+    // Ripple timing: a bit faster than before
+    const ringPeriod = 3000;            // faster ripple
+    const ringProg   = (elapsed % ringPeriod) / ringPeriod;
+    const ringRadius = ringProg * 100;  // full-screen reach
+    const ringWidth  = 3;               // keep a thin ring
 
-    // Base glow: solid at center, fading to transparent at 50%
-    const baseGlow = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
-                     `${baseColor} 0%, transparent 50%)`;
+    // Base glow: solid at center, fading to transparent by 35%
+    const baseGlow = `radial-gradient(
+      circle at ${mouseX}px ${mouseY}px,
+      ${baseColor} 0%,
+      transparent 35%
+    )`;
 
-    // Ripple ring: transparent until ringRadius, then a semi-transparent colored ring
-    const ringGlow = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
-                     `transparent ${ringRadius}%, ${ringColor} ${ringRadius + ringWidth}%, ` +
-                     `transparent ${ringRadius + ringWidth}%)`;
+    // Ripple ring: transparent until ringRadius, then semi-transparent colored ring
+    const ringGlow = `radial-gradient(
+      circle at ${mouseX}px ${mouseY}px,
+      transparent ${ringRadius}%,
+      ${ringColor} ${ringRadius + ringWidth}%,
+      transparent ${ringRadius + ringWidth}%
+    )`;
 
     neonContainer.style.background = `${baseGlow}, ${ringGlow}`;
     requestAnimationFrame(animateNeon);
@@ -77,22 +83,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const dimmedOverlay  = document.querySelector(".dimmed");
   const quoteContainer = document.getElementById("quote-container");
 
-  // Select popups by their IDs from the popups container
   const aboutPopup   = document.getElementById("about-popup");
   const contactPopup = document.getElementById("contact-popup");
   const adminPopup   = document.getElementById("admin-popup");
 
-  // --- Popup Controls ---
+  // Popup controls
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display    = "block";
   });
-  aboutLink.addEventListener("click", (e) => {
+  aboutLink.addEventListener("click", e => {
     e.preventDefault();
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display    = "block";
   });
-  contactLink.addEventListener("click", (e) => {
+  contactLink.addEventListener("click", e => {
     e.preventDefault();
     dimmedOverlay.style.display = "block";
     contactPopup.style.display  = "block";
@@ -112,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     dimmedOverlay.style.display = "none";
   });
 
-  // --- Admin Popup Controls ---
+  // Admin popup logic
   const adminPasswordInput = document.getElementById("admin-password");
   const togglePasswordBtn  = document.getElementById("toggle-password");
   const submitPasswordBtn  = document.getElementById("submit-password");
@@ -129,9 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ────────────────────────────────────────────────────────────
-  // 🔒 SHA-256 check for “M@rk2005”
-  // ────────────────────────────────────────────────────────────
   const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
   async function hashPassword(str) {
     const buf     = new TextEncoder().encode(str);
@@ -156,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
     errorMessage.style.display = "none";
   });
 
-  // --- Ball Physics & Collision ---
+  // Ball physics & collision
   const balls = [];
   const GRAVITY = 0.3;
   const RESTITUTION = 0.8;
@@ -205,14 +207,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return color;
   }
 
-  // --- Falling Quotes ---
+  // Falling quotes
   let quotesStarted = false;
   let quoteStartTime = Date.now();
 
   function startFallingQuotes() {
-    setInterval(() => {
-      createFallingQuote();
-    }, 10000);
+    setInterval(createFallingQuote, 10000);
     updateQuotes();
   }
 
@@ -238,20 +238,18 @@ document.addEventListener("DOMContentLoaded", function () {
     quoteElem.style.animation = "fall 20s linear forwards";
     quoteContainer.appendChild(quoteElem);
     setTimeout(() => {
-      if (quoteElem.parentElement) quoteElem.parentElement.removeChild(quoteElem);
+      if (quoteElem.parentElement) quoteElem.remove();
     }, 21000);
   }
 
   function updateQuotes() {
     const now = Date.now();
-    const quotes = document.querySelectorAll(".falling-quote");
-    quotes.forEach(quote => {
+    document.querySelectorAll(".falling-quote").forEach(quote => {
       const initLeft = parseFloat(quote.dataset.initialLeft) || 0;
       const amp = parseFloat(quote.dataset.amp) || 0;
       const phase = parseFloat(quote.dataset.phase) || 0;
       const t = (now - quoteStartTime) / 1000;
-      const offset = amp * Math.sin(t + phase);
-      quote.style.left = (initLeft + offset) + "px";
+      quote.style.left = initLeft + amp * Math.sin(t + phase) + "px";
     });
     requestAnimationFrame(updateQuotes);
   }
@@ -259,138 +257,85 @@ document.addEventListener("DOMContentLoaded", function () {
   function updateBalls() {
     balls.forEach(ball => {
       ball.velocityY += GRAVITY;
+      let newTop  = parseFloat(ball.style.top) + ball.velocityY;
+      let newLeft = parseFloat(ball.style.left) + ball.velocityX;
 
-      let currentTop = parseFloat(ball.style.top);
-      let currentLeft = parseFloat(ball.style.left);
-      let newTop = currentTop + ball.velocityY;
-      let newLeft = currentLeft + ball.velocityX;
-
-      if (newLeft <= 0) {
-        newLeft = 0;
-        ball.velocityX = -ball.velocityX * RESTITUTION;
-      }
-      if (newLeft + ball.radius * 2 >= window.innerWidth) {
-        newLeft = window.innerWidth - ball.radius * 2;
-        ball.velocityX = -ball.velocityX * RESTITUTION;
+      if (newLeft <= 0 || newLeft + ball.radius * 2 >= window.innerWidth) {
+        ball.velocityX *= -RESTITUTION;
+        newLeft = Math.min(Math.max(newLeft, 0), window.innerWidth - ball.radius * 2);
       }
 
       const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
       if (newTop + ball.radius * 2 >= footerTop) {
-        newTop = footerTop - ball.radius * 2;
-        ball.velocityY = -ball.velocityY * RESTITUTION;
+        ball.velocityY *= -RESTITUTION;
         ball.velocityX *= RESTITUTION;
+        newTop = footerTop - ball.radius * 2;
       }
 
-      ball.style.top = newTop + "px";
+      ball.style.top  = newTop + "px";
       ball.style.left = newLeft + "px";
     });
 
     handleBallCollisions();
     handleBallQuoteCollisions();
-
     requestAnimationFrame(updateBalls);
   }
 
   function handleBallCollisions() {
     for (let i = 0; i < balls.length; i++) {
-      const ballA = balls[i];
-      const xA = parseFloat(ballA.style.left) + ballA.radius;
-      const yA = parseFloat(ballA.style.top) + ballA.radius;
       for (let j = i + 1; j < balls.length; j++) {
-        const ballB = balls[j];
-        const xB = parseFloat(ballB.style.left) + ballB.radius;
-        const yB = parseFloat(ballB.style.top) + ballB.radius;
-        const dx = xB - xA;
-        const dy = yB - yA;
+        const a = balls[i], b = balls[j];
+        const dx = (parseFloat(b.style.left) + b.radius) - (parseFloat(a.style.left) + a.radius);
+        const dy = (parseFloat(b.style.top) + b.radius)  - (parseFloat(a.style.top) + a.radius);
         const dist = Math.hypot(dx, dy);
-        if (dist < ballA.radius + ballB.radius && dist > 0) {
-          const nx = dx / dist;
-          const ny = dy / dist;
-          const tx = -ny;
-          const ty = nx;
-
-          const vA_n = ballA.velocityX * nx + ballA.velocityY * ny;
-          const vA_t = ballA.velocityX * tx + ballA.velocityY * ty;
-          const vB_n = ballB.velocityX * nx + ballB.velocityY * ny;
-          const vB_t = ballB.velocityX * tx + ballB.velocityY * ty;
-
-          const vA_n_after =
-            (vA_n * (ballA.mass - ballB.mass) + 2 * ballB.mass * vB_n) /
-            (ballA.mass + ballB.mass);
-          const vB_n_after =
-            (vB_n * (ballB.mass - ballA.mass) + 2 * ballA.mass * vA_n) /
-            (ballA.mass + ballB.mass);
-
-          ballA.velocityX = vA_n_after * nx + vA_t * tx;
-          ballA.velocityY = vA_n_after * ny + vA_t * ty;
-          ballB.velocityX = vB_n_after * nx + vB_t * tx;
-          ballB.velocityY = vB_n_after * ny + vB_t * ty;
-
-          const overlap = ballA.radius + ballB.radius - dist;
-          const separationX = nx * (overlap / 2);
-          const separationY = ny * (overlap / 2);
-          ballA.style.left = (parseFloat(ballA.style.left) - separationX) + "px";
-          ballA.style.top = (parseFloat(ballA.style.top) - separationY) + "px";
-          ballB.style.left = (parseFloat(ballB.style.left) + separationX) + "px";
-          ballB.style.top = (parseFloat(ballB.style.top) + separationY) + "px";
+        if (dist < a.radius + b.radius) {
+          const nx = dx / dist, ny = dy / dist;
+          const p  = 2 * (a.velocityX * nx + a.velocityY * ny - b.velocityX * nx - b.velocityY * ny) /
+                     (a.mass + b.mass);
+          a.velocityX -= p * b.mass * nx;
+          a.velocityY -= p * b.mass * ny;
+          b.velocityX += p * a.mass * nx;
+          b.velocityY += p * a.mass * ny;
         }
       }
     }
   }
 
   function handleBallQuoteCollisions() {
-    const quoteElements = document.querySelectorAll(".falling-quote");
-    balls.forEach(ball => {
-      const ballRadius = ball.radius;
-      const ballX = parseFloat(ball.style.left) + ballRadius;
-      const ballY = parseFloat(ball.style.top) + ballRadius;
-      quoteElements.forEach(quote => {
-        const rect = quote.getBoundingClientRect();
-        const quoteX = rect.left;
-        const quoteY = rect.top + window.scrollY;
-        const quoteWidth = rect.width;
-        const quoteHeight = rect.height;
-        if (ball.velocityY > 0 && ballY < quoteY) {
-          const closestX = Math.max(quoteX, Math.min(ballX, quoteX + quoteWidth));
-          const closestY = Math.max(quoteY, Math.min(ballY, quoteY + quoteHeight));
-          const distance = Math.hypot(ballX - closestX, ballY - closestY);
-          if (distance < ballRadius) {
-            ball.velocityX = -ball.velocityX * RESTITUTION;
-            ball.velocityY = -ball.velocityY * RESTITUTION;
-            quote.style.transform = "scale(1.2)";
-            setTimeout(() => {
-              quote.style.transform = "scale(1)";
-            }, 200);
-          }
+    document.querySelectorAll(".falling-quote").forEach(quote => {
+      const rect = quote.getBoundingClientRect();
+      balls.forEach(ball => {
+        const bx = parseFloat(ball.style.left) + ball.radius;
+        const by = parseFloat(ball.style.top) + ball.radius;
+        const closestX = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
+        const closestY = Math.max(rect.top,  Math.min(by, rect.top + rect.height));
+        const d = Math.hypot(bx - closestX, by - closestY);
+        if (d < ball.radius && ball.velocityY > 0) {
+          ball.velocityY *= -RESTITUTION;
+          quote.style.transform = "scale(1.2)";
+          setTimeout(() => quote.style.transform = "scale(1)", 200);
         }
       });
     });
   }
 
-  let lastScrollTop = window.scrollY;
   window.addEventListener("scroll", () => {
-    const scrollTop = window.scrollY;
-    const scrollDirection = scrollTop > lastScrollTop ? 1 : -1;
-    lastScrollTop = scrollTop;
-    balls.forEach(ball => {
-      ball.velocityY += scrollDirection * 0.5;
-    });
+    const dir = window.scrollY > (this.lastScroll || 0) ? 1 : -1;
+    this.lastScroll = window.scrollY;
+    balls.forEach(b => b.velocityY += dir * 0.5);
   });
 
   updateBalls();
 
-  // ────────────────────────────────────────────────────────────
-  // 🚀 Visitor Tracking via localStorage (IP → count, latestTime, location)
-  // ────────────────────────────────────────────────────────────
+  // Visitor tracking
   async function logVisitor() {
     try {
-      const res = await fetch("https://ipapi.co/json/");
+      const res  = await fetch("https://ipapi.co/json/");
       const data = await res.json();
-      const ip = data.ip;
+      const ip       = data.ip;
       const location = `${data.city}, ${data.region}, ${data.country_name}`;
-      const now = new Date().toISOString();
-
-      const logs = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+      const now      = new Date().toISOString();
+      const logs     = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
       if (logs[ip]) {
         logs[ip].count++;
         logs[ip].latestTime = now;
@@ -402,6 +347,5 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("logVisitor error:", e);
     }
   }
-
   logVisitor();
 });

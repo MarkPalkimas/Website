@@ -175,7 +175,6 @@ body {
 
 .gravity-btn:hover, .admin-btn:hover {
     background-color: #005bb5;
-}
 .quote-container {
     position: fixed;
     top: 0;
@@ -184,17 +183,26 @@ body {
     height: 100vh;
     overflow: hidden;
     pointer-events: none;
-    z-index: -1;
+    z-index: 10;               /* changed from -1 so the quotes sit on top */
     background: rgba(0, 0, 0, 0.2);
 }
 
-.quotes {
+/* Replace your old .quotes block with this: */
+.falling-quote {
     position: absolute;
     white-space: nowrap;
     font-size: 1.5rem;
     font-family: 'Poppins', sans-serif;
-    color: rgba(255, 255, 255, 0.6);
-    animation: scrollQuotes 15s linear infinite;
+    color: rgba(255, 255, 255, 0.9);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 11;
+}
+
+/* If you need a keyframe for the “fall” animation: */
+@keyframes fall {
+  from { top: -50px; }
+  to   { top: 100vh; }
 }
 
 @keyframes scrollQuotes {

@@ -1,217 +1,163 @@
+<!-- public/mobile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Disable double-tap and pinch zoom -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
-  <title>Mark Palkimas - Mobile</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mark Palkimas' Interactive Website</title>
   <style>
-    /* ========================================================= */
-    /* Variables & Base Style                                   */
-    /* ========================================================= */
-    :root {
-      --bg: #1a1a1a;
-      --footer-bg: #3a3a3a;
-      --text: #eee;
-      --drop-btn-bg: #777;
-      --drop-btn-hover: #999;
-      --neon-colors: lime, yellow, orange, red, magenta, blue;
-    }
-    html { touch-action: manipulation; }
-    *, *::before, *::after {
+    /* Basic Reset */
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
+      font-family: Arial, sans-serif;
     }
     body {
-      background: var(--bg);
-      color: var(--text);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      overflow-x: hidden;
+      background-color: #f4f4f4;
+      color: #333;
       position: relative;
-      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
-
-    /* ========================================================= */
-    /* Header                                                    */
-    /* ========================================================= */
+    /* Header */
     header {
-      position: sticky;
-      top: 0;
-      background: rgba(0,0,0,0.8);
-      padding: 1rem;
+      width: 100%;
+      padding: 1em;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 50;
-    }
-    header .logo {
-      font-weight: 600;
-      font-size: 1.2rem;
-    }
-    header .projects-link {
-      color: var(--text);
-      text-decoration: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      transition: background 0.3s;
-    }
-    header .projects-link:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    /* ========================================================= */
-    /* Main & Profile                                            */
-    /* ========================================================= */
-    main {
-      flex: 1;
-      padding: 1rem;
-      margin-top: 4rem;
-      position: relative;
-    }
-    .profile-container {
-      text-align: center;
-      margin-bottom: 2rem;
-      position: relative;
+      background-color: #333;
+      color: #fff;
+      position: fixed;
+      top: 0;
       z-index: 10;
     }
-    .profile-photo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      animation: neon 8s linear infinite;
-      cursor: pointer;
+    .projects-link {
+      color: #bbb;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 0.5em 1em;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      transition: background-color 0.3s;
     }
-    @keyframes neon {
-      0%,100% { box-shadow:0 0 8px lime,0 0 16px lime; }
-      16%    { box-shadow:0 0 8px yellow,0 0 16px yellow; }
-      33%    { box-shadow:0 0 8px orange,0 0 16px orange; }
-      50%    { box-shadow:0 0 8px red,0 0 16px red; }
-      66%    { box-shadow:0 0 8px magenta,0 0 16px magenta; }
-      83%    { box-shadow:0 0 8px blue,0 0 16px blue; }
+    /* Profile and Popup */
+    .profile-container {
+      text-align: center;
+      margin-top: 100px;
+    }
+    .profile-photo {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      cursor: pointer;
+      object-fit: cover;
+      border: 4px solid #333;
+      transition: transform 0.3s;
+      z-index: 20;
     }
     .profile-photo:hover {
-      transform: scale(1.05);
+      transform: scale(1.1);
     }
-    .profile-name {
-      margin-top: 1rem;
-      font-size: 1.4rem;
-      font-weight: 600;
+    .hello-mark {
+      font-size: 1.5em;
+      margin-top: 10px;
+      color: #333;
+      font-weight: bold;
+      font-family: 'Arial', sans-serif;
     }
     .about-popup {
       display: none;
       position: absolute;
-      top: 75%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #222;
-      color: var(--text);
-      padding: 1rem;
+      top: 250px;
+      left: calc(50% - 125px);
+      background: #fff;
+      padding: 1em;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
-      width: 80%;
-      max-width: 260px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      max-width: 250px;
       z-index: 20;
     }
     .dimmed {
       display: none;
       position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 15;
-      cursor: pointer;
-    }
-
-    /* ========================================================= */
-    /* Canvas Lightning                                          */
-    /* ========================================================= */
-    canvas#lightning-canvas {
-      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none;
-      z-index: 8;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 15;
     }
-
-    /* ========================================================= */
-    /* Footer & Contact                                          */
-    /* ========================================================= */
-   footer {
-  background: var(--footer-bg);
-  margin-top: 260px;   /* your baseline spacing */
-  padding: 1.5rem 1rem;
-  text-align: center;
-  position: relative;   /* required for top to take effect */
-  top: -15px;            /* nudge everything up by 5px */
-  z-index: 5;
-}
-    footer p {
-      color: #888;        /* blended copyright */
-      font-size: 0.8rem;
-      margin-top: 0.5rem;
+    /* Footer */
+    footer {
+      margin-top: 41vh;
+      width: 100%;
+      padding: 1.5em 0;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      position: relative;
+      z-index: 5;
+    }
+    .contact-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
     .social-links {
       display: flex;
+      gap: 15px;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
     }
     .social-links img {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       transition: transform 0.3s;
     }
-    .social-links img:hover { transform: scale(1.2); }
-    .gravity-footer { margin-top: 1rem; }
+    .social-links img:hover {
+      transform: scale(1.2);
+    }
+    .footer-content p {
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    /* Gravity Buttons */
+    .gravity-section {
+      text-align: center;
+      padding: 1em;
+      position: relative;
+      top: .05vh;
+    }
     .gravity-btn, .reset-btn {
-      background: var(--drop-btn-bg);
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
-      font-size: 0.95rem;
+      padding: 8px 16px;
       cursor: pointer;
-      transition: opacity 0.3s, transform 0.2s, background 0.3s;
-      margin: 0.5rem;
+      background-color: #0073e6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 5px;
+      display: inline-block;
     }
-    .gravity-btn:hover {
-      background: var(--drop-btn-hover);
-      opacity: 1;
-      transform: translateY(-2px);
+    .reset-btn {
+      display: none;
     }
-    .reset-btn { background: #555; opacity: 0.8; display: none; }
-    .reset-btn:hover { opacity: 1; }
-
-    /* ========================================================= */
-    /* Quotes & Balls                                            */
-    /* ========================================================= */
-    .falling-quote {
-      position: absolute;
-      font-size: 0.9rem;
-      background: rgba(30,30,30,0.9);
-      color: #ddd;
-      padding: 0.4rem 0.6rem;
-      border-radius: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.7);
-      z-index: 12;
-    }
+    /* Ball Styling */
     .ball {
       position: absolute;
+      top: 0;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      z-index: 6;
+      background-color: #0073e6;
     }
   </style>
 </head>
 <body>
-  <div class="dimmed" onclick="hideAbout()"></div>
-  <canvas id="lightning-canvas"></canvas>
+  <div class="dimmed"></div>
 
   <header>
     <div class="logo">Mark Palkimas</div>
@@ -219,230 +165,152 @@
   </header>
 
   <main>
-    <section class="profile-container">
-      <img src="assets/profile.jpg" class="profile-photo" onclick="toggleAbout()" alt="Profile Photo">
-      <div class="profile-name">Hello, I’m Mark</div>
+    <section id="about" class="profile-container">
+      <img src="profile.jpg" alt="Profile Photo" class="profile-photo" onclick="showAboutSection()" />
+      <div class="hello-mark">Hello, I'm Mark</div>
       <div class="about-popup">
         <h2>About Me</h2>
-        <p>More detailed info about my background.</p>
+        <p>This section contains more detailed information about me and my professional background.</p>
       </div>
     </section>
   </main>
 
   <footer>
-    <h2>Contact Me</h2>
-    <div class="social-links">
-      <a href="#"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram"></a>
-      <a href="#"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn"></a>
-      <a href="#"><img src="assets/github-logo.png" alt="GitHub"></a>
-      <a href="#"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail"></a>
-      <a href="#"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube"></a>
-    </div>
-    <div class="gravity-footer">
-      <button class="gravity-btn" onclick="dropBall()">Drop Ball</button>
-      <button class="reset-btn" onclick="resetBalls()">Reset</button>
-    </div>
-    <p>&copy; 2024 Mark Palkimas. All rights reserved.</p>
+    <section class="contact-section">
+      <h2>Contact Me</h2>
+      <div class="social-links">
+        <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="iconmonstr-instagram-11-240.png" alt="Instagram"></a>
+        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="iconmonstr-linkedin-1-240.png" alt="LinkedIn"></a>
+        <a href="https://github.com/MarkPalkimas" target="_blank"><img src="github-logo.png" alt="GitHub"></a>
+        <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="iconmonstr-gmail-1-240.png" alt="Gmail"></a>
+        <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="iconmonstr-youtube-6-240.png" alt="YouTube"></a>
+      </div>
+      <p>&copy; 2024 Mark Palkimas. All rights reserved.</p>
+    </section>
   </footer>
 
+  <div class="gravity-section">
+    <button class="gravity-btn" onclick="dropBall()">Drop Ball</button>
+    <button class="reset-btn" onclick="resetBalls()">Reset</button>
+  </div>
+
   <script>
-    // About popup
-    function toggleAbout(){
-      document.querySelector('.about-popup').style.display='block';
-      document.querySelector('.dimmed').style.display='block';
-    }
-    function hideAbout(){
-      document.querySelector('.about-popup').style.display='none';
-      document.querySelector('.dimmed').style.display='none';
-    }
-
-    // Physics & Effects
     const balls = [];
-    const GRAVITY = 0.3;
-    const REST = 0.8;
-    const resetBtn = document.querySelector('.reset-btn');
-    const footerEl = document.querySelector('footer');
-    let quoteTime = Date.now();
+    const resetBtn = document.querySelector(".reset-btn");
+    const footer = document.querySelector("footer");
 
-    // Lightning control
-    const lightningTimers = [];
-    const canvas = document.getElementById('lightning-canvas');
-    const ctx = canvas.getContext('2d');
-    let HORIZON = 0;
+    document.addEventListener("DOMContentLoaded", function () {
+      const dimmedOverlay = document.querySelector(".dimmed");
+      const aboutPopup = document.querySelector(".about-popup");
 
-    function resize(){
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      HORIZON = canvas.height * 0.5;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    function getCurrentNeonColor(){
-      const t = (Date.now()%8000)/8000;
-      if(t<0.16) return 'lime';
-      if(t<0.33) return 'yellow';
-      if(t<0.5) return 'orange';
-      if(t<0.66) return 'red';
-      if(t<0.83) return 'magenta';
-      return 'blue';
-    }
-
-    function drawLightning(){
-      const photo = document.querySelector('.profile-photo').getBoundingClientRect();
-      const sx = photo.left + photo.width/2, sy = photo.top + photo.height/2;
-      const ex = Math.random() * canvas.width;
-      const ey = HORIZON + Math.random() * (canvas.height - HORIZON);
-      const segments = [];
-
-      (function branch(x1,y1,x2,y2,depth){
-        if(depth>6){
-          segments.push({x1,y1,x2,y2});
-          return;
-        }
-        const mx = (x1+x2)/2 + (Math.random()-0.5)*(150/(depth+1));
-        const my = (y1+y2)/2 + (Math.random()-0.5)*(150/(depth+1));
-        branch(x1,y1,mx,my,depth+1);
-        branch(mx,my,x2,y2,depth+1);
-      })(sx, sy, ex, ey, 0);
-
-      const col = getCurrentNeonColor();
-      ctx.save();
-      ctx.shadowBlur = 30;
-      ctx.shadowColor = col;
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = col;
-
-      // ripple segments faster (20ms per segment)
-      segments.forEach((seg, i) => {
-        const delay = i * 20;
-        lightningTimers.push(setTimeout(() => {
-          ctx.beginPath();
-          ctx.moveTo(seg.x1, seg.y1);
-          ctx.lineTo(seg.x2, seg.y2);
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.lineWidth = 6;
-          ctx.globalAlpha = 0.2;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }, delay));
+      dimmedOverlay.addEventListener("click", () => {
+        aboutPopup.style.display = "none";
+        dimmedOverlay.style.display = "none";
+        const profilePhoto = document.querySelector(".profile-photo");
+        profilePhoto.style.transform = "scale(1)";
       });
+    });
 
-      // clear after ripple
-      const clearDelay = segments.length * 20 + 150;
-      lightningTimers.push(setTimeout(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.restore();
-      }, clearDelay));
+    function showAboutSection() {
+      const aboutPopup = document.querySelector(".about-popup");
+      const dimmedOverlay = document.querySelector(".dimmed");
+      const profilePhoto = document.querySelector(".profile-photo");
+
+      aboutPopup.style.display = "block";
+      dimmedOverlay.style.display = "block";
+      profilePhoto.style.transform = "scale(1.1)";
     }
 
-    function scheduleLightning(){
-      const burstCount = 3 + Math.floor(Math.random() * 6);
-      for(let i=0; i<burstCount; i++){
-        lightningTimers.push(setTimeout(drawLightning, i * 100));
-      }
-      lightningTimers.push(setTimeout(scheduleLightning, 2000 + Math.random() * 3000));
+    function dropBall() {
+      const ball = document.createElement("div");
+      ball.className = "ball";
+      ball.style.backgroundColor = getRandomColor();
+      ball.style.width = ball.style.height = Math.random() * 20 + 30 + "px";
+      ball.style.left = Math.random() * (window.innerWidth - 50) + "px";
+      ball.velocityY = Math.random() * 4 + 1;
+      ball.velocityX = Math.random() * 2 - 1;
+      ball.bounceOffset = 10;
+      document.body.appendChild(ball);
+      balls.push(ball);
+      resetBtn.style.display = "inline-block";
     }
 
-    function dropBall(){
-      const b = document.createElement('div');
-      const sz = 30 + Math.random()*30;
-      Object.assign(b.style, {
-        width: sz + 'px',
-        height: sz + 'px',
-        left: Math.random()*(window.innerWidth-sz) + 'px',
-        top: '0px',
-        backgroundColor: '#' + Math.random().toString(16).slice(2,8)
-      });
-      b.className = 'ball';
-      b.vx = Math.random()*2 - 1;
-      b.vy = 2 + Math.random()*2;
-      b.mass = sz*sz;
-      document.body.appendChild(b);
-      balls.push(b);
-      resetBtn.style.display = 'inline-block';
-      if(balls.length===1){
-        animateBalls();
-        scheduleLightning();
-      }
-    }
-
-    function resetBalls(){
-      balls.forEach(b=>b.remove());
+    function resetBalls() {
+      balls.forEach(ball => ball.remove());
       balls.length = 0;
-      resetBtn.style.display = 'none';
-      lightningTimers.forEach(id => clearTimeout(id));
-      lightningTimers.length = 0;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      resetBtn.style.display = "none";
     }
 
-    // Falling Quotes
-    function createQuote(){
-      const msgs = ["Life isn’t about...","Best time...","Money is not...","Cold water...","Regret is proof..."];
-      const q = document.createElement('div'); q.className='falling-quote';
-      q.innerText = msgs[Math.floor(Math.random()*msgs.length)];
-      const l = Math.random()*(window.innerWidth-260);
-      q.dataset.initialLeft = l;
-      q.dataset.amp = 10 + Math.random()*20;
-      q.dataset.phase = Math.random()*2*Math.PI;
-      Object.assign(q.style, { left: l + 'px', top: '-50px', animation: 'fall 20s linear forwards' });
-      document.body.appendChild(q);
-      setTimeout(()=>q.remove(),21000);
-    }
-    setInterval(createQuote,10000);
-    (function animateQuotes(){
-      const now = Date.now();
-      document.querySelectorAll('.falling-quote').forEach(q=>{
-        const t = (now-quoteTime)/1000;
-        q.style.left = (+q.dataset.initialLeft + q.dataset.amp*Math.sin(t + +q.dataset.phase)) + 'px';
-      });
-      requestAnimationFrame(animateQuotes);
-    })();
-
-    // Physics loop
-    function animateBalls(){
-      const ftop = footerEl.getBoundingClientRect().top + window.scrollY;
-      balls.forEach(b=>{
-        b.vy += GRAVITY;
-        let x = parseFloat(b.style.left), y = parseFloat(b.style.top);
-        let nx = x + b.vx, ny = y + b.vy;
-        if(nx<=0||nx+b.offsetWidth>=window.innerWidth){
-          b.vx*=-REST;
-          nx=Math.max(0,Math.min(nx,window.innerWidth-b.offsetWidth));
-        }
-        if(ny+b.offsetHeight>=ftop){
-          ny=ftop-b.offsetHeight;
-          b.vy*=-REST;
-          b.vx*=REST;
-        }
-        b.style.left = nx+'px';
-        b.style.top = ny+'px';
-      });
-      for(let i=0;i<balls.length;i++){
-        for(let j=i+1;j<balls.length;j++){
-          const A=balls[i], B=balls[j],
-                ax=parseFloat(A.style.left)+A.offsetWidth/2,
-                ay=parseFloat(A.style.top)+A.offsetHeight/2,
-                bx=parseFloat(B.style.left)+B.offsetWidth/2,
-                by=parseFloat(B.style.top)+B.offsetHeight/2,
-                dx=bx-ax, dy=by-ay,
-                dist=Math.hypot(dx,dy), r=(A.offsetWidth+B.offsetWidth)/2;
-          if(dist<r&&dist>0){
-            const nx=dx/dist, ny=dy/dist,
-                  p=2*(A.vx*nx+A.vy*ny - B.vx*nx - B.vy*ny)/(A.mass+B.mass);
-            A.vx -= p*B.mass*nx; A.vy -= p*B.mass*ny;
-            B.vx += p*A.mass*nx; B.vy += p*A.mass*ny;
-            const ov=r-dist;
-            A.style.left=(parseFloat(A.style.left)-nx*ov/2)+'px';
-            A.style.top =(parseFloat(A.style.top)-ny*ov/2)+'px';
-            B.style.left=(parseFloat(B.style.left)+nx*ov/2)+'px';
-            B.style.top =(parseFloat(B.style.top)+ny*ov/2)+'px';
-          }
-        }
+    function getRandomColor() {
+      const letters = "0123456789ABCDEF";
+      let color = "#";
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
       }
-      requestAnimationFrame(animateBalls);
+      return color;
     }
+
+    function updateBalls() {
+      const velocityCutoff = 0.01;
+      const footerTop = footer.getBoundingClientRect().top + window.scrollY;
+
+      balls.forEach((ball, index) => {
+        let currentTop = parseFloat(ball.style.top) || 0;
+        let currentLeft = parseFloat(ball.style.left) || 0;
+
+        let newTop = currentTop + ball.velocityY;
+        let newLeft = currentLeft + ball.velocityX;
+
+        // Bounce off the footer
+        if (newTop + ball.offsetHeight >= footerTop) {
+          newTop = footerTop - ball.offsetHeight;
+          ball.velocityY *= -0.8;
+          if (Math.abs(ball.velocityY) < velocityCutoff) ball.velocityY = 0;
+        } else {
+          ball.velocityY += 0.3;
+        }
+
+        // Bounce off walls
+        if (newLeft <= 0 || newLeft + ball.offsetWidth >= document.documentElement.clientWidth) {
+          newLeft = newLeft <= 0 ? 0 : document.documentElement.clientWidth - ball.offsetWidth;
+          ball.velocityX *= -0.8;
+          if (Math.abs(ball.velocityX) < velocityCutoff) ball.velocityX = 0;
+        }
+
+        ball.style.top = newTop + "px";
+        ball.style.left = newLeft + "px";
+      });
+
+      requestAnimationFrame(updateBalls);
+    }
+
+    // Start the loop
+    updateBalls();
+
+    // --- Visitor Tracking via localStorage ---
+    async function logVisitor() {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        const ip = data.ip;
+        const location = `${data.city}, ${data.region}, ${data.country_name}`;
+        const now = new Date().toISOString();
+        const logs = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+
+        if (logs[ip]) {
+          logs[ip].count++;
+          logs[ip].latestTime = now;
+        } else {
+          logs[ip] = { count: 1, latestTime: now, location };
+        }
+
+        localStorage.setItem("visitorLogs", JSON.stringify(logs));
+      } catch (e) {
+        console.error("logVisitor error:", e);
+      }
+    }
+    // Log this mobile visit now
+    logVisitor();
   </script>
 </body>
 </html>

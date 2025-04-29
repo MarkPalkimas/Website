@@ -1,27 +1,61 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // --- Neon Glow Effect (Orb Following the Cursor) ---
+  // --- Neon Glow Effect (Smooth multi-color ripple) ---
   const neonContainer = document.getElementById("neon-container");
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
-  const glowColors = ["#00d084", "#3498db", "#8e44ad", "#f39c12"];
-  let glowIndex = 0;
-  
-  function updateNeonBackground() {
-    neonContainer.style.background = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ${glowColors[glowIndex]}, transparent 70%)`;
+  const glowColors = [
+    "#5EBD3E",
+    "#FFB900",
+    "#F78200",
+    "#E23838",
+    "#973999",
+    "#009CDF"
+  ];
+
+  // Parse a hex string like "#FF5733" into [r,g,b]
+  function parseHexColor(hex) {
+    const num = parseInt(hex.slice(1), 16);
+    return [ (num >> 16) & 255, (num >> 8) & 255, num & 255 ];
   }
-  updateNeonBackground();
-  
-  document.addEventListener("mousemove", function (event) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    updateNeonBackground();
+  // Linearly interpolate between two [r,g,b] at fraction t
+  function lerpColor(a, b, t) {
+    const r  = Math.round(a[0] + (b[0] - a[0]) * t);
+    const g  = Math.round(a[1] + (b[1] - a[1]) * t);
+    const bl = Math.round(a[2] + (b[2] - a[2]) * t);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  // Update mouse position for the gradient center
+  document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
   });
-  
-  setInterval(() => {
-    glowIndex = (glowIndex + 1) % glowColors.length;
-    updateNeonBackground();
-  }, 4000);
-  
+
+  let startTime = null;
+  function animateNeon(time) {
+    if (startTime === null) startTime = time;
+    const elapsed   = time - startTime;
+    const segmentMs = 2000;
+    const cycleMs   = segmentMs * glowColors.length;
+    const progress  = (elapsed % cycleMs) / segmentMs;
+    const idx       = Math.floor(progress);
+    const frac      = progress - idx;
+
+    const colA = parseHexColor(glowColors[idx]);
+    const colB = parseHexColor(glowColors[(idx + 1) % glowColors.length]);
+    const currentColor = lerpColor(colA, colB, frac);
+
+    // ripple between 60%–80%
+    const rippleRadius = 70 + Math.sin(elapsed / 500) * 10;
+
+    neonContainer.style.background =
+      `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
+      `${currentColor}, transparent ${rippleRadius}%)`;
+
+    requestAnimationFrame(animateNeon);
+  }
+  requestAnimationFrame(animateNeon);
+
   // --- Elements & UI Variables ---
   const profilePic = document.querySelector(".profile-photo");
   const aboutLink = document.querySelector(".about-link");
@@ -31,12 +65,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const resetBtn = document.querySelector(".reset-btn");
   const dimmedOverlay = document.querySelector(".dimmed");
   const quoteContainer = document.getElementById("quote-container");
-  
+
   // Select popups by their IDs from the popups container
   const aboutPopup = document.getElementById("about-popup");
   const contactPopup = document.getElementById("contact-popup");
   const adminPopup = document.getElementById("admin-popup");
-  
+
   // --- Popup Controls ---
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
@@ -61,21 +95,20 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("toggle-password").textContent = "Show";
     document.getElementById("admin-error").style.display = "none";
   });
-  
   dimmedOverlay.addEventListener("click", () => {
-    aboutPopup.style.display    = "none";
-    contactPopup.style.display  = "none";
-    adminPopup.style.display    = "none";
+    aboutPopup.style.display = "none";
+    contactPopup.style.display = "none";
+    adminPopup.style.display = "none";
     dimmedOverlay.style.display = "none";
   });
-  
+
   // --- Admin Popup Controls ---
   const adminPasswordInput = document.getElementById("admin-password");
   const togglePasswordBtn = document.getElementById("toggle-password");
   const submitPasswordBtn = document.getElementById("submit-password");
   const cancelPasswordBtn = document.getElementById("cancel-password");
   const errorMessage = document.getElementById("admin-error");
-  
+
   togglePasswordBtn.addEventListener("click", () => {
     if (adminPasswordInput.type === "password") {
       adminPasswordInput.type = "text";
@@ -85,16 +118,17 @@ document.addEventListener("DOMContentLoaded", function () {
       togglePasswordBtn.textContent = "Show";
     }
   });
-  
+
   // ────────────────────────────────────────────────────────────
-  // 🔒 SHA-256 check for “M@rk2005”
+  // 🔒 SHA-256 check
   // ────────────────────────────────────────────────────────────
   const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
   async function hashPassword(str) {
     const buf = new TextEncoder().encode(str);
     const hashBuf = await crypto.subtle.digest("SHA-256", buf);
-    const arr = Array.from(new Uint8Array(hashBuf));
-    return arr.map(b => b.toString(16).padStart(2, "0")).join("");
+    return Array.from(new Uint8Array(hashBuf))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
   }
 
   submitPasswordBtn.addEventListener("click", async () => {
@@ -112,12 +146,12 @@ document.addEventListener("DOMContentLoaded", function () {
     adminPasswordInput.value = "";
     errorMessage.style.display = "none";
   });
-  
+
   // --- Ball Physics & Collision ---
   const balls = [];
   const GRAVITY = 0.3;
   const RESTITUTION = 0.8;
-  
+
   gravityBtn.addEventListener("click", () => {
     dropBall();
     resetBtn.style.display = "block";
@@ -130,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
     resetBalls();
     resetBtn.style.display = "none";
   });
-  
+
   function dropBall() {
     const ball = document.createElement("div");
     ball.className = "ball";
@@ -147,12 +181,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.appendChild(ball);
     balls.push(ball);
   }
-  
+
   function resetBalls() {
     balls.forEach(ball => ball.remove());
     balls.length = 0;
   }
-  
+
   function getRandomColor() {
     const letters = "89ABCDEF";
     let color = "#";
@@ -161,18 +195,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     return color;
   }
-  
+
   // --- Falling Quotes ---
   let quotesStarted = false;
   let quoteStartTime = Date.now();
-  
+
   function startFallingQuotes() {
     setInterval(() => {
       createFallingQuote();
     }, 10000);
     updateQuotes();
   }
-  
+
   function createFallingQuote() {
     const quotes = [
       "Life isn’t about what you know, It’s about what you’re able to figure out.",
@@ -198,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (quoteElem.parentElement) quoteElem.parentElement.removeChild(quoteElem);
     }, 21000);
   }
-  
+
   function updateQuotes() {
     const now = Date.now();
     const quotes = document.querySelectorAll(".falling-quote");
@@ -212,16 +246,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     requestAnimationFrame(updateQuotes);
   }
-  
+
   function updateBalls() {
     balls.forEach(ball => {
       ball.velocityY += GRAVITY;
-      
+
       let currentTop = parseFloat(ball.style.top);
       let currentLeft = parseFloat(ball.style.left);
       let newTop = currentTop + ball.velocityY;
       let newLeft = currentLeft + ball.velocityX;
-      
+
       if (newLeft <= 0) {
         newLeft = 0;
         ball.velocityX = -ball.velocityX * RESTITUTION;
@@ -230,24 +264,24 @@ document.addEventListener("DOMContentLoaded", function () {
         newLeft = window.innerWidth - ball.radius * 2;
         ball.velocityX = -ball.velocityX * RESTITUTION;
       }
-      
+
       const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
       if (newTop + ball.radius * 2 >= footerTop) {
         newTop = footerTop - ball.radius * 2;
         ball.velocityY = -ball.velocityY * RESTITUTION;
         ball.velocityX *= RESTITUTION;
       }
-      
+
       ball.style.top = newTop + "px";
       ball.style.left = newLeft + "px";
     });
-    
+
     handleBallCollisions();
     handleBallQuoteCollisions();
-    
+
     requestAnimationFrame(updateBalls);
   }
-  
+
   function handleBallCollisions() {
     for (let i = 0; i < balls.length; i++) {
       const ballA = balls[i];
@@ -265,20 +299,20 @@ document.addEventListener("DOMContentLoaded", function () {
           const ny = dy / dist;
           const tx = -ny;
           const ty = nx;
-          
+
           const vA_n = ballA.velocityX * nx + ballA.velocityY * ny;
           const vA_t = ballA.velocityX * tx + ballA.velocityY * ty;
           const vB_n = ballB.velocityX * nx + ballB.velocityY * ny;
           const vB_t = ballB.velocityX * tx + ballB.velocityY * ty;
-          
+
           const vA_n_after = (vA_n * (ballA.mass - ballB.mass) + 2 * ballB.mass * vB_n) / (ballA.mass + ballB.mass);
           const vB_n_after = (vB_n * (ballB.mass - ballA.mass) + 2 * ballA.mass * vA_n) / (ballA.mass + ballB.mass);
-          
+
           ballA.velocityX = vA_n_after * nx + vA_t * tx;
           ballA.velocityY = vA_n_after * ny + vA_t * ty;
           ballB.velocityX = vB_n_after * nx + vB_t * tx;
           ballB.velocityY = vB_n_after * ny + vB_t * ty;
-          
+
           const overlap = ballA.radius + ballB.radius - dist;
           const separationX = nx * (overlap / 2);
           const separationY = ny * (overlap / 2);
@@ -290,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   }
-  
+
   function handleBallQuoteCollisions() {
     const quoteElements = document.querySelectorAll(".falling-quote");
     balls.forEach(ball => {
@@ -317,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
-  
+
   let lastScrollTop = window.scrollY;
   window.addEventListener("scroll", () => {
     const scrollTop = window.scrollY;
@@ -327,9 +361,9 @@ document.addEventListener("DOMContentLoaded", function () {
       ball.velocityY += scrollDirection * 0.5;
     });
   });
-  
+
   updateBalls();
-  
+
   // ────────────────────────────────────────────────────────────
   // 🚀 Visitor Tracking via localStorage (IP → count, latestTime, location)
   // ────────────────────────────────────────────────────────────
@@ -353,5 +387,6 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("logVisitor error:", e);
     }
   }
+
   logVisitor();
 });

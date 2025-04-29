@@ -24,7 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ——— Log visitor (can be called from your client code) —————————
+// ——— Log visitor (to be called from your client) ——————————
 app.post("/api/logVisitor", (req, res) => {
   const ip        = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown";
   const userAgent = req.headers["user-agent"] || "Unknown";
@@ -49,32 +49,38 @@ app.get("/api/getVisitorLogs", (req, res) => {
 
   // 2) Build enriched array
   const enriched = Object.entries(agg).map(([ip, { count, latestTime, userAgents }]) => {
+    // Normalize IPv4-mapped IPv6
+    let lookupIP = ip;
+    if (ip.startsWith("::ffff:")) {
+      lookupIP = ip.split(":").pop();
+    } else if (ip === "::1") {
+      lookupIP = "127.0.0.1";
+    }
+
     // Geo lookup
     let location = "Unknown";
     try {
-      const geo = cityReader.city(ip);
-      const city = geo.city?.names?.en;
-      const region = geo.subdivisions?.[0]?.names?.en;
-      const country = geo.country?.names?.en;
-      if (city || region || country) {
-        location = [city, region, country].filter(Boolean).join(", ");
-      }
+      const geo = cityReader.city(lookupIP);
+      const parts = [
+        geo.city?.names?.en,
+        geo.subdivisions?.[0]?.names?.en,
+        geo.country?.names?.en
+      ].filter(Boolean);
+      if (parts.length) location = parts.join(", ");
     } catch {}
 
     // ASN lookup (ISP/Provider)
     let provider = "Unknown";
     try {
-      const asn = asnReader.asn(ip);
+      const asn = asnReader.asn(lookupIP);
       if (asn.autonomous_system_organization) {
         provider = asn.autonomous_system_organization;
       }
     } catch {}
 
-    // Device determination (rough)
+    // Device determination
     const agents = Array.from(userAgents);
-    const device = agents.some(ua =>
-      /Android|iPhone|iPad|iPod|Mobile/i.test(ua)
-    )
+    const device = agents.some(ua => /Android|iPhone|Mobile/i.test(ua))
       ? "Mobile"
       : "Desktop";
 

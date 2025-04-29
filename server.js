@@ -6,8 +6,9 @@ const adminSDK = require("firebase-admin");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ——— Initialize Firebase Admin SDK ———————————————————————
-const serviceAccount = require("./secrets/firebase-sa.json"); // do NOT commit this file
+const serviceAccount = JSON.parse(
+  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf8")
+);
 adminSDK.initializeApp({
   credential: adminSDK.credential.cert(serviceAccount),
   databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"

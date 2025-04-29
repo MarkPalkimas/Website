@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Admin Dashboard – Mark Palkimas</title>
+  <title>Admin Dashboard - Mark Palkimas</title>
   <style>
     /* Basic Reset */
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -22,61 +22,44 @@
       align-items:center;
     }
     header .logo {
-      font-size:1.5rem;
-      font-weight:bold;
-      color:#ffcc00;
+      font-size:1.5rem; font-weight:bold; color:#ffcc00;
     }
     header a.logout {
-      color:#e0e0e0;
-      text-decoration:none;
-      font-size:1.1rem;
+      color:#e0e0e0; text-decoration:none; font-size:1.1rem;
     }
     header a.logout:hover { color:#ffcc00; }
     .container { padding:2rem; }
     .card {
-      background:#1f1f1f;
-      border-radius:8px;
-      padding:1rem;
+      background:#1f1f1f; border-radius:8px;
+      padding:1rem; margin-bottom:1rem;
       box-shadow:0 2px 8px rgba(0,0,0,0.5);
     }
     .card h2 { margin-bottom:.5rem; }
     .pulse {
-      display:inline-block;
-      width:10px;
-      height:10px;
-      background:#ffcc00;
-      border-radius:50%;
-      animation:pulse 2s infinite;
-      margin-left:.5rem;
+      display:inline-block; width:10px; height:10px;
+      background:#ffcc00; border-radius:50%;
+      animation:pulse 2s infinite; margin-left:.5rem;
     }
     @keyframes pulse {
-      0%   { box-shadow:0 0 0 0    rgba(255,204,0,0.7); }
+      0%   { box-shadow:0 0 0 0 rgba(255,204,0,0.7); }
       70%  { box-shadow:0 0 0 10px rgba(255,204,0,0); }
-      100% { box-shadow:0 0 0 0    rgba(255,204,0,0); }
+      100% { box-shadow:0 0 0 0 rgba(255,204,0,0); }
     }
     table {
-      width:100%;
-      border-collapse:collapse;
-      background:#222;
-      color:#e0e0e0;
-      margin-top:1rem;
+      width:100%; border-collapse:collapse;
+      background:#222; color:#e0e0e0; margin-top:1rem;
     }
     table th, table td {
-      padding:.5rem;
-      text-align:left;
-      border:1px solid #333;
-      vertical-align: top;
+      padding:.5rem; text-align:left; border:1px solid #333;
     }
-    table th { background:#2a2a2a; }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo">
-      Admin Dashboard <span class="pulse"></span>
-    </div>
+    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
     <a href="index.html" class="logout">⟵ Back to Site</a>
   </header>
+
   <div class="container">
     <div class="card">
       <h2>Visitor Logs</h2>
@@ -85,44 +68,83 @@
           <tr>
             <th>Latest Visit</th>
             <th>IP Address</th>
-            <th>Location</th>
-            <th>Provider</th>
-            <th>Device</th>
+            <th>User Agent / Location</th>
             <th>Count</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Filled dynamically -->
+          <!-- Populated by script -->
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    fetch("/api/getVisitorLogs")
-      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-      .then(rows => {
-        const tbody = document.querySelector("#visitor-logs tbody");
-        tbody.innerHTML = "";
-        rows.forEach(({ latestTime, ip, location, provider, device, count }) => {
-          const dateStr = new Date(latestTime).toLocaleString();
-          tbody.insertAdjacentHTML("beforeend", `
-            <tr>
-              <td>${dateStr}</td>
-              <td>${ip}</td>
-              <td>${location}</td>
-              <td>${provider}</td>
-              <td>${device}</td>
-              <td>${count}</td>
-            </tr>`);
-        });
-      })
-      .catch(() => {
-        document.querySelector("#visitor-logs tbody").innerHTML =
-          `<tr><td colspan="6" style="text-align:center;color:#f55;">
-             Error loading logs
-           </td></tr>`;
+    // 1. LocalStorage-based logs (old code)
+    function getLocalLogs() {
+      const obj = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+      return Object.entries(obj)
+        .map(([ip, d]) => ({
+          ip,
+          location: d.location || d.userAgent || '—',
+          count: d.count || 1,
+          latestTime: d.latestTime
+        }));
+    }
+
+    // 2. Fetch from new server API
+    async function getServerLogs() {
+      try {
+        const res = await fetch('/api/getVisitorLogs');
+        if (!res.ok) throw new Error(res.statusText);
+        const logs = await res.json();
+        return logs.map(log => ({
+          latestTime: log.timestamp,
+          ip: log.ip,
+          location: log.userAgent || '—',
+          count: 1
+        }));
+      } catch (err) {
+        console.error("Failed to fetch server logs:", err);
+        return [];
+      }
+    }
+
+    // 3. Unified loader
+    async function loadLogs() {
+      let entries = [];
+      if (localStorage.getItem("visitorLogs")) {
+        entries = getLocalLogs();
+      } else {
+        entries = await getServerLogs();
+      }
+      // sort descending by date
+      entries.sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
+      return entries;
+    }
+
+    // 4. Render table
+    async function populateTable() {
+      const tbody = document.querySelector("#visitor-logs tbody");
+      tbody.innerHTML = "";
+      const logs = await loadLogs();
+      logs.forEach(({ ip, location, count, latestTime }) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(latestTime).toLocaleString()}</td>
+          <td>${ip}</td>
+          <td>${location}</td>
+          <td>${count}</td>
+        `;
+        tbody.appendChild(tr);
       });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      populateTable();
+      // refresh every 10s
+      setInterval(populateTable, 10000);
+    });
   </script>
 </body>
 </html>

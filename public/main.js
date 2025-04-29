@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return `rgb(${r},${g},${bl})`;
   }
 
-  // Update mouse position for the gradient center
+  // Keep track of mouse for gradient center
   document.addEventListener("mousemove", e => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -41,90 +41,99 @@ document.addEventListener("DOMContentLoaded", function () {
     const idx       = Math.floor(progress);
     const frac      = progress - idx;
 
+    // Interpolate between current pair of colors
     const colA = parseHexColor(glowColors[idx]);
     const colB = parseHexColor(glowColors[(idx + 1) % glowColors.length]);
     const currentColor = lerpColor(colA, colB, frac);
 
-    // ripple between 60%–80%
-    const rippleRadius = 70 + Math.sin(elapsed / 500) * 10;
+    // Compute an outward‐moving ring
+    const ringPeriod  = 2000;
+    const ringProg    = (elapsed % ringPeriod) / ringPeriod;
+    const ringRadius  = ringProg * 100;  // percent
+    const ringWidth   = 5;               // percent thickness
 
-    neonContainer.style.background =
-      `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
-      `${currentColor}, transparent ${rippleRadius}%)`;
+    // Base glow: solid at center, fading to transparent at 70%
+    const baseGlow = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
+                     `${currentColor} 0%, transparent 70%)`;
 
+    // Ripple ring: transparent until ringRadius, then a colored ring of width ringWidth
+    const ringGlow = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
+                     `transparent ${ringRadius}%, ${currentColor} ${ringRadius + ringWidth}%, ` +
+                     `transparent ${ringRadius + ringWidth}%)`;
+
+    neonContainer.style.background = `${baseGlow}, ${ringGlow}`;
     requestAnimationFrame(animateNeon);
   }
   requestAnimationFrame(animateNeon);
 
   // --- Elements & UI Variables ---
-  const profilePic = document.querySelector(".profile-photo");
-  const aboutLink = document.querySelector(".about-link");
-  const contactLink = document.querySelector(".contact-link");
-  const adminBtn = document.querySelector(".admin-btn");
-  const gravityBtn = document.querySelector(".gravity-btn");
-  const resetBtn = document.querySelector(".reset-btn");
-  const dimmedOverlay = document.querySelector(".dimmed");
+  const profilePic     = document.querySelector(".profile-photo");
+  const aboutLink      = document.querySelector(".about-link");
+  const contactLink    = document.querySelector(".contact-link");
+  const adminBtn       = document.querySelector(".admin-btn");
+  const gravityBtn     = document.querySelector(".gravity-btn");
+  const resetBtn       = document.querySelector(".reset-btn");
+  const dimmedOverlay  = document.querySelector(".dimmed");
   const quoteContainer = document.getElementById("quote-container");
 
   // Select popups by their IDs from the popups container
-  const aboutPopup = document.getElementById("about-popup");
+  const aboutPopup   = document.getElementById("about-popup");
   const contactPopup = document.getElementById("contact-popup");
-  const adminPopup = document.getElementById("admin-popup");
+  const adminPopup   = document.getElementById("admin-popup");
 
   // --- Popup Controls ---
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
-    aboutPopup.style.display = "block";
+    aboutPopup.style.display    = "block";
   });
   aboutLink.addEventListener("click", (e) => {
     e.preventDefault();
     dimmedOverlay.style.display = "block";
-    aboutPopup.style.display = "block";
+    aboutPopup.style.display    = "block";
   });
   contactLink.addEventListener("click", (e) => {
     e.preventDefault();
     dimmedOverlay.style.display = "block";
-    contactPopup.style.display = "block";
+    contactPopup.style.display  = "block";
   });
   adminBtn.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
-    adminPopup.style.display = "block";
-    const adminPasswordInput = document.getElementById("admin-password");
-    adminPasswordInput.value = "";
-    adminPasswordInput.type = "password";
+    adminPopup.style.display    = "block";
+    const pw = document.getElementById("admin-password");
+    pw.value = ""; pw.type = "password";
     document.getElementById("toggle-password").textContent = "Show";
     document.getElementById("admin-error").style.display = "none";
   });
   dimmedOverlay.addEventListener("click", () => {
-    aboutPopup.style.display = "none";
-    contactPopup.style.display = "none";
-    adminPopup.style.display = "none";
+    aboutPopup.style.display    = "none";
+    contactPopup.style.display  = "none";
+    adminPopup.style.display    = "none";
     dimmedOverlay.style.display = "none";
   });
 
   // --- Admin Popup Controls ---
   const adminPasswordInput = document.getElementById("admin-password");
-  const togglePasswordBtn = document.getElementById("toggle-password");
-  const submitPasswordBtn = document.getElementById("submit-password");
-  const cancelPasswordBtn = document.getElementById("cancel-password");
-  const errorMessage = document.getElementById("admin-error");
+  const togglePasswordBtn  = document.getElementById("toggle-password");
+  const submitPasswordBtn  = document.getElementById("submit-password");
+  const cancelPasswordBtn  = document.getElementById("cancel-password");
+  const errorMessage       = document.getElementById("admin-error");
 
   togglePasswordBtn.addEventListener("click", () => {
     if (adminPasswordInput.type === "password") {
-      adminPasswordInput.type = "text";
+      adminPasswordInput.type         = "text";
       togglePasswordBtn.textContent = "Hide";
     } else {
-      adminPasswordInput.type = "password";
+      adminPasswordInput.type         = "password";
       togglePasswordBtn.textContent = "Show";
     }
   });
 
   // ────────────────────────────────────────────────────────────
-  // 🔒 SHA-256 check
+  // 🔒 SHA-256 check for “M@rk2005”
   // ────────────────────────────────────────────────────────────
   const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
   async function hashPassword(str) {
-    const buf = new TextEncoder().encode(str);
+    const buf     = new TextEncoder().encode(str);
     const hashBuf = await crypto.subtle.digest("SHA-256", buf);
     return Array.from(new Uint8Array(hashBuf))
       .map(b => b.toString(16).padStart(2, "0"))
@@ -135,15 +144,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const hash = await hashPassword(adminPasswordInput.value);
     if (hash === storedHash) {
       errorMessage.style.display = "none";
-      window.location.href = "admin.html";
+      window.location.href       = "admin.html";
     } else {
-      adminPasswordInput.value = "";
+      adminPasswordInput.value   = "";
       errorMessage.style.display = "block";
     }
   });
-
   cancelPasswordBtn.addEventListener("click", () => {
-    adminPasswordInput.value = "";
+    adminPasswordInput.value   = "";
     errorMessage.style.display = "none";
   });
 
@@ -305,8 +313,12 @@ document.addEventListener("DOMContentLoaded", function () {
           const vB_n = ballB.velocityX * nx + ballB.velocityY * ny;
           const vB_t = ballB.velocityX * tx + ballB.velocityY * ty;
 
-          const vA_n_after = (vA_n * (ballA.mass - ballB.mass) + 2 * ballB.mass * vB_n) / (ballA.mass + ballB.mass);
-          const vB_n_after = (vB_n * (ballB.mass - ballA.mass) + 2 * ballA.mass * vA_n) / (ballA.mass + ballB.mass);
+          const vA_n_after =
+            (vA_n * (ballA.mass - ballB.mass) + 2 * ballB.mass * vB_n) /
+            (ballA.mass + ballB.mass);
+          const vB_n_after =
+            (vB_n * (ballB.mass - ballA.mass) + 2 * ballA.mass * vA_n) /
+            (ballA.mass + ballB.mass);
 
           ballA.velocityX = vA_n_after * nx + vA_t * tx;
           ballA.velocityY = vA_n_after * ny + vA_t * ty;
@@ -345,7 +357,9 @@ document.addEventListener("DOMContentLoaded", function () {
             ball.velocityX = -ball.velocityX * RESTITUTION;
             ball.velocityY = -ball.velocityY * RESTITUTION;
             quote.style.transform = "scale(1.2)";
-            setTimeout(() => { quote.style.transform = "scale(1)"; }, 200);
+            setTimeout(() => {
+              quote.style.transform = "scale(1)";
+            }, 200);
           }
         }
       });

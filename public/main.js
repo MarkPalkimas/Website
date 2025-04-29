@@ -1,3 +1,4 @@
+// public/main.js
 document.addEventListener("DOMContentLoaded", function () {
   // --- Neon Glow Effect (Smooth multi-color ripple) ---
   const neonContainer = document.getElementById("neon-container");
@@ -156,17 +157,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
-  async function hashPassword(str) {
-    const buf     = new TextEncoder().encode(str);
-    const hashBuf = await crypto.subtle.digest("SHA-256", buf);
-    return Array.from(new Uint8Array(hashBuf))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("");
-  }
-
   submitPasswordBtn.addEventListener("click", async () => {
-    const hash = await hashPassword(adminPasswordInput.value);
+    const buf     = new TextEncoder().encode(adminPasswordInput.value);
+    const hashBuf = await crypto.subtle.digest("SHA-256", buf);
+    const hash    = Array.from(new Uint8Array(hashBuf))
+                         .map(b => b.toString(16).padStart(2,"0"))
+                         .join("");
+    const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
     if (hash === storedHash) {
       errorMessage.style.display = "none";
       window.location.href       = "admin.html";
@@ -254,13 +251,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const quoteElem = document.createElement("div");
     quoteElem.className = "falling-quote";
     quoteElem.innerText = quoteText;
+
+    // ← INLINE STYLES TO ENSURE VISIBILITY
+    quoteElem.style.position      = "absolute";
+    quoteElem.style.color         = "#eee";
+    quoteElem.style.fontSize      = "1.5rem";
+    quoteElem.style.opacity       = "0.9";
+    quoteElem.style.pointerEvents = "none";
+    quoteElem.style.zIndex        = "11";
+
     const initLeft = Math.random() * (window.innerWidth - 300);
     quoteElem.dataset.initialLeft = initLeft;
-    quoteElem.dataset.amp = Math.random() * 20 + 10;
-    quoteElem.dataset.phase = Math.random() * 2 * Math.PI;
-    quoteElem.style.left = initLeft + "px";
-    quoteElem.style.top = "-50px";
-    quoteElem.style.animation = "fall 20s linear forwards";
+    quoteElem.dataset.amp         = Math.random() * 20 + 10;
+    quoteElem.dataset.phase       = Math.random() * 2 * Math.PI;
+    quoteElem.style.left          = initLeft + "px";
+    quoteElem.style.top           = "-50px";
+    quoteElem.style.animation     = "fall 20s linear forwards";
+
     quoteContainer.appendChild(quoteElem);
     setTimeout(() => {
       if (quoteElem.parentElement) quoteElem.remove();
@@ -271,9 +278,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const now = Date.now();
     document.querySelectorAll(".falling-quote").forEach(quote => {
       const initLeft = parseFloat(quote.dataset.initialLeft) || 0;
-      const amp = parseFloat(quote.dataset.amp) || 0;
-      const phase = parseFloat(quote.dataset.phase) || 0;
-      const t = (now - quoteStartTime) / 1000;
+      const amp      = parseFloat(quote.dataset.amp)         || 0;
+      const phase    = parseFloat(quote.dataset.phase)       || 0;
+      const t        = (now - quoteStartTime) / 1000;
       quote.style.left = initLeft + amp * Math.sin(t + phase) + "px";
     });
     requestAnimationFrame(updateQuotes);

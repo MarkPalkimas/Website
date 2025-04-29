@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Admin Dashboard - Mark Palkimas</title>
+  <title>Admin Dashboard – Mark Palkimas</title>
   <style>
     /* Basic Reset */
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -38,7 +38,6 @@
       background:#1f1f1f;
       border-radius:8px;
       padding:1rem;
-      margin-bottom:1rem;
       box-shadow:0 2px 8px rgba(0,0,0,0.5);
     }
     .card h2 { margin-bottom:.5rem; }
@@ -68,11 +67,16 @@
       text-align:left;
       border:1px solid #333;
     }
+    table th {
+      background:#2a2a2a;
+    }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
+    <div class="logo">
+      Admin Dashboard <span class="pulse"></span>
+    </div>
     <a href="index.html" class="logout">⟵ Back to Site</a>
   </header>
   <div class="container">
@@ -83,42 +87,84 @@
           <tr>
             <th>Latest Visit</th>
             <th>IP Address</th>
-            <th>Location</th>
+            <th>Page(s)</th>
             <th>Device</th>
             <th>Count</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Populated by script -->
+          <!-- Filled dynamically -->
         </tbody>
       </table>
     </div>
   </div>
-  <script>
-    function getLogs() {
-      const obj = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
-      return Object.entries(obj)
-        .map(([ip, d]) => ({ ip, ...d }))
-        .sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
-    }
-    function populateTable() {
+
+  <script type="module">
+    import { initializeApp }          from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    // ——— Your Firebase config ———
+    const firebaseConfig = {
+      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
+      authDomain: "mark-palkimas-visits.firebaseapp.com",
+      databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com",
+      projectId: "mark-palkimas-visits",
+      storageBucket: "mark-palkimas-visits.appspot.com",
+      messagingSenderId: "1062485579247",
+      appId: "1:1062485579247:web:c5b8797f515b33d5a0521a",
+      measurementId: "G-248HFN3PP7"
+    };
+    // ————————————————————————
+
+    // Initialize Firebase & get a reference to /visits
+    const app      = initializeApp(firebaseConfig);
+    const db       = getDatabase(app);
+    const visitsRef = ref(db, 'visits');
+
+    // Whenever visits change, regroup by IP and repaint the table
+    onValue(visitsRef, snapshot => {
+      const raw  = snapshot.val() || {};
+      const agg  = {};  // aggregator: ip → { count, latestTime, pages:Set }
+
+      // build aggregator
+      Object.values(raw).forEach(({ ip, timestamp, page }) => {
+        if (!agg[ip]) {
+          agg[ip] = { count:0, latestTime:0, pages: new Set() };
+        }
+        agg[ip].count++;
+        if (timestamp > agg[ip].latestTime) {
+          agg[ip].latestTime = timestamp;
+        }
+        agg[ip].pages.add(page);
+      });
+
+      // turn into sorted array
+      const rows = Object.entries(agg).map(([ip, { count, latestTime, pages }]) => ({
+        ip,
+        count,
+        latestTime,
+        pages: Array.from(pages).sort(),
+      }))
+      .sort((a, b) => b.latestTime - a.latestTime);
+
+      // render
       const tbody = document.querySelector("#visitor-logs tbody");
       tbody.innerHTML = "";
-      getLogs().forEach(({ ip, location, device, count, latestTime }) => {
+      rows.forEach(({ ip, count, latestTime, pages }) => {
+        const dateStr = new Date(latestTime).toLocaleString();
+        // simple device detection from page paths
+        const device = pages.some(p => p.includes('mobile')) ? 'Mobile' : 'Desktop';
+        const pageList = pages.join(', ');
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${new Date(latestTime).toLocaleString()}</td>
+          <td>${dateStr}</td>
           <td>${ip}</td>
-          <td>${location}</td>
-          <td>${device || "Unknown"}</td>
+          <td>${pageList}</td>
+          <td>${device}</td>
           <td>${count}</td>
         `;
         tbody.appendChild(tr);
       });
-    }
-    document.addEventListener("DOMContentLoaded", () => {
-      populateTable();
-      setInterval(populateTable, 10000);
     });
   </script>
 </body>

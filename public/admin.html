@@ -1,4 +1,3 @@
-<!-- public/admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,77 +100,19 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp }            from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-    // ——— Your Firebase config ———
-    const firebaseConfig = {
-      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
-      authDomain: "mark-palkimas-visits.firebaseapp.com",
-      databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com",
-      projectId: "mark-palkimas-visits",
-      storageBucket: "mark-palkimas-visits.appspot.com",
-      messagingSenderId: "1062485579247",
-      appId: "1:1062485579247:web:c5b8797f515b33d5a0521a",
-      measurementId: "G-248HFN3PP7"
-    };
-    // ————————————————————————
-
-    // Initialize Firebase
-    const app       = initializeApp(firebaseConfig);
-    const db        = getDatabase(app);
-    const visitsRef = ref(db, 'visits');
-
-    onValue(visitsRef, snapshot => {
-      const raw = snapshot.val() || {};
-
-      // 1) Aggregate by IP
-      const agg = {};
-      Object.values(raw).forEach(({ ip, timestamp, page }) => {
-        if (!agg[ip]) {
-          agg[ip] = { count:0, latestTime:0, pages: new Set() };
-        }
-        agg[ip].count++;
-        agg[ip].latestTime = Math.max(agg[ip].latestTime, timestamp);
-        agg[ip].pages.add(page);
-      });
-
-      // 2) Build rows array
-      const rows = Object.entries(agg).map(([ip, { count, latestTime, pages }]) => ({
-        ip,
-        count,
-        latestTime,
-        pages: Array.from(pages),
-      }))
-      .sort((a, b) => b.latestTime - a.latestTime);
-
-      // 3) Enrich each IP with geo & ISP lookup via ipapi.co
-      const lookups = rows.map(row => {
-        return fetch(`https://ipapi.co/${row.ip}/json/`)
-          .then(res => res.json())
-          .then(info => {
-            row.location = info.city && info.region && info.country_name
-              ? `${info.city}, ${info.region}, ${info.country_name}`
-              : 'Unknown';
-            row.provider = info.org || 'Unknown';
-            return row;
-          })
-          .catch(() => {
-            row.location = 'Unknown';
-            row.provider = 'Unknown';
-            return row;
-          });
-      });
-
-      Promise.all(lookups).then(enrichedRows => {
+  <script>
+    // Fetch enriched logs from your server and render the table
+    fetch("/api/getVisitorLogs")
+      .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then(rows => {
         const tbody = document.querySelector("#visitor-logs tbody");
         tbody.innerHTML = "";
 
-        enrichedRows.forEach(({ ip, count, latestTime, pages, location, provider }) => {
+        rows.forEach(({ latestTime, ip, location, provider, device, count }) => {
           const dateStr = new Date(latestTime).toLocaleString();
-          const device  = pages.some(p => p.includes('mobile')) ? 'Mobile' : 'Desktop';
-
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${dateStr}</td>
@@ -183,8 +124,12 @@
           `;
           tbody.appendChild(tr);
         });
+      })
+      .catch(err => {
+        console.error("Failed to load visitor logs:", err);
+        const tbody = document.querySelector("#visitor-logs tbody");
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f55;">Error loading logs</td></tr>`;
       });
-    });
   </script>
 </body>
 </html>

@@ -1,61 +1,72 @@
 // server.js
 // ------------------------------------------------------------
-const fs = require("fs");
-const path = require("path");
-const express = require("express");
-const cors = require("cors");
+const fs       = require("fs");
+const path     = require("path");
+const express  = require("express");
+const cors     = require("cors");
+const adminSDK = require("firebase-admin");
 const { Reader } = require("@maxmind/geoip2-node");
 
-const app = express();
+const app  = express();
 const port = process.env.PORT || 3000;
 
-// ——— Load MMDBs into memory —————————————————————————————
+// ——— Initialize Firebase Admin SDK —————————————————————————
+// Put your service account JSON at ./secrets/firebase-sa.json (never commit this file!)
+const serviceAccount = require("./secrets/firebase-sa.json");
+adminSDK.initializeApp({
+  credential: adminSDK.credential.cert(serviceAccount),
+  databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
+});
+const dbRef = adminSDK.database().ref("visits");
+
+// ——— Load GeoLite2 MMDBs —————————————————————————————
 const cityBuffer = fs.readFileSync(path.join(__dirname, "db/GeoLite2-City.mmdb"));
 const asnBuffer  = fs.readFileSync(path.join(__dirname, "db/GeoLite2-ASN.mmdb"));
-
 const cityReader = Reader.openBuffer(cityBuffer);
 const asnReader  = Reader.openBuffer(asnBuffer);
-
-// ——— In-memory visitor store ——————————————————————————
-let visitorLogs = [];
 
 // ——— Middleware ———————————————————————————————————————
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ——— Log visitor (to be called from your client) ——————————
+// ——— Log visitor ———————————————————————————————————————
+// Frontend calls this instead of using Firebase client.
 app.post("/api/logVisitor", (req, res) => {
   const ip        = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown";
   const userAgent = req.headers["user-agent"] || "Unknown";
-  const timestamp = new Date().toISOString();
+  const timestamp = Date.now();
 
-  visitorLogs.push({ ip, userAgent, timestamp });
-  res.json({ message: "Logged successfully" });
+  dbRef.push({ ip, userAgent, timestamp })
+    .then(() => res.json({ message: "Logged successfully" }))
+    .catch(err => res.status(500).json({ error: err.message }));
 });
 
 // ——— Return aggregated & enriched logs —————————————————————
-app.get("/api/getVisitorLogs", (req, res) => {
-  // 1) Aggregate by IP
+app.get("/api/getVisitorLogs", async (req, res) => {
+  // 1) Fetch raw logs from Firebase
+  const snapshot = await dbRef.once("value");
+  const raw = snapshot.val() || {};
+
+  // 2) Aggregate by IP
   const agg = {};
-  visitorLogs.forEach(({ ip, userAgent, timestamp }) => {
-    if (!agg[ip]) agg[ip] = { count: 0, latestTime: "", userAgents: new Set() };
+  Object.values(raw).forEach(({ ip, userAgent, timestamp }) => {
+    if (!agg[ip]) {
+      agg[ip] = { count: 0, latestTime: 0, userAgents: new Set() };
+    }
     agg[ip].count++;
-    agg[ip].latestTime = agg[ip].latestTime < timestamp ? timestamp : agg[ip].latestTime;
+    agg[ip].latestTime = Math.max(agg[ip].latestTime, timestamp);
     agg[ip].userAgents.add(userAgent);
   });
 
-  // 2) Enrich each IP
+  // 3) Enrich each entry
   const enriched = Object.entries(agg).map(([ip, { count, latestTime, userAgents }]) => {
-    // Normalize IP for lookup:
+    // Normalize IPv4-mapped IPv6
     let lookupIP = ip;
-    if (ip.startsWith("::ffff:")) {
-      lookupIP = ip.split(":").pop();           // "::ffff:8.8.8.8" → "8.8.8.8"
-    } else if (ip === "::1") {
-      lookupIP = "127.0.0.1";                   // local fallback
-    }
+    if (ip.startsWith("::ffff:")) lookupIP = ip.split(":").pop();
+    else if (ip === "::1") lookupIP = "127.0.0.1";
 
-    // City lookup
+    // Geo lookup
     let location = "Unknown";
     try {
       const geo = cityReader.city(lookupIP);
@@ -67,7 +78,7 @@ app.get("/api/getVisitorLogs", (req, res) => {
       if (parts.length) location = parts.join(", ");
     } catch {}
 
-    // ASN lookup (provider)
+    // ASN lookup (ISP)
     let provider = "Unknown";
     try {
       const asn = asnReader.asn(lookupIP);
@@ -76,7 +87,7 @@ app.get("/api/getVisitorLogs", (req, res) => {
       }
     } catch {}
 
-    // Determine device
+    // Device detection
     const device = Array.from(userAgents).some(ua =>
       /Android|iPhone|Mobile/i.test(ua)
     ) ? "Mobile" : "Desktop";
@@ -84,14 +95,8 @@ app.get("/api/getVisitorLogs", (req, res) => {
     return { ip, count, latestTime, location, provider, device };
   });
 
-  // 3) Sort newest-first & respond
-  enriched.sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
-  res.json(enriched);
-});
-
-  // 3) Sort by most recent
-  enriched.sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
-
+  // 4) Sort newest-first and respond
+  enriched.sort((a, b) => b.latestTime - a.latestTime);
   res.json(enriched);
 });
 

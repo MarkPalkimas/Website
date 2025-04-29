@@ -1,16 +1,15 @@
 // public/main.js
 document.addEventListener("DOMContentLoaded", function () {
-  // --- Neon Glow Effect (Smooth multi-color ripple) ---
+  // --- Neon Glow & Pulse-on-Click Setup ---
   const neonContainer = document.getElementById("neon-container");
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
 
-  // Pulse-on-click state
   let clickPending = false;
-  let pulseStart = null;
-  let pulseCenter = { x: 0, y: 0 };
-  let wavesActive = false;
-  let waveData = { centerX: 0, centerY: 0, radiusPx: 0, thicknessPx: 0 };
+  let pulseStart   = null;
+  let pulseCenter  = { x: 0, y: 0 };
+  let wavesActive  = false;
+  let waveData     = { centerX: 0, centerY: 0, radiusPx: 0, thicknessPx: 0 };
 
   const glowColors = [
     "#5EBD3E",
@@ -23,18 +22,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const maxDim = () => Math.max(window.innerWidth, window.innerHeight);
 
   // Physics constants
-  const GRAVITY    = 0.3;
-  const RESTITUTION= 0.8;
-  const WAVE_FORCE = 1.8;    // boosted wave force
-  const DAMPING    = 0.98;   // for settling
-  const SLEEP_THRESH = 0.05; // velocity threshold
+  const GRAVITY      = 0.3;
+  const RESTITUTION  = 0.8;
+  const WAVE_FORCE   = 1.8;
+  const DAMPING      = 1.0;    // no global damping to preserve bounciness
+  const SLEEP_THRESH = 0.05;   // threshold below which velocities zero out
+  const COLLISION_EPS= 0.5;    // ignore tiny overlaps to prevent jitter
 
-  // Parse hex to [r,g,b]
+  // --- Color Utilities ---
   function parseHexColor(hex) {
     const num = parseInt(hex.slice(1), 16);
     return [ (num >> 16) & 255, (num >> 8) & 255, num & 255 ];
   }
-  // Interpolate between two [r,g,b]
   function lerpColor(a, b, t) {
     const r  = Math.round(a[0] + (b[0] - a[0]) * t);
     const g  = Math.round(a[1] + (b[1] - a[1]) * t);
@@ -42,25 +41,26 @@ document.addEventListener("DOMContentLoaded", function () {
     return `rgb(${r},${g},${bl})`;
   }
 
-  // Track mouse for glow position
+  // track mouse for glow position
   document.addEventListener("mousemove", e => {
-    mouseX = e.clientX;
+    mouseX = e.clientX;    
     mouseY = e.clientY;
   });
 
-  // Trigger a single pulse on container click
-  neonContainer.addEventListener("click", e => {
+  // trigger a pulse on any click (falls through UI clicks too)
+  document.body.addEventListener("click", e => {
     clickPending = true;
     pulseCenter.x = e.clientX;
     pulseCenter.y = e.clientY;
   });
 
+  // --- Animation Loop for Neon Glow & Pulse ---
   let startTime = null;
   function animateNeon(time) {
     if (startTime === null) startTime = time;
     const elapsed = time - startTime;
 
-    // Color cycling
+    // color cycling
     const segmentMs = 2000;
     const cycleMs   = segmentMs * glowColors.length;
     const progress  = (elapsed % cycleMs) / segmentMs;
@@ -71,14 +71,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const baseColor = lerpColor(colA, colB, frac);
     const ringColor = baseColor.replace("rgb", "rgba").replace(")", ",0.5)");
 
-    // Check for new click to start pulse
+    // handle pending click to start a pulse
     if (clickPending) {
       wavesActive  = true;
       pulseStart   = elapsed;
       clickPending = false;
     }
 
-    // Base glow (always)
+    // always show base glow at mouse
     const baseGlow = `radial-gradient(
       circle at ${mouseX}px ${mouseY}px,
       ${baseColor} 0%,
@@ -86,17 +86,15 @@ document.addEventListener("DOMContentLoaded", function () {
     )`;
     let background = baseGlow;
 
-    // If a pulse is active, draw one expanding ring
-    const ringPeriod = 3000;           // length of one pulse
-    const ringWidthP = 3;              // 3% thickness
-
+    // if pulse active, draw one expanding ring
+    const ringPeriod = 3000;
+    const ringWidthP = 3;
     if (wavesActive && pulseStart !== null) {
       const pulseElapsed = elapsed - pulseStart;
-      const ringProg     = pulseElapsed / ringPeriod;
-      const ringRadiusP  = ringProg * 100;
-      // Only draw while within one period
       if (pulseElapsed <= ringPeriod) {
-        const ringGlow = `radial-gradient(
+        const ringProg    = pulseElapsed / ringPeriod;
+        const ringRadiusP = ringProg * 100;
+        const ringGlow    = `radial-gradient(
           circle at ${pulseCenter.x}px ${pulseCenter.y}px,
           transparent ${ringRadiusP}%,
           ${ringColor} ${ringRadiusP + ringWidthP}%,
@@ -104,15 +102,15 @@ document.addEventListener("DOMContentLoaded", function () {
         )`;
         background += `, ${ringGlow}`;
 
-        // Update waveData for physics
+        // update wave data for physics
         waveData = {
-          centerX:   pulseCenter.x,
-          centerY:   pulseCenter.y,
-          radiusPx:  (ringRadiusP  / 100) * maxDim(),
-          thicknessPx: (ringWidthP / 100) * maxDim()
+          centerX:    pulseCenter.x,
+          centerY:    pulseCenter.y,
+          radiusPx:   (ringRadiusP  / 100) * maxDim(),
+          thicknessPx:(ringWidthP   / 100) * maxDim()
         };
       } else {
-        // End of pulse
+        // end of pulse
         wavesActive = false;
         pulseStart  = null;
       }
@@ -123,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   requestAnimationFrame(animateNeon);
 
-  // --- Elements & UI Variables ---
+  // --- UI & Popup Controls ---
   const profilePic     = document.querySelector(".profile-photo");
   const aboutLink      = document.querySelector(".about-link");
   const contactLink    = document.querySelector(".contact-link");
@@ -137,7 +135,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const contactPopup = document.getElementById("contact-popup");
   const adminPopup   = document.getElementById("admin-popup");
 
-  // --- Popup Controls ---
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display    = "block";
@@ -167,7 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
     dimmedOverlay.style.display = "none";
   });
 
-  // --- Admin Popup Controls ---
   const adminPasswordInput = document.getElementById("admin-password");
   const togglePasswordBtn  = document.getElementById("toggle-password");
   const submitPasswordBtn  = document.getElementById("submit-password");
@@ -176,11 +172,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   togglePasswordBtn.addEventListener("click", () => {
     if (adminPasswordInput.type === "password") {
-      adminPasswordInput.type         = "text";
-      togglePasswordBtn.textContent   = "Hide";
+      adminPasswordInput.type       = "text";
+      togglePasswordBtn.textContent = "Hide";
     } else {
-      adminPasswordInput.type         = "password";
-      togglePasswordBtn.textContent   = "Show";
+      adminPasswordInput.type       = "password";
+      togglePasswordBtn.textContent = "Show";
     }
   });
 
@@ -204,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
     errorMessage.style.display = "none";
   });
 
-  // --- Ball Physics & Collision ---
+  // --- Ball Physics & Interaction ---
   const balls = [];
 
   gravityBtn.addEventListener("click", () => {
@@ -225,10 +221,10 @@ document.addEventListener("DOMContentLoaded", function () {
     ball.style.height = diameter + "px";
     ball.style.left   = Math.random() * (window.innerWidth - diameter) + "px";
     ball.style.top    = "0px";
-    ball.radius   = diameter / 2;
-    ball.mass     = Math.pow(ball.radius, 2);
-    ball.velocityX= Math.random() * 2 - 1;
-    ball.velocityY= Math.random() * 4 + 1;
+    ball.radius    = diameter / 2;
+    ball.mass      = Math.pow(ball.radius, 2);
+    ball.velocityX = Math.random() * 2 - 1;
+    ball.velocityY = Math.random() * 4 + 1;
     document.body.appendChild(ball);
     balls.push(ball);
   }
@@ -248,37 +244,40 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateBalls() {
-    let restingCount = 0;
-
     balls.forEach(ball => {
       // apply gravity
       ball.velocityY += GRAVITY;
 
-      // apply damping
+      // apply (or skip) damping
       ball.velocityX *= DAMPING;
       ball.velocityY *= DAMPING;
 
-      // zero out small velocities for rest
+      // zero small velocities
       if (Math.abs(ball.velocityX) < SLEEP_THRESH) ball.velocityX = 0;
       if (Math.abs(ball.velocityY) < SLEEP_THRESH) ball.velocityY = 0;
-      if (ball.velocityX === 0 && ball.velocityY === 0) restingCount++;
 
-      // update positions
-      let newTop  = parseFloat(ball.style.top)  + ball.velocityY;
+      // compute next pos
       let newLeft = parseFloat(ball.style.left) + ball.velocityX;
+      let newTop  = parseFloat(ball.style.top ) + ball.velocityY;
 
-      // wall collisions
+      // wall collision
       if (newLeft <= 0 || newLeft + ball.radius * 2 >= window.innerWidth) {
-        ball.velocityX *= -RESTITUTION;
+        ball.velocityX = -ball.velocityX * RESTITUTION;
         newLeft = Math.min(Math.max(newLeft, 0), window.innerWidth - ball.radius * 2);
       }
 
-      // floor collision at footer
+      // floor collision
       const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
-      if (newTop + ball.radius * 2 >= footerTop) {
-        ball.velocityY *= -RESTITUTION;
+      if (newTop + ball.radius*2 >= footerTop) {
+        // bounce
+        ball.velocityY = -ball.velocityY * RESTITUTION;
         ball.velocityX *= RESTITUTION;
-        newTop = footerTop - ball.radius * 2;
+        newTop = footerTop - ball.radius*2;
+        // if nearly at rest on floor, lock it
+        if (Math.abs(ball.velocityY) < SLEEP_THRESH && Math.abs(ball.velocityX) < SLEEP_THRESH) {
+          ball.velocityY = 0;
+          ball.velocityX = 0;
+        }
       }
 
       // wave push
@@ -294,8 +293,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      ball.style.top  = newTop  + "px";
+      // apply
       ball.style.left = newLeft + "px";
+      ball.style.top  = newTop  + "px";
     });
 
     handleBallCollisions();
@@ -308,22 +308,26 @@ document.addEventListener("DOMContentLoaded", function () {
       for (let j = i + 1; j < balls.length; j++) {
         const a = balls[i], b = balls[j];
         const ax = parseFloat(a.style.left) + a.radius;
-        const ay = parseFloat(a.style.top)  + a.radius;
+        const ay = parseFloat(a.style.top ) + a.radius;
         const bx = parseFloat(b.style.left) + b.radius;
-        const by = parseFloat(b.style.top)  + b.radius;
-        const dx = bx - ax, dy = by - ay;
+        const by = parseFloat(b.style.top ) + b.radius;
+        const dx = bx - ax;
+        const dy = by - ay;
         const dist = Math.hypot(dx, dy);
-        if (dist < a.radius + b.radius) {
-          // resolve overlap
-          const overlap = a.radius + b.radius - dist;
-          const ux = dx / dist, uy = dy / dist;
-          a.style.left = (ax - ux * overlap / 2 - a.radius) + "px";
-          a.style.top  = (ay - uy * overlap / 2 - a.radius) + "px";
-          b.style.left = (bx + ux * overlap / 2 - b.radius) + "px";
-          b.style.top  = (by + uy * overlap / 2 - b.radius) + "px";
+        const minDist = a.radius + b.radius;
+        const overlap = minDist - dist;
+        // only resolve significant overlaps
+        if (overlap > COLLISION_EPS) {
+          // push apart
+          const ux = dx / dist;
+          const uy = dy / dist;
+          a.style.left = (ax - ux * overlap/2 - a.radius) + "px";
+          a.style.top  = (ay - uy * overlap/2 - a.radius) + "px";
+          b.style.left = (bx + ux * overlap/2 - b.radius) + "px";
+          b.style.top  = (by + uy * overlap/2 - b.radius) + "px";
 
-          // basic elastic collision
-          const p = 2 * (a.velocityX * ux + a.velocityY * uy - b.velocityX * ux - b.velocityY * uy)
+          // elastic collision
+          const p = 2 * (a.velocityX*ux + a.velocityY*uy - b.velocityX*ux - b.velocityY*uy)
                     / (a.mass + b.mass);
           a.velocityX -= p * b.mass * ux;
           a.velocityY -= p * b.mass * uy;
@@ -339,10 +343,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const rect = quote.getBoundingClientRect();
       balls.forEach(ball => {
         const bx = parseFloat(ball.style.left) + ball.radius;
-        const by = parseFloat(ball.style.top)  + ball.radius;
-        const closestX = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
-        const closestY = Math.max(rect.top,  Math.min(by, rect.top  + rect.height));
-        const d = Math.hypot(bx - closestX, by - closestY);
+        const by = parseFloat(ball.style.top ) + ball.radius;
+        const cx = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
+        const cy = Math.max(rect.top,  Math.min(by, rect.top  + rect.height));
+        const d  = Math.hypot(bx - cx, by - cy);
         if (d < ball.radius && ball.velocityY > 0) {
           ball.velocityY *= -RESTITUTION;
           quote.style.transform = "scale(1.2)";
@@ -360,9 +364,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   updateBalls();
 
-  // --- Falling Quotes (unchanged) ---
-  let quotesStarted   = false;
-  let quoteStartTime  = Date.now();
+  // --- Falling Quotes ---
+  let quotesStarted  = false;
+  let quoteStartTime = Date.now();
 
   function startFallingQuotes() {
     setInterval(createFallingQuote, 10000);
@@ -378,27 +382,25 @@ document.addEventListener("DOMContentLoaded", function () {
       "Cold water feels warm when your hands are freezing.",
       "Regret is proof you cared. But growth is proof you learned."
     ];
-    const quoteText = quotes[Math.floor(Math.random() * quotes.length)];
-    const quoteElem = document.createElement("div");
-    quoteElem.className = "falling-quote";
-    quoteElem.innerText = quoteText;
-    quoteElem.style.position      = "absolute";
-    quoteElem.style.color         = "#eee";
-    quoteElem.style.fontSize      = "1.5rem";
-    quoteElem.style.opacity       = "0.9";
-    quoteElem.style.pointerEvents = "none";
-    quoteElem.style.zIndex        = "11";
-    const initLeft = Math.random() * (window.innerWidth - 300);
-    quoteElem.dataset.initialLeft = initLeft;
-    quoteElem.dataset.amp         = Math.random() * 20 + 10;
-    quoteElem.dataset.phase       = Math.random() * 2 * Math.PI;
-    quoteElem.style.left          = initLeft + "px";
-    quoteElem.style.top           = "-50px";
-    quoteElem.style.animation     = "fall 20s linear forwards";
-    quoteContainer.appendChild(quoteElem);
-    setTimeout(() => {
-      if (quoteElem.parentElement) quoteElem.remove();
-    }, 21000);
+    const text = quotes[Math.floor(Math.random() * quotes.length)];
+    const elem = document.createElement("div");
+    elem.className = "falling-quote";
+    elem.innerText = text;
+    Object.assign(elem.style, {
+      position:      "absolute",
+      color:         "#eee",
+      fontSize:      "1.5rem",
+      opacity:       "0.9",
+      pointerEvents: "none",
+      zIndex:        "11",
+      left:          (elem.dataset.initialLeft = Math.random() * (window.innerWidth - 300)) + "px",
+      top:           "-50px",
+      animation:     "fall 20s linear forwards"
+    });
+    elem.dataset.amp   = Math.random() * 20 + 10;
+    elem.dataset.phase = Math.random() * Math.PI * 2;
+    quoteContainer.appendChild(elem);
+    setTimeout(() => elem.remove(), 21000);
 
     if (!quotesStarted) {
       quotesStarted = true;
@@ -408,17 +410,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateQuotes() {
     const now = Date.now();
-    document.querySelectorAll(".falling-quote").forEach(quote => {
-      const initLeft = parseFloat(quote.dataset.initialLeft) || 0;
-      const amp      = parseFloat(quote.dataset.amp)         || 0;
-      const phase    = parseFloat(quote.dataset.phase)       || 0;
+    document.querySelectorAll(".falling-quote").forEach(q => {
+      const initLeft = parseFloat(q.dataset.initialLeft) || 0;
+      const amp      = parseFloat(q.dataset.amp)         || 0;
+      const phase    = parseFloat(q.dataset.phase)       || 0;
       const t        = (now - quoteStartTime) / 1000;
-      quote.style.left = initLeft + amp * Math.sin(t + phase) + "px";
+      q.style.left   = initLeft + amp * Math.sin(t + phase) + "px";
     });
     requestAnimationFrame(updateQuotes);
   }
 
-  // --- Visitor Tracking via localStorage (unchanged) ---
+  // --- Visitor Logging ---
   async function logVisitor() {
     try {
       const res  = await fetch("https://ipapi.co/json/");

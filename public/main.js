@@ -44,21 +44,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // Interpolate between current pair of colors
     const colA = parseHexColor(glowColors[idx]);
     const colB = parseHexColor(glowColors[(idx + 1) % glowColors.length]);
-    const currentColor = lerpColor(colA, colB, frac);
+    const baseColor = lerpColor(colA, colB, frac);
+    const ringColor = baseColor.replace("rgb", "rgba").replace(")", ",0.5)");
 
-    // Compute an outward‐moving ring
-    const ringPeriod  = 2000;
+    // Compute an outward‐moving ring (slower & half-size)
+    const ringPeriod  = 4000;            // slower ripple
     const ringProg    = (elapsed % ringPeriod) / ringPeriod;
-    const ringRadius  = ringProg * 100;  // percent
-    const ringWidth   = 5;               // percent thickness
+    const ringRadius  = ringProg * 50;   // half size
+    const ringWidth   = 3;               // thinner ring
 
-    // Base glow: solid at center, fading to transparent at 70%
+    // Base glow: solid at center, fading to transparent at 50%
     const baseGlow = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
-                     `${currentColor} 0%, transparent 70%)`;
+                     `${baseColor} 0%, transparent 50%)`;
 
-    // Ripple ring: transparent until ringRadius, then a colored ring of width ringWidth
+    // Ripple ring: transparent until ringRadius, then a semi-transparent colored ring
     const ringGlow = `radial-gradient(circle at ${mouseX}px ${mouseY}px, ` +
-                     `transparent ${ringRadius}%, ${currentColor} ${ringRadius + ringWidth}%, ` +
+                     `transparent ${ringRadius}%, ${ringColor} ${ringRadius + ringWidth}%, ` +
                      `transparent ${ringRadius + ringWidth}%)`;
 
     neonContainer.style.background = `${baseGlow}, ${ringGlow}`;

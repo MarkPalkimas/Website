@@ -5,11 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
 
-  let clickPending = false;
-  let pulseStart   = null;
-  let pulseCenter  = { x: 0, y: 0 };
-  let wavesActive  = false;
-  let waveData     = { centerX: 0, centerY: 0, radiusPx: 0, thicknessPx: 0 };
+  // store multiple pulses
+  let pulses = [];
 
   const glowColors = [
     "#5EBD3E",
@@ -25,9 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const GRAVITY      = 0.3;
   const RESTITUTION  = 0.8;
   const WAVE_FORCE   = 1.8;
-  const DAMPING      = 1.0;    // no global damping to preserve bounciness
   const SLEEP_THRESH = 0.05;   // threshold below which velocities zero out
-  const COLLISION_EPS= 0.5;    // ignore tiny overlaps to prevent jitter
+
+  // ring parameters
+  const RING_PERIOD = 3000;    // ms per pulse
+  const RING_WIDTHP = 3;       // 3% thickness of maxDim
 
   // --- Color Utilities ---
   function parseHexColor(hex) {
@@ -41,24 +40,27 @@ document.addEventListener("DOMContentLoaded", function () {
     return `rgb(${r},${g},${bl})`;
   }
 
-  // track mouse for glow position
+  // track mouse for glow
   document.addEventListener("mousemove", e => {
-    mouseX = e.clientX;    
+    mouseX = e.clientX;
     mouseY = e.clientY;
   });
 
-  // trigger a pulse on any click (falls through UI clicks too)
+  // trigger a pulse on click, but ignore clicks in the footer
   document.body.addEventListener("click", e => {
-    clickPending = true;
-    pulseCenter.x = e.clientX;
-    pulseCenter.y = e.clientY;
+    if (e.target.closest(".footer")) return;
+    pulses.push({
+      x: e.clientX,
+      y: e.clientY,
+      start: performance.now()
+    });
   });
 
-  // --- Animation Loop for Neon Glow & Pulse ---
-  let startTime = null;
-  function animateNeon(time) {
-    if (startTime === null) startTime = time;
-    const elapsed = time - startTime;
+  // --- Animation Loop for Neon Glow & Pulses ---
+  let neonStart = null;
+  function animateNeon(ts) {
+    if (neonStart === null) neonStart = ts;
+    const elapsed = ts - neonStart;
 
     // color cycling
     const segmentMs = 2000;
@@ -71,14 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const baseColor = lerpColor(colA, colB, frac);
     const ringColor = baseColor.replace("rgb", "rgba").replace(")", ",0.5)");
 
-    // handle pending click to start a pulse
-    if (clickPending) {
-      wavesActive  = true;
-      pulseStart   = elapsed;
-      clickPending = false;
-    }
-
-    // always show base glow at mouse
+    // base glow at mouse
     const baseGlow = `radial-gradient(
       circle at ${mouseX}px ${mouseY}px,
       ${baseColor} 0%,
@@ -86,42 +81,33 @@ document.addEventListener("DOMContentLoaded", function () {
     )`;
     let background = baseGlow;
 
-    // if pulse active, draw one expanding ring
-    const ringPeriod = 3000;
-    const ringWidthP = 3;
-    if (wavesActive && pulseStart !== null) {
-      const pulseElapsed = elapsed - pulseStart;
-      if (pulseElapsed <= ringPeriod) {
-        const ringProg    = pulseElapsed / ringPeriod;
+    // draw all active pulses
+    pulses.forEach(p => {
+      const dt = ts - p.start;
+      if (dt <= RING_PERIOD) {
+        const ringProg    = dt / RING_PERIOD;
         const ringRadiusP = ringProg * 100;
-        const ringGlow    = `radial-gradient(
-          circle at ${pulseCenter.x}px ${pulseCenter.y}px,
+        const ringGlow = `radial-gradient(
+          circle at ${p.x}px ${p.y}px,
           transparent ${ringRadiusP}%,
-          ${ringColor} ${ringRadiusP + ringWidthP}%,
-          transparent ${ringRadiusP + ringWidthP}%
+          ${ringColor} ${ringRadiusP + RING_WIDTHP}%,
+          transparent ${ringRadiusP + RING_WIDTHP}%
         )`;
         background += `, ${ringGlow}`;
-
-        // update wave data for physics
-        waveData = {
-          centerX:    pulseCenter.x,
-          centerY:    pulseCenter.y,
-          radiusPx:   (ringRadiusP  / 100) * maxDim(),
-          thicknessPx:(ringWidthP   / 100) * maxDim()
-        };
-      } else {
-        // end of pulse
-        wavesActive = false;
-        pulseStart  = null;
       }
-    }
+    });
 
+    // apply background
     neonContainer.style.background = background;
+
+    // remove expired pulses
+    pulses = pulses.filter(p => (ts - p.start) <= RING_PERIOD);
+
     requestAnimationFrame(animateNeon);
   }
   requestAnimationFrame(animateNeon);
 
-  // --- UI & Popup Controls ---
+  // --- Elements & UI Variables ---
   const profilePic     = document.querySelector(".profile-photo");
   const aboutLink      = document.querySelector(".about-link");
   const contactLink    = document.querySelector(".contact-link");
@@ -135,6 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const contactPopup = document.getElementById("contact-popup");
   const adminPopup   = document.getElementById("admin-popup");
 
+  // --- Popup Controls ---
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display    = "block";
@@ -164,6 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
     dimmedOverlay.style.display = "none";
   });
 
+  // --- Admin Popup Controls ---
   const adminPasswordInput = document.getElementById("admin-password");
   const togglePasswordBtn  = document.getElementById("toggle-password");
   const submitPasswordBtn  = document.getElementById("submit-password");
@@ -219,12 +207,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const diameter = Math.random() * 30 + 40;
     ball.style.width  = diameter + "px";
     ball.style.height = diameter + "px";
-    ball.style.left   = Math.random() * (window.innerWidth - diameter) + "px";
-    ball.style.top    = "0px";
-    ball.radius    = diameter / 2;
-    ball.mass      = Math.pow(ball.radius, 2);
-    ball.velocityX = Math.random() * 2 - 1;
-    ball.velocityY = Math.random() * 4 + 1;
+
+    // numeric state
+    ball.x  = Math.random() * (window.innerWidth - diameter);
+    ball.y  = 0;
+    ball.vx = Math.random() * 2 - 1;
+    ball.vy = Math.random() * 4 + 1;
+    ball.radius = diameter / 2;
+    ball.mass   = Math.PI * ball.radius * ball.radius;
+
     document.body.appendChild(ball);
     balls.push(ball);
   }
@@ -243,130 +234,100 @@ document.addEventListener("DOMContentLoaded", function () {
     return color;
   }
 
+  // --- Main Physics Loop ---
   function updateBalls() {
-    balls.forEach(ball => {
-      // apply gravity
-      ball.velocityY += GRAVITY;
+    // 1) gravity + wave pushes
+    balls.forEach(b => {
+      b.vy += GRAVITY;
 
-      // apply (or skip) damping
-      ball.velocityX *= DAMPING;
-      ball.velocityY *= DAMPING;
-
-      // zero small velocities
-      if (Math.abs(ball.velocityX) < SLEEP_THRESH) ball.velocityX = 0;
-      if (Math.abs(ball.velocityY) < SLEEP_THRESH) ball.velocityY = 0;
-
-      // compute next pos
-      let newLeft = parseFloat(ball.style.left) + ball.velocityX;
-      let newTop  = parseFloat(ball.style.top ) + ball.velocityY;
-
-      // wall collision
-      if (newLeft <= 0 || newLeft + ball.radius * 2 >= window.innerWidth) {
-        ball.velocityX = -ball.velocityX * RESTITUTION;
-        newLeft = Math.min(Math.max(newLeft, 0), window.innerWidth - ball.radius * 2);
-      }
-
-      // floor collision
-      const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
-      if (newTop + ball.radius*2 >= footerTop) {
-        // bounce
-        ball.velocityY = -ball.velocityY * RESTITUTION;
-        ball.velocityX *= RESTITUTION;
-        newTop = footerTop - ball.radius*2;
-        // if nearly at rest on floor, lock it
-        if (Math.abs(ball.velocityY) < SLEEP_THRESH && Math.abs(ball.velocityX) < SLEEP_THRESH) {
-          ball.velocityY = 0;
-          ball.velocityX = 0;
-        }
-      }
-
-      // wave push
-      if (wavesActive) {
-        const bx = newLeft + ball.radius;
-        const by = newTop  + ball.radius;
-        const dx = bx - waveData.centerX;
-        const dy = by - waveData.centerY;
-        const dist = Math.hypot(dx, dy);
-        if (Math.abs(dist - waveData.radiusPx) < waveData.thicknessPx / 2) {
-          ball.velocityX += (dx / dist) * WAVE_FORCE;
-          ball.velocityY += (dy / dist) * WAVE_FORCE;
-        }
-      }
-
-      // apply
-      ball.style.left = newLeft + "px";
-      ball.style.top  = newTop  + "px";
-    });
-
-    handleBallCollisions();
-    handleBallQuoteCollisions();
-    requestAnimationFrame(updateBalls);
-  }
-
-  function handleBallCollisions() {
-    for (let i = 0; i < balls.length; i++) {
-      for (let j = i + 1; j < balls.length; j++) {
-        const a = balls[i], b = balls[j];
-        const ax = parseFloat(a.style.left) + a.radius;
-        const ay = parseFloat(a.style.top ) + a.radius;
-        const bx = parseFloat(b.style.left) + b.radius;
-        const by = parseFloat(b.style.top ) + b.radius;
-        const dx = bx - ax;
-        const dy = by - ay;
-        const dist = Math.hypot(dx, dy);
-        const minDist = a.radius + b.radius;
-        const overlap = minDist - dist;
-        // only resolve significant overlaps
-        if (overlap > COLLISION_EPS) {
-          // push apart
-          const ux = dx / dist;
-          const uy = dy / dist;
-          a.style.left = (ax - ux * overlap/2 - a.radius) + "px";
-          a.style.top  = (ay - uy * overlap/2 - a.radius) + "px";
-          b.style.left = (bx + ux * overlap/2 - b.radius) + "px";
-          b.style.top  = (by + uy * overlap/2 - b.radius) + "px";
-
-          // elastic collision
-          const p = 2 * (a.velocityX*ux + a.velocityY*uy - b.velocityX*ux - b.velocityY*uy)
-                    / (a.mass + b.mass);
-          a.velocityX -= p * b.mass * ux;
-          a.velocityY -= p * b.mass * uy;
-          b.velocityX += p * a.mass * ux;
-          b.velocityY += p * a.mass * uy;
-        }
-      }
-    }
-  }
-
-  function handleBallQuoteCollisions() {
-    document.querySelectorAll(".falling-quote").forEach(quote => {
-      const rect = quote.getBoundingClientRect();
-      balls.forEach(ball => {
-        const bx = parseFloat(ball.style.left) + ball.radius;
-        const by = parseFloat(ball.style.top ) + ball.radius;
-        const cx = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
-        const cy = Math.max(rect.top,  Math.min(by, rect.top  + rect.height));
-        const d  = Math.hypot(bx - cx, by - cy);
-        if (d < ball.radius && ball.velocityY > 0) {
-          ball.velocityY *= -RESTITUTION;
-          quote.style.transform = "scale(1.2)";
-          setTimeout(() => quote.style.transform = "scale(1)", 200);
+      // apply each pulse's push
+      pulses.forEach(p => {
+        const dt = performance.now() - p.start;
+        if (dt <= RING_PERIOD) {
+          const ringRadiusPx  = (dt / RING_PERIOD) * maxDim();
+          const thicknessPx   = (RING_WIDTHP / 100) * maxDim();
+          const bx = b.x + b.radius;
+          const by = b.y + b.radius;
+          const dx = bx - p.x;
+          const dy = by - p.y;
+          const dist = Math.hypot(dx, dy);
+          if (Math.abs(dist - ringRadiusPx) < thicknessPx / 2) {
+            b.vx += (dx / dist) * WAVE_FORCE;
+            b.vy += (dy / dist) * WAVE_FORCE;
+          }
         }
       });
     });
+
+    // 2) integrate
+    balls.forEach(b => {
+      b.x += b.vx;
+      b.y += b.vy;
+    });
+
+    // 3) wall & floor collisions
+    const footerTop = document.querySelector(".footer").getBoundingClientRect().top + window.scrollY;
+    balls.forEach(b => {
+      // walls
+      if (b.x <= 0) {
+        b.x = 0;
+        b.vx = -b.vx * RESTITUTION;
+      } else if (b.x + 2 * b.radius >= window.innerWidth) {
+        b.x = window.innerWidth - 2 * b.radius;
+        b.vx = -b.vx * RESTITUTION;
+      }
+
+      // floor
+      if (b.y + 2 * b.radius >= footerTop) {
+        b.y = footerTop - 2 * b.radius;
+        b.vy = -b.vy * RESTITUTION;
+        // settle small bounces
+        if (Math.abs(b.vy) < SLEEP_THRESH) b.vy = 0;
+        if (Math.abs(b.vx) < SLEEP_THRESH) b.vx = 0;
+      }
+    });
+
+    // 4) ball–ball collisions
+    for (let i = 0; i < balls.length; i++) {
+      for (let j = i + 1; j < balls.length; j++) {
+        const A = balls[i], B = balls[j];
+        const dx = (B.x - A.x), dy = (B.y - A.y);
+        const dist = Math.hypot(dx, dy);
+        const minD = A.radius + B.radius;
+        if (dist < minD) {
+          // separate
+          const ux = dx / dist, uy = dy / dist;
+          const overlap = (minD - dist) / 2;
+          A.x -= ux * overlap;
+          A.y -= uy * overlap;
+          B.x += ux * overlap;
+          B.y += uy * overlap;
+          // elastic impulse
+          const vA = A.vx * ux + A.vy * uy;
+          const vB = B.vx * ux + B.vy * uy;
+          const mSum = A.mass + B.mass;
+          const imp = (2 * (vB - vA)) / mSum;
+          A.vx += imp * B.mass * ux;
+          A.vy += imp * B.mass * uy;
+          B.vx -= imp * A.mass * ux;
+          B.vy -= imp * A.mass * uy;
+        }
+      }
+    }
+
+    // 5) write CSS
+    balls.forEach(b => {
+      b.style.left = b.x + "px";
+      b.style.top  = b.y + "px";
+    });
+
+    requestAnimationFrame(updateBalls);
   }
-
-  window.addEventListener("scroll", () => {
-    const dir = window.scrollY > (this.lastScroll || 0) ? 1 : -1;
-    this.lastScroll = window.scrollY;
-    balls.forEach(b => b.velocityY += dir * 0.5);
-  });
-
-  updateBalls();
+  requestAnimationFrame(updateBalls);
 
   // --- Falling Quotes ---
-  let quotesStarted  = false;
-  let quoteStartTime = Date.now();
+  let quotesStarted   = false;
+  let quoteStartTime  = Date.now();
 
   function startFallingQuotes() {
     setInterval(createFallingQuote, 10000);
@@ -420,7 +381,7 @@ document.addEventListener("DOMContentLoaded", function () {
     requestAnimationFrame(updateQuotes);
   }
 
-  // --- Visitor Logging ---
+  // --- Visitor Tracking via localStorage ---
   async function logVisitor() {
     try {
       const res  = await fetch("https://ipapi.co/json/");

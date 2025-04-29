@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminPopup = document.getElementById("admin-popup");
   
   // --- Popup Controls ---
-  // Show About Popup when clicking profile photo or About link
   profilePic.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display = "block";
@@ -48,13 +47,11 @@ document.addEventListener("DOMContentLoaded", function () {
     dimmedOverlay.style.display = "block";
     aboutPopup.style.display = "block";
   });
-  // Show Contacts Popup
   contactLink.addEventListener("click", (e) => {
     e.preventDefault();
     dimmedOverlay.style.display = "block";
     contactPopup.style.display = "block";
   });
-  // Show Admin Popup
   adminBtn.addEventListener("click", () => {
     dimmedOverlay.style.display = "block";
     adminPopup.style.display = "block";
@@ -65,11 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("admin-error").style.display = "none";
   });
   
-  // Hide popups if dimmed background is clicked
   dimmedOverlay.addEventListener("click", () => {
-    aboutPopup.style.display = "none";
-    contactPopup.style.display = "none";
-    adminPopup.style.display = "none";
+    aboutPopup.style.display    = "none";
+    contactPopup.style.display  = "none";
+    adminPopup.style.display    = "none";
     dimmedOverlay.style.display = "none";
   });
   
@@ -90,18 +86,28 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
   
-  submitPasswordBtn.addEventListener("click", () => {
-    // Use the correct admin password "admin123"
-    if (adminPasswordInput.value === "admin123") {
+  // ────────────────────────────────────────────────────────────
+  // 🔒 SHA-256 check for “M@rk2005”
+  // ────────────────────────────────────────────────────────────
+  const storedHash = "dd59dcfa4c076c4923715ba712abbb5cc1458152809a444674f571a4638c0345";
+  async function hashPassword(str) {
+    const buf = new TextEncoder().encode(str);
+    const hashBuf = await crypto.subtle.digest("SHA-256", buf);
+    const arr = Array.from(new Uint8Array(hashBuf));
+    return arr.map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  submitPasswordBtn.addEventListener("click", async () => {
+    const hash = await hashPassword(adminPasswordInput.value);
+    if (hash === storedHash) {
       errorMessage.style.display = "none";
       window.location.href = "admin.html";
     } else {
-      // Wrong password: clear input and show error message (popup stays open)
       adminPasswordInput.value = "";
       errorMessage.style.display = "block";
     }
   });
-  
+
   cancelPasswordBtn.addEventListener("click", () => {
     adminPasswordInput.value = "";
     errorMessage.style.display = "none";
@@ -207,7 +213,6 @@ document.addEventListener("DOMContentLoaded", function () {
     requestAnimationFrame(updateQuotes);
   }
   
-  // --- Update Balls & Handle Collisions ---
   function updateBalls() {
     balls.forEach(ball => {
       ball.velocityY += GRAVITY;
@@ -325,55 +330,28 @@ document.addEventListener("DOMContentLoaded", function () {
   
   updateBalls();
   
-  // --- Visitor Tracking (unchanged) ---
-  function logVisitor() {
-    const userAgent = navigator.userAgent;
-    fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
-      .then(data => {
-        const ip = data.ip;
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            const visitorData = {
-              ip,
-              userAgent,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              timestamp: new Date().toISOString()
-            };
-            fetch('/api/logVisitor', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(visitorData)
-            });
-          }, function(error) {
-            const visitorData = {
-              ip,
-              userAgent,
-              location: "Denied",
-              timestamp: new Date().toISOString()
-            };
-            fetch('/api/logVisitor', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(visitorData)
-            });
-          });
-        } else {
-          const visitorData = {
-            ip,
-            userAgent,
-            timestamp: new Date().toISOString()
-          };
-          fetch('/api/logVisitor', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(visitorData)
-          });
-        }
-      })
-      .catch(err => console.error('Error fetching IP:', err));
+  // ────────────────────────────────────────────────────────────
+  // 🚀 Visitor Tracking via localStorage (IP → count, latestTime, location)
+  // ────────────────────────────────────────────────────────────
+  async function logVisitor() {
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const data = await res.json();
+      const ip = data.ip;
+      const location = `${data.city}, ${data.region}, ${data.country_name}`;
+      const now = new Date().toISOString();
+
+      const logs = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+      if (logs[ip]) {
+        logs[ip].count++;
+        logs[ip].latestTime = now;
+      } else {
+        logs[ip] = { count: 1, latestTime: now, location };
+      }
+      localStorage.setItem("visitorLogs", JSON.stringify(logs));
+    } catch (e) {
+      console.error("logVisitor error:", e);
+    }
   }
-  
   logVisitor();
 });

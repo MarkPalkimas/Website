@@ -31,30 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
     mouseY = e.clientY;
   });
 
-  // --- Background Quotes (static positions, reveal under neon) ---
-  const quotes = [
-    "Life isn’t about what you know, It’s about what you’re able to figure out.",
-    "The best time to plant a tree is 20 years ago, the second best time is today.",
-    "The rich get richer because the poor see every opportunity as a scam",
-    "Money is not the key to happiness, it is the key to pursuing opportunities.",
-    "Cold water feels warm when your hands are freezing.",
-    "Regret is proof you cared. But growth is proof you learned."
-  ];
-  const quoteContainer = document.getElementById("quote-container");
-  quotes.forEach(text => {
-    const quoteElem = document.createElement("div");
-    quoteElem.className = "background-quote";
-    quoteElem.innerText = text;
-    quoteElem.style.position = "absolute";
-    quoteElem.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
-    quoteElem.style.top = `${Math.random() * (window.innerHeight - 100)}px`;
-    quoteElem.style.fontSize = "0.8rem";
-    quoteElem.style.pointerEvents = "none";
-    quoteElem.style.color = "white";
-    quoteElem.style.opacity = "0";
-    quoteContainer.appendChild(quoteElem);
-  });
-
   let startTime = null;
   function animateNeon(time) {
     if (startTime === null) startTime = time;
@@ -71,11 +47,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const baseColor = lerpColor(colA, colB, frac);
     const ringColor = baseColor.replace("rgb", "rgba").replace(")", ",0.5)");
 
-    // Ripple timing: faster ripple
-    const ringPeriod = 3000;
+    // Ripple timing: a bit faster than before
+    const ringPeriod = 3000;            // faster ripple
     const ringProg   = (elapsed % ringPeriod) / ringPeriod;
-    const ringRadius = ringProg * 100;
-    const ringWidth  = 3;
+    const ringRadius = ringProg * 100;  // full-screen reach
+    const ringWidth  = 3;               // keep a thin ring
 
     // Base glow: solid at center, fading to transparent by 35%
     const baseGlow = `radial-gradient(
@@ -93,19 +69,6 @@ document.addEventListener("DOMContentLoaded", function () {
     )`;
 
     neonContainer.style.background = `${baseGlow}, ${ringGlow}`;
-
-    // Update background quotes visibility
-    document.querySelectorAll(".background-quote").forEach(elem => {
-      const rect = elem.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const dist = Math.hypot(centerX - mouseX, centerY - mouseY);
-      // Visible within 35% radius
-      const maxDist = 0.35 * Math.max(window.innerWidth, window.innerHeight);
-      const vis = Math.max(0, 1 - dist / maxDist);
-      elem.style.opacity = vis;
-    });
-
     requestAnimationFrame(animateNeon);
   }
   requestAnimationFrame(animateNeon);
@@ -118,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const gravityBtn     = document.querySelector(".gravity-btn");
   const resetBtn       = document.querySelector(".reset-btn");
   const dimmedOverlay  = document.querySelector(".dimmed");
+  const quoteContainer = document.getElementById("quote-container");
 
   const aboutPopup   = document.getElementById("about-popup");
   const contactPopup = document.getElementById("contact-popup");
@@ -153,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     dimmedOverlay.style.display = "none";
   });
 
-  // Admin popup logic...
+  // Admin popup logic
   const adminPasswordInput = document.getElementById("admin-password");
   const togglePasswordBtn  = document.getElementById("toggle-password");
   const submitPasswordBtn  = document.getElementById("submit-password");
@@ -194,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
     errorMessage.style.display = "none";
   });
 
-  // Ball physics & collision logic (unchanged)
+  // Ball physics & collision
   const balls = [];
   const GRAVITY = 0.3;
   const RESTITUTION = 0.8;
@@ -202,6 +166,10 @@ document.addEventListener("DOMContentLoaded", function () {
   gravityBtn.addEventListener("click", () => {
     dropBall();
     resetBtn.style.display = "block";
+    if (!quotesStarted) {
+      startFallingQuotes();
+      quotesStarted = true;
+    }
   });
   resetBtn.addEventListener("click", () => {
     resetBalls();
@@ -239,6 +207,53 @@ document.addEventListener("DOMContentLoaded", function () {
     return color;
   }
 
+  // Falling quotes
+  let quotesStarted = false;
+  let quoteStartTime = Date.now();
+
+  function startFallingQuotes() {
+    setInterval(createFallingQuote, 10000);
+    updateQuotes();
+  }
+
+  function createFallingQuote() {
+    const quotes = [
+      "Life isn’t about what you know, It’s about what you’re able to figure out.",
+      "The best time to plant a tree is 20 years ago, the second best time is today.",
+      "The rich get richer because the poor see every opportunity as a scam",
+      "Money is not the key to happiness, it is the key to pursuing opportunities.",
+      "Cold water feels warm when your hands are freezing.",
+      "Regret is proof you cared. But growth is proof you learned."
+    ];
+    const quoteText = quotes[Math.floor(Math.random() * quotes.length)];
+    const quoteElem = document.createElement("div");
+    quoteElem.className = "falling-quote";
+    quoteElem.innerText = quoteText;
+    const initLeft = Math.random() * (window.innerWidth - 300);
+    quoteElem.dataset.initialLeft = initLeft;
+    quoteElem.dataset.amp = Math.random() * 20 + 10;
+    quoteElem.dataset.phase = Math.random() * 2 * Math.PI;
+    quoteElem.style.left = initLeft + "px";
+    quoteElem.style.top = "-50px";
+    quoteElem.style.animation = "fall 20s linear forwards";
+    quoteContainer.appendChild(quoteElem);
+    setTimeout(() => {
+      if (quoteElem.parentElement) quoteElem.remove();
+    }, 21000);
+  }
+
+  function updateQuotes() {
+    const now = Date.now();
+    document.querySelectorAll(".falling-quote").forEach(quote => {
+      const initLeft = parseFloat(quote.dataset.initialLeft) || 0;
+      const amp = parseFloat(quote.dataset.amp) || 0;
+      const phase = parseFloat(quote.dataset.phase) || 0;
+      const t = (now - quoteStartTime) / 1000;
+      quote.style.left = initLeft + amp * Math.sin(t + phase) + "px";
+    });
+    requestAnimationFrame(updateQuotes);
+  }
+
   function updateBalls() {
     balls.forEach(ball => {
       ball.velocityY += GRAVITY;
@@ -262,6 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     handleBallCollisions();
+    handleBallQuoteCollisions();
     requestAnimationFrame(updateBalls);
   }
 
@@ -285,6 +301,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function handleBallQuoteCollisions() {
+    document.querySelectorAll(".falling-quote").forEach(quote => {
+      const rect = quote.getBoundingClientRect();
+      balls.forEach(ball => {
+        const bx = parseFloat(ball.style.left) + ball.radius;
+        const by = parseFloat(ball.style.top) + ball.radius;
+        const closestX = Math.max(rect.left, Math.min(bx, rect.left + rect.width));
+        const closestY = Math.max(rect.top,  Math.min(by, rect.top + rect.height));
+        const d = Math.hypot(bx - closestX, by - closestY);
+        if (d < ball.radius && ball.velocityY > 0) {
+          ball.velocityY *= -RESTITUTION;
+          quote.style.transform = "scale(1.2)";
+          setTimeout(() => quote.style.transform = "scale(1)", 200);
+        }
+      });
+    });
+  }
+
   window.addEventListener("scroll", () => {
     const dir = window.scrollY > (this.lastScroll || 0) ? 1 : -1;
     this.lastScroll = window.scrollY;
@@ -293,7 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   updateBalls();
 
-  // Visitor tracking (unchanged)
+  // Visitor tracking
   async function logVisitor() {
     try {
       const res  = await fetch("https://ipapi.co/json/");

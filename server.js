@@ -39,25 +39,23 @@ app.get("/api/getVisitorLogs", (req, res) => {
   // 1) Aggregate by IP
   const agg = {};
   visitorLogs.forEach(({ ip, userAgent, timestamp }) => {
-    if (!agg[ip]) {
-      agg[ip] = { count: 0, latestTime: "", userAgents: new Set() };
-    }
+    if (!agg[ip]) agg[ip] = { count: 0, latestTime: "", userAgents: new Set() };
     agg[ip].count++;
     agg[ip].latestTime = agg[ip].latestTime < timestamp ? timestamp : agg[ip].latestTime;
     agg[ip].userAgents.add(userAgent);
   });
 
-  // 2) Build enriched array
+  // 2) Enrich each IP
   const enriched = Object.entries(agg).map(([ip, { count, latestTime, userAgents }]) => {
-    // Normalize IPv4-mapped IPv6
+    // Normalize IP for lookup:
     let lookupIP = ip;
     if (ip.startsWith("::ffff:")) {
-      lookupIP = ip.split(":").pop();
+      lookupIP = ip.split(":").pop();           // "::ffff:8.8.8.8" → "8.8.8.8"
     } else if (ip === "::1") {
-      lookupIP = "127.0.0.1";
+      lookupIP = "127.0.0.1";                   // local fallback
     }
 
-    // Geo lookup
+    // City lookup
     let location = "Unknown";
     try {
       const geo = cityReader.city(lookupIP);
@@ -69,7 +67,7 @@ app.get("/api/getVisitorLogs", (req, res) => {
       if (parts.length) location = parts.join(", ");
     } catch {}
 
-    // ASN lookup (ISP/Provider)
+    // ASN lookup (provider)
     let provider = "Unknown";
     try {
       const asn = asnReader.asn(lookupIP);
@@ -78,21 +76,18 @@ app.get("/api/getVisitorLogs", (req, res) => {
       }
     } catch {}
 
-    // Device determination
-    const agents = Array.from(userAgents);
-    const device = agents.some(ua => /Android|iPhone|Mobile/i.test(ua))
-      ? "Mobile"
-      : "Desktop";
+    // Determine device
+    const device = Array.from(userAgents).some(ua =>
+      /Android|iPhone|Mobile/i.test(ua)
+    ) ? "Mobile" : "Desktop";
 
-    return {
-      ip,
-      count,
-      latestTime,
-      location,
-      provider,
-      device,
-    };
+    return { ip, count, latestTime, location, provider, device };
   });
+
+  // 3) Sort newest-first & respond
+  enriched.sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
+  res.json(enriched);
+});
 
   // 3) Sort by most recent
   enriched.sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));

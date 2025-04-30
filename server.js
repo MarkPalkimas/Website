@@ -1,38 +1,66 @@
 // server.js
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const app = express();
+const express  = require('express');
+const cors     = require('cors');
+const path     = require('path');
+const maxmind  = require('@maxmind/geoip2-node');        // ← NEW
+
+const app  = express();
 const port = process.env.PORT || 3000;
 
-// Enable CORS if needed and JSON parsing for POST requests
+/* ── GeoLite2 database: loaded once at startup ───────────────────────── */
+const DB_PATH = path.join(
+  __dirname,
+  'node_modules',
+  'geolite2',
+  'db',
+  'GeoLite2-City.mmdb'
+);                                             // adjust only if you
+                                               // move the .mmdb file
+let cityReader;
+maxmind.Reader.open(DB_PATH).then(r => (cityReader = r));
+
+/* ── Middleware ──────────────────────────────────────────────────────── */
 app.use(cors());
 app.use(express.json());
-
-// In-memory store for visitor logs (for production, consider using a database)
-let visitorLogs = [];
-
-// Endpoint to return visitor logs for admin.html
-app.get('/api/getVisitorLogs', (req, res) => {
-  res.json(visitorLogs);
-});
-
-// Endpoint to log visitor data
-app.post('/api/logVisitor', (req, res) => {
-  // Get client IP from x-forwarded-for header (if behind a proxy) or socket.remoteAddress
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
-  const userAgent = req.headers['user-agent'] || 'Unknown';
-  const timestamp = new Date().toISOString();
-  
-  const newLog = { timestamp, ip, userAgent };
-  visitorLogs.push(newLog);
-  
-  res.json({ message: 'Logged successfully', log: newLog });
-});
-
-// Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+/* ── In-memory log indexed by IP ─────────────────────────────────────── */
+const visitorLogs = {};   // { ip: { latestTime, userAgent, location, count } }
+
+/* ── API: record a visit ─────────────────────────────────────────────── */
+app.post('/api/logVisitor', (req, res) => {
+  const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '')
+               .split(',')[0].trim();
+  const userAgent = req.headers['user-agent'] || 'Unknown';
+  const timestamp = new Date().toISOString();
+
+  // best-effort geo lookup
+  let location = 'Unknown';
+  if (cityReader) {
+    try {
+      const g = cityReader.city(ip);
+      location = [g?.city?.names?.en, g?.country?.names?.en]
+                   .filter(Boolean).join(', ');
+    } catch { /* private / unroutable IPs */ }
+  }
+
+  if (!visitorLogs[ip]) {
+    visitorLogs[ip] = { latestTime: timestamp, userAgent, location, count: 1 };
+  } else {
+    visitorLogs[ip].latestTime = timestamp;
+    visitorLogs[ip].count += 1;
+  }
+
+  res.json({ message: 'Logged', log: visitorLogs[ip] });
 });
+
+/* ── API: return logs (newest first) ─────────────────────────────────── */
+app.get('/api/getVisitorLogs', (_, res) => {
+  const data = Object.entries(visitorLogs)
+    .map(([ip, d]) => ({ ip, ...d }))
+    .sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
+  res.json(data);
+});
+
+/* ── Boot ────────────────────────────────────────────────────────────── */
+app.listen(port, () => console.log(`Server running on port ${port}`));

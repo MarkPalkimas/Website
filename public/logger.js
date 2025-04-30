@@ -10,16 +10,15 @@ import { getDatabase, ref,
 
 //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 // 🚨  KEEP THE REAL VALUES **OUT** OF THE REPO  🚨
-// - inject them at build time, read from a secure <script> block,
-//   or import from an env-only file that’s git-ignored.
+/* public/logger.js */
 export const firebaseConfig = {
-  apiKey:          import.meta.env.VITE_FB_API_KEY,
-  authDomain:      import.meta.env.VITE_FB_AUTH_DOMAIN,
-  databaseURL:     import.meta.env.VITE_FB_DATABASE_URL,
-  projectId:       import.meta.env.VITE_FB_PROJECT_ID,
-  storageBucket:   import.meta.env.VITE_FB_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FB_MSG_SENDER,
-  appId:           import.meta.env.VITE_FB_APP_ID
+  apiKey:            "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId:         "YOUR_PROJECT",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId:             "YOUR_APP_ID"
 };
 //–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 

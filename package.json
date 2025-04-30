@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "Mark Palkimas personal website with server-side visitor logging.",
   "main": "server.js",
-  {
   "scripts": {
     "start": "node server.js",
     "postinstall": "curl -sSfL --retry 3 -u \"$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY\" \"https://download.maxmind.com/geoip/databases/GeoLite2-City/download?edition_id=GeoLite2-City&suffix=mmdb\" -o GeoLite2-City.mmdb"
-  }
-}
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",

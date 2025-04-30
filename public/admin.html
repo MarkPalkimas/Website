@@ -1,56 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Admin Dashboard - Mark Palkimas</title>
   <style>
-    /* Basic Reset */
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family:'Segoe UI',sans-serif;
-      background:#121212;
-      color:#e0e0e0;
-      overflow-x:hidden;
-      padding-bottom:2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      padding-bottom: 2rem;
     }
     header {
-      background:#1f1f1f;
-      padding:1rem 2rem;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      background: #1f1f1f;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     header .logo {
-      font-size:1.5rem; font-weight:bold; color:#ffcc00;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffcc00;
     }
     header a.logout {
-      color:#e0e0e0; text-decoration:none; font-size:1.1rem;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1.1rem;
     }
-    header a.logout:hover { color:#ffcc00; }
-    .container { padding:2rem; }
+    header a.logout:hover { color: #ffcc00; }
+    .container { padding: 2rem; }
     .card {
-      background:#1f1f1f; border-radius:8px;
-      padding:1rem; margin-bottom:1rem;
-      box-shadow:0 2px 8px rgba(0,0,0,0.5);
+      background: #1f1f1f;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
-    .card h2 { margin-bottom:.5rem; }
+    .card h2 { margin-bottom: .5rem; }
     .pulse {
-      display:inline-block; width:10px; height:10px;
-      background:#ffcc00; border-radius:50%;
-      animation:pulse 2s infinite; margin-left:.5rem;
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #ffcc00;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      margin-left: .5rem;
     }
     @keyframes pulse {
-      0%   { box-shadow:0 0 0 0 rgba(255,204,0,0.7); }
-      70%  { box-shadow:0 0 0 10px rgba(255,204,0,0); }
-      100% { box-shadow:0 0 0 0 rgba(255,204,0,0); }
+      0%   { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
+      70%  { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
     }
     table {
-      width:100%; border-collapse:collapse;
-      background:#222; color:#e0e0e0; margin-top:1rem;
+      width: 100%;
+      border-collapse: collapse;
+      background: #222;
+      color: #e0e0e0;
+      margin-top: 1rem;
     }
     table th, table td {
-      padding:.5rem; text-align:left; border:1px solid #333;
+      padding: .5rem;
+      text-align: left;
+      border: 1px solid #333;
     }
   </style>
 </head>
@@ -69,41 +83,80 @@
             <th>IP Address</th>
             <th>Location</th>
             <th>Provider</th>
+            <th>Device</th>
             <th>Visits</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Populated by script -->
+          <!-- Filled by JS -->
         </tbody>
       </table>
     </div>
   </div>
-  <script>
-    function getLogs() {
-      const obj = JSON.parse(localStorage.getItem("visitorLogs")||"{}");
-      return Object.entries(obj)
-        .map(([ip,d]) => ({ ip, ...d }))
-        .sort((a,b)=> new Date(b.latestTime)-new Date(a.latestTime));
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
+      authDomain: "mark-palkimas-visits.firebaseapp.com",
+      projectId: "mark-palkimas-visits"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function getLogsGroupedByIP() {
+      const snapshot = await getDocs(collection(db, "visitors"));
+      const grouped = {};
+
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const ip = d.ip || "Unknown";
+        const prev = grouped[ip] || {
+          ip,
+          count: 0,
+          latestTime: "1970-01-01T00:00:00Z",
+          location: d.location?.city || d.location?.country_name || "Unknown",
+          provider: d.location?.org || "Unknown",
+          deviceType: d.deviceType || "Unknown"
+        };
+
+        grouped[ip] = {
+          ...prev,
+          count: prev.count + 1,
+          latestTime: new Date(d.timestamp) > new Date(prev.latestTime) ? d.timestamp : prev.latestTime
+        };
+      });
+
+      return Object.values(grouped).sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
     }
 
-    function populateTable() {
+    function populateTable(logs) {
       const tbody = document.querySelector("#visitor-logs tbody");
       tbody.innerHTML = "";
-      getLogs().forEach(({ ip, location, count, latestTime }) => {
+      logs.forEach(log => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${new Date(latestTime).toLocaleString()}</td>
-          <td>${ip}</td>
-          <td>${location}</td>
-          <td>${count}</td>
+          <td>${new Date(log.latestTime).toLocaleString()}</td>
+          <td>${log.ip}</td>
+          <td>${log.location}</td>
+          <td>${log.provider}</td>
+          <td>${log.deviceType}</td>
+          <td>${log.count}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      populateTable();
-      setInterval(populateTable, 10000);
+    document.addEventListener("DOMContentLoaded", async () => {
+      const logs = await getLogsGroupedByIP();
+      populateTable(logs);
+      setInterval(async () => {
+        const logs = await getLogsGroupedByIP();
+        populateTable(logs);
+      }, 10000);
     });
   </script>
 </body>

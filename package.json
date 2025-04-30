@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "curl -sSfL --retry 3 -u \"$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY\" \"https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=mmdb\" -o GeoLite2-City.mmdb"
+    "postinstall": "curl -sSfL --retry 3 \"https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$MAXMIND_LICENSE_KEY&account_id=$MAXMIND_ACCOUNT_ID&suffix=mmdb\" -o GeoLite2-City.mmdb\""
   },
   "dependencies": {
     "cors": "^2.8.5",

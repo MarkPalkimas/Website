@@ -1,5 +1,6 @@
 /* public/logger.js
  * Logs { page, ip, location, provider, lat (number), lon (number), ts }.
+ 
  */
 
 import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";

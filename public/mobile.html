@@ -160,11 +160,13 @@
   
   <!-- Visitor logging: fires on every mobile page load -->
   <script>
-   fetch("https://markpalkimas-logger.onrender.com/log-visit", {
-  method: "POST"
-});
-    .then(res => res.json())
-    .catch(()=>{});
-  </script>
+  fetch("https://markpalkimas-logger.onrender.com/log-visit", {
+    method: "POST"
+  })
+  .then(res => res.json())
+  .then(() => console.log("Visitor logged"))
+  .catch(err => console.error("Logging failed", err));
+</script>
+
 </body>
 </html>

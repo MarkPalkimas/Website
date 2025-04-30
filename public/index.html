@@ -12,6 +12,11 @@
       }
     </script>
     <style>
+      <script>
+  fetch("https://<your-render-backend>/log-visit", { method: "POST" })
+    .catch(()=>{});
+</script>
+
       /* Global & Modern Styles */
       body {
         margin: 0;

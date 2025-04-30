@@ -114,19 +114,25 @@
       snapshot.forEach(doc => {
         const d = doc.data();
         const ip = d.ip || "Unknown";
+        const location = d.location || {};
+        const city = location.city || location.region || location.country_name || "Unknown";
+        const provider = location.org || location.isp || "Unknown";
+        const deviceType = d.deviceType || "Unknown";
+        const timestamp = d.timestamp || "1970-01-01T00:00:00Z";
+
         const prev = grouped[ip] || {
           ip,
           count: 0,
-          latestTime: "1970-01-01T00:00:00Z",
-          location: d.location?.city || d.location?.country_name || "Unknown",
-          provider: d.location?.org || "Unknown",
-          deviceType: d.deviceType || "Unknown"
+          latestTime: timestamp,
+          location: city,
+          provider,
+          deviceType
         };
 
         grouped[ip] = {
           ...prev,
           count: prev.count + 1,
-          latestTime: new Date(d.timestamp) > new Date(prev.latestTime) ? d.timestamp : prev.latestTime
+          latestTime: new Date(timestamp) > new Date(prev.latestTime) ? timestamp : prev.latestTime
         };
       });
 
@@ -151,12 +157,12 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      const logs = await getLogsGroupedByIP();
-      populateTable(logs);
-      setInterval(async () => {
+      try {
         const logs = await getLogsGroupedByIP();
         populateTable(logs);
-      }, 10000);
+      } catch (e) {
+        console.error("Failed to load visitor logs:", e);
+      }
     });
   </script>
 </body>

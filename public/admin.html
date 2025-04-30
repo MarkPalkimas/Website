@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Admin Dashboard – Mark Palkimas</title>
+
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{
@@ -39,6 +40,15 @@
     }
     th,td{padding:.6rem;border:1px solid #333;text-align:left}
     th{white-space:nowrap}
+
+    /* subtle hover effect for clickable IPs */
+    a.ip-link{
+      color:#4ea9ff;text-decoration:none;
+      transition:color .25s ease;
+    }
+    a.ip-link:hover{
+      color:#ffd64e;text-decoration:underline;
+    }
   </style>
 </head>
 <body>

@@ -1,62 +1,56 @@
-/* public/logger.js
- * Logs { page, ip, location, provider, lat, lon, ts } ➜ /visits
+/* public/admin.js
+ * Dashboard: one row/IP, link to map if coords exist.
  */
 
-import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, push,
-         set, serverTimestamp }    from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { initializeApp, getApps, getApp }
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getDatabase, ref, onValue,
+         query, orderByChild }
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { firebaseConfig } from "./logger.js";   // reuse same config
 
-/* ---- Firebase config (public) ---- */
-export const firebaseConfig = {
-  apiKey:            "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
-  authDomain:        "mark-palkimas-visits.firebaseapp.com",
-  databaseURL:       "https://mark-palkimas-visits-default-rtdb.firebaseio.com",
-  projectId:         "mark-palkimas-visits",
-  storageBucket:     "mark-palkimas-visits.appspot.com",
-  messagingSenderId: "1062485579247",
-  appId:             "1:1062485579247:web:91d1322a90f1e875a0521a"
-};
-/* ---------------------------------- */
-
-const app = initializeApp(firebaseConfig);
+// ✅ use existing Firebase app if already initialised
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-/* public-IP lookup */
-async function getIp () {
-  try {
-    const r = await fetch("https://api.ipify.org?format=json");
-    return (await r.json()).ip ?? "?";
-  } catch { return "?"; }
-}
+const tbody = document.getElementById("visits");
 
-/* geo + provider + coords */
-async function getInfo (ip) {
-  if (ip === "?") return { location:"—", provider:"—", lat:null, lon:null };
-  try {
-    const r = await fetch(`https://ipapi.co/${ip}/json/`);
-    const d = await r.json();
-    if (d.error) return { location:"—", provider:"—", lat:null, lon:null };
-
-    const locParts = [d.city, d.region, d.country_name].filter(Boolean);
-    return {
-      location : locParts.join(", ") || d.country_name || "—",
-      provider : d.org || d.asn || "—",
-      lat      : d.latitude  ?? null,
-      lon      : d.longitude ?? null
-    };
-  } catch {
-    return { location:"—", provider:"—", lat:null, lon:null };
-  }
-}
-
-/* write visit */
-export async function logVisit (page) {
-  const ip         = await getIp();
-  const info       = await getInfo(ip);
-  await set(push(ref(db, "visits")), {
-    page, ip, ...info, ts: serverTimestamp()
+const q = query(ref(db, "visits"), orderByChild("ts"));
+onValue(q, snap => {
+  const byIp = new Map();   // ip → aggregate record
+  snap.forEach(c => {
+    const {
+      page="index", ip="?", location="—", provider="—",
+      lat=null, lon=null, ts=0
+    } = c.val();
+    const device = page === "mobile" ? "mobile" : "desktop";
+    if (!byIp.has(ip)) {
+      byIp.set(ip,{ latestTs:ts,count:1,device,location,provider,lat,lon });
+    } else {
+      const r = byIp.get(ip);
+      r.count += 1;
+      if (ts > r.latestTs) Object.assign(r,{ latestTs:ts,device,location,provider,lat,lon });
+    }
   });
-}
 
-/* auto-log */
-logVisit(document.body.dataset.page || "unknown");
+  const rows = Array.from(byIp.entries())
+                    .map(([ip,d]) => ({ ip, ...d }))
+                    .sort((a,b) => b.latestTs - a.latestTs);
+
+  tbody.innerHTML = "";
+  for (const r of rows) {
+    const ipCell = (r.lat!==null && r.lon!==null)
+      ? `<a href="https://maps.google.com/?q=${r.lat},${r.lon}"
+            target="_blank" rel="noopener">${r.ip}</a>`
+      : r.ip;
+    tbody.innerHTML += `
+      <tr>
+        <td>${ipCell}</td>
+        <td>${r.device}</td>
+        <td>${r.provider}</td>
+        <td>${r.location}</td>
+        <td>${new Date(r.latestTs).toLocaleString()}</td>
+        <td>${r.count}</td>
+      </tr>`;
+  }
+});

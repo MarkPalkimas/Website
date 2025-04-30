@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -250,7 +249,9 @@
       }
     </style>
   </head>
-  <body>
+
+  <!-- ✨ NEW attribute tells logger which page this is -->
+  <body data-page="index">
     <!-- Neon Glow Container -->
     <div id="neon-container"></div>
     
@@ -369,6 +370,8 @@
     <!-- Reset Button (if needed) -->
     <button class="reset-btn">Reset</button>
     
+    <!-- ✨ NEW: log this visit (loads first so it fires ASAP) -->
+    <script type="module" src="public/logger.js"></script>
     <script src="main.js"></script>
   </body>
 </html>

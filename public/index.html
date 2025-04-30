@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mark Palkimas' Personal Website</title>
   <link rel="stylesheet" href="app.css" />
+
   <script>
     // Redirect to mobile version if on a mobile device
     if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       window.location.href = "mobile.html";
     }
   </script>
+
   <style>
     /* Global & Modern Styles */
     body {
@@ -44,6 +46,7 @@
       text-decoration: none;
       color: #eee;
     }
+
     /* Dimmed Background Overlay */
     .dimmed {
       position: fixed;
@@ -55,6 +58,7 @@
       z-index: 1005;
       display: none;
     }
+
     /* Popups Container – ensures popups are above the overlay */
     #popups-container {
       position: fixed;
@@ -65,6 +69,7 @@
       z-index: 2000;
       pointer-events: none;
     }
+
     /* Common Popup Styles */
     .popup {
       display: none;
@@ -79,17 +84,26 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       padding: 30px;
     }
+
     /* About Popup */
-    .about-popup { background: #fff; color: #333; }
+    .about-popup {
+      background: #fff;
+      color: #333;
+    }
     .about-popup .about-popup-content {
-      display: flex; align-items: center; gap: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
     .about-popup .about-image img {
-      width: 200px; border-radius: 8px;
+      width: 200px;
+      border-radius: 8px;
     }
     .about-popup .about-text {
-      font-size: 16px; line-height: 1.5;
+      font-size: 16px;
+      line-height: 1.5;
     }
+
     /* Social (Contacts) Popup */
     .social-popup {
       background: linear-gradient(135deg, #ffffff, #f0f0f0);
@@ -97,65 +111,145 @@
       text-align: center;
     }
     .social-popup .social-popup-content {
-      display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      width: 100%;
     }
     .popup-social-links {
-      display: flex; width: 100%; justify-content: space-evenly; align-items: center;
+      display: flex;
+      width: 100%;
+      justify-content: space-evenly;
+      align-items: center;
     }
     .popup-social-links img {
-      width: 50px; height: 50px; display: block; margin: 0 auto;
+      width: 50px;
+      height: 50px;
+      display: block;
+      margin: 0 auto;
     }
+
     /* Admin Popup */
     .admin-popup {
-      background: #f9f9f9; color: #333; text-align: center;
+      background: #f9f9f9;
+      color: #333;
+      text-align: center;
     }
     .admin-popup .admin-popup-content input {
-      width: 80%; padding: 10px; margin: 10px 0; font-size: 16px;
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
     }
     .admin-popup .admin-popup-content button {
-      padding: 10px 20px; margin: 5px; font-size: 16px;
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
     }
     .admin-popup .admin-popup-content #admin-error {
-      color: red; margin-bottom: 10px; font-size: 14px; display: none;
+      color: red;
+      margin-bottom: 10px;
+      font-size: 14px;
+      display: none;
     }
+
     /* Footer */
     .footer {
-      background-color: #222; padding: 20px; text-align: center; position: relative; z-index: 2;
+      background-color: #222;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
     }
-    .footer p { margin: 0; }
-    .social-links img { width: 40px; height: 40px; margin: 0 10px; }
+    .footer p {
+      margin: 0;
+    }
+    .social-links img {
+      width: 40px;
+      height: 40px;
+      margin: 0 10px;
+    }
+
+    /* Reset Button */
     .reset-btn {
-      display: none; background-color: #ff2222; color: white;
-      padding: 10px 20px; font-size: 20px; border: none; border-radius: 5px;
-      cursor: pointer; position: fixed; bottom: 20px; left: 20px; z-index: 1020;
+      display: none;
+      background-color: #ff2222;
+      color: white;
+      padding: 10px 20px;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1020;
     }
-    .reset-btn:hover { background-color: #c21010; }
+    .reset-btn:hover {
+      background-color: #c21010;
+    }
+
     /* Neon Glow Effect – the orb follows the cursor */
     #neon-container {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: -2; transition: background 2s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -2;
+      transition: background 2s ease;
     }
+
     /* Content */
-    .content { position: relative; z-index: 2; padding: 40px; }
-    .section { margin-bottom: 60px; }
+    .content {
+      position: relative;
+      z-index: 2;
+      padding: 40px;
+    }
+    .section {
+      margin-bottom: 60px;
+    }
     .profile-photo {
-      max-width: 100%; border-radius: 50%; transition: box-shadow 0.3s, transform 0.3s;
+      max-width: 100%;
+      border-radius: 50%;
+      transition: box-shadow 0.3s, transform 0.3s;
       cursor: pointer;
     }
-    .profile-photo:hover { box-shadow: 0 0 20px #00d084; transform: scale(1.05); }
+    .profile-photo:hover {
+      box-shadow: 0 0 20px #00d084;
+      transform: scale(1.05);
+    }
+
     /* Falling Quotes */
     #quote-container {
-      position: fixed; top: 0; left: 0; width: 100%; pointer-events: none;
-      z-index: 1; overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
     }
     .falling-quote {
-      position: absolute; font-size: 1.5rem; color: rgba(255,255,255,0.8);
-      white-space: nowrap; transition: transform 0.3s;
+      position: absolute;
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+      white-space: nowrap;
+      transition: transform 0.3s;
     }
-    @keyframes fall { from { top: -50px; } to { top: 110vh; } }
+    @keyframes fall {
+      from { top: -50px; }
+      to { top: 110vh; }
+    }
+
     /* Ball style */
     .ball {
-      position: absolute; border-radius: 50%; z-index: 1000; pointer-events: none;
+      position: absolute;
+      border-radius: 50%;
+      z-index: 1000;
+      pointer-events: none;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     }
   </style>
@@ -163,8 +257,10 @@
 <body>
   <!-- Neon Glow Container -->
   <div id="neon-container"></div>
+
   <!-- Dimming Overlay -->
   <div class="dimmed"></div>
+
   <!-- Quote Container -->
   <div id="quote-container"></div>
 
@@ -181,7 +277,6 @@
 
   <main class="content">
     <section id="about" class="section">
-      <!-- Update image path to assets folder -->
       <img src="assets/profile.jpg" alt="Profile Photo" class="profile-photo" />
       <div class="intro-text">
         <h2>Hello, I'm Mark Palkimas</h2>
@@ -194,28 +289,17 @@
 
   <footer class="footer">
     <p>Contact Me</p>
-    <!-- Social links updated to use assets folder -->
     <div class="social-links">
-      <a href="https://www.instagram.com/ya.boimark" target="_blank">
-        <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
-      </a>
-      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
-        <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
-      </a>
-      <a href="https://github.com/MarkPalkimas" target="_blank">
-        <img src="assets/github-logo.png" alt="GitHub" />
-      </a>
-      <a href="mailto:mark.palkimas@gmail.com" target="_blank">
-        <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
-      </a>
-      <a href="https://www.youtube.com/@markpalkimas" target="_blank">
-        <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
-      </a>
+      <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" /></a>
+      <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" /></a>
+      <a href="https://github.com/MarkPalkimas" target="_blank"><img src="assets/github-logo.png" alt="GitHub" /></a>
+      <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" /></a>
+      <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" /></a>
     </div>
     <div class="footer-bottom">
       <button class="gravity-btn">Drop Ball</button>
       <button class="admin-btn">Admin</button>
-      <p class="copyright">© 2024 Mark Palkimas</p>
+      <p>© 2024 Mark Palkimas</p>
     </div>
   </footer>
 
@@ -224,12 +308,10 @@
     <!-- About Popup -->
     <div class="popup about-popup" id="about-popup">
       <div class="about-popup-content">
-        <div class="about-image">
-          <img src="assets/profile.jpg" alt="Profile Image" />
-        </div>
+        <div class="about-image"><img src="assets/profile.jpg" alt="Profile Image" /></div>
         <div class="about-text">
           <h2>About Me</h2>
-          <p>I'm Mark Palkimas, an ambitious student with a passion for technology and innovation…</p>
+          <p>I'm Mark Palkimas, an ambitious student with a passion for technology and innovation.</p>
         </div>
       </div>
     </div>
@@ -238,7 +320,11 @@
       <div class="social-popup-content">
         <h2>Contact Links</h2>
         <div class="popup-social-links">
-          <!-- same five social icons as above -->
+          <a href="https://www.instagram.com/ya.boimark" target="_blank"><img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" /></a>
+          <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank"><img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" /></a>
+          <a href="https://github.com/MarkPalkimas" target="_blank"><img src="assets/github-logo.png" alt="GitHub" /></a>
+          <a href="mailto:mark.palkimas@gmail.com" target="_blank"><img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" /></a>
+          <a href="https://www.youtube.com/@markpalkimas" target="_blank"><img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" /></a>
         </div>
       </div>
     </div>
@@ -255,48 +341,44 @@
     </div>
   </div>
 
+  <!-- Reset Button -->
   <button class="reset-btn">Reset</button>
 
-  <!-- CHANGED to module so Firebase imports work -->
-  <!-- load the Firebase JS SDK -->
-<script type="module">
-  // 1. Import the modules you need
-  import { initializeApp }        from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAnalytics }         from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
-  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  <!-- Firebase & Env Config -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-  import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+    const firebaseConfig = {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
+      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    };
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-};
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(({ ip }) => {
+        const db = getDatabase(app);
+        const visitsRef = ref(db, 'visits');
+        push(visitsRef, {
+          ip,
+          timestamp: Date.now(),
+          page: window.location.pathname
+        });
+      })
+      .catch(err => console.error('IP fetch failed', err));
+  </script>
 
-
-  // 4. Fetch the visitor's IP & push a record
-  fetch('https://api.ipify.org?format=json')
-    .then(res => res.json())
-    .then(({ ip }) => {
-      const visitsRef = ref(db, 'visits');
-      push(visitsRef, {
-        ip,
-        timestamp: Date.now(),
-        page: window.location.pathname   // e.g. "/index.html" or "/mobile.html"
-      });
-    })
-    .catch(err => console.error('IP fetch failed', err));
-</script>
-
+  <!-- Your main.js (neon, popups, balls, physics, encryptPassword) -->
   <script type="module" src="main.js"></script>
 </body>
 </html>

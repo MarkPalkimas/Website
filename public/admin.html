@@ -1,47 +1,49 @@
-/* public/admin.js
- * Dashboard: one row per IP with latest info and visit count
- */
-import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue, query, orderByChild }
-       from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-import { firebaseConfig }      from "./logger.js";   // reuse same config
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Admin Dashboard – Mark Palkimas</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',sans-serif;background:#121212;color:#e0e0e0;padding-bottom:2rem}
+    header{background:#1f1f1f;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+    header .logo{font-size:1.5rem;font-weight:bold;color:#ffcc00}
+    header a{color:#e0e0e0;text-decoration:none;font-size:1.1rem}
+    header a:hover{color:#ffcc00}
+    .pulse{display:inline-block;width:10px;height:10px;background:#ffcc00;border-radius:50%;animation:pulse 2s infinite;margin-left:.5rem}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,204,0,.7)}70%{box-shadow:0 0 0 10px rgba(255,204,0,0)}100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}}
+    .container{padding:2rem}
+    .card{background:#1f1f1f;border-radius:8px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+    table{width:100%;border-collapse:collapse;background:#222;margin-top:1rem}
+    th,td{padding:.6rem;border:1px solid #333;text-align:left}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
+    <a href="index.html">⟵ Back to Site</a>
+  </header>
 
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
+  <div class="container">
+    <div class="card">
+      <h2>Visitor Logs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>IP Address</th>
+            <th>Device</th>
+            <th>Location</th>
+            <th>Latest Visit</th>
+            <th>Visits</th>   <!-- count — last column -->
+          </tr>
+        </thead>
+        <tbody id="visits"></tbody>
+      </table>
+    </div>
+  </div>
 
-const tbody = document.getElementById("visits");
-
-const q = query(ref(db, "visits"), orderByChild("ts"));
-onValue(q, snap => {
-  const byIp = new Map(); // ip → {latestTs,count,device,location,provider}
-  snap.forEach(c => {
-    const { page="index", ip="?", location="—", provider="—", ts=0 } = c.val();
-    const device = page === "mobile" ? "mobile" : "desktop";
-    if (!byIp.has(ip)) {
-      byIp.set(ip,{ latestTs:ts, count:1, device, location, provider });
-    } else {
-      const rec = byIp.get(ip);
-      rec.count += 1;
-      if (ts > rec.latestTs) {
-        Object.assign(rec,{ latestTs:ts, device, location, provider });
-      }
-    }
-  });
-
-  const rows = Array.from(byIp.entries())
-                    .map(([ip,data])=>({ ip, ...data }))
-                    .sort((a,b)=> b.latestTs - a.latestTs);
-
-  tbody.innerHTML = "";
-  for (const r of rows) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${r.ip}</td>
-      <td>${r.device}</td>
-      <td>${r.provider}</td>
-      <td>${r.location}</td>
-      <td>${new Date(r.latestTs).toLocaleString()}</td>
-      <td>${r.count}</td>`;
-    tbody.appendChild(tr);
-  }
-});
+  <!-- live Firebase feed -->
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>

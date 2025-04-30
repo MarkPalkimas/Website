@@ -4,8 +4,7 @@
   "description": "Mark Palkimas personal website with server-side visitor logging.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "postinstall": "curl -sSfL --retry 3 -u \"$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY\" \"https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&suffix=mmdb\" -o GeoLite2-City.mmdb"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

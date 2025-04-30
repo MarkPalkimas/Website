@@ -1,62 +1,106 @@
-import express from 'express';
-import cors from 'cors';
-import admin from 'firebase-admin';
-import fetch from 'node-fetch';
-import requestIp from 'request-ip';
-import useragent from 'express-useragent';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// server.js
+// ------------------------------------------------------------
+const fs       = require("fs");
+const path     = require("path");
+const express  = require("express");
+const cors     = require("cors");
+const adminSDK = require("firebase-admin");
+const { Reader } = require("@maxmind/geoip2-node");
 
-const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const app  = express();
+const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-app.use(useragent.express());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// 🔐 Decode service account from secure environment variable
-const serviceAccount = JSON.parse(
-  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8')
-);
-
-// ✅ Initialize Firebase Admin
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+// ——— Initialize Firebase Admin SDK —————————————————————————
+// Put your service account JSON at ./secrets/firebase-sa.json (never commit this file!)
+const serviceAccount = require("./secrets/firebase-sa.json");
+adminSDK.initializeApp({
+  credential: adminSDK.credential.cert(serviceAccount),
   databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
 });
-const db = admin.database();
+const dbRef = adminSDK.database().ref("visits");
 
-// ✅ Log visitor data to /visits
-app.post('/log-visit', async (req, res) => {
-  const ip = requestIp.getClientIp(req) || 'unknown';
-  const ua = req.useragent || {};
-  const deviceType = ua.isMobile ? 'Mobile' : 'Desktop';
+// ——— Load GeoLite2 MMDBs —————————————————————————————
+const cityBuffer = fs.readFileSync(path.join(__dirname, "db/GeoLite2-City.mmdb"));
+const asnBuffer  = fs.readFileSync(path.join(__dirname, "db/GeoLite2-ASN.mmdb"));
+const cityReader = Reader.openBuffer(cityBuffer);
+const asnReader  = Reader.openBuffer(asnBuffer);
 
-  let location = {};
-  try {
-    const response = await fetch(`https://ipapi.co/${ip}/json/`);
-    location = await response.json();
-  } catch {
-    location = { error: 'Location lookup failed' };
-  }
+// ——— Middleware ———————————————————————————————————————
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-  try {
-    await db.ref('visits').push({
-      ip,
-      page: req.headers.referer || '/',
-      timestamp: Date.now(),
-      deviceType,
-      location,
-      userAgent: ua.source || ''
-    });
-    res.json({ status: 'logged' });
-  } catch (err) {
-    console.error("🔥 Firebase write error:", err);
-    res.status(500).json({ status: 'error', error: err.message });
-  }
+// ——— Log visitor ———————————————————————————————————————
+// Frontend calls this instead of using Firebase client.
+app.post("/api/logVisitor", (req, res) => {
+  const ip        = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown";
+  const userAgent = req.headers["user-agent"] || "Unknown";
+  const timestamp = Date.now();
+
+  dbRef.push({ ip, userAgent, timestamp })
+    .then(() => res.json({ message: "Logged successfully" }))
+    .catch(err => res.status(500).json({ error: err.message }));
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🚀 Logging server running on port ${PORT}`));
+// ——— Return aggregated & enriched logs —————————————————————
+app.get("/api/getVisitorLogs", async (req, res) => {
+  // 1) Fetch raw logs from Firebase
+  const snapshot = await dbRef.once("value");
+  const raw = snapshot.val() || {};
+
+  // 2) Aggregate by IP
+  const agg = {};
+  Object.values(raw).forEach(({ ip, userAgent, timestamp }) => {
+    if (!agg[ip]) {
+      agg[ip] = { count: 0, latestTime: 0, userAgents: new Set() };
+    }
+    agg[ip].count++;
+    agg[ip].latestTime = Math.max(agg[ip].latestTime, timestamp);
+    agg[ip].userAgents.add(userAgent);
+  });
+
+  // 3) Enrich each entry
+  const enriched = Object.entries(agg).map(([ip, { count, latestTime, userAgents }]) => {
+    // Normalize IPv4-mapped IPv6
+    let lookupIP = ip;
+    if (ip.startsWith("::ffff:")) lookupIP = ip.split(":").pop();
+    else if (ip === "::1") lookupIP = "127.0.0.1";
+
+    // Geo lookup
+    let location = "Unknown";
+    try {
+      const geo = cityReader.city(lookupIP);
+      const parts = [
+        geo.city?.names?.en,
+        geo.subdivisions?.[0]?.names?.en,
+        geo.country?.names?.en
+      ].filter(Boolean);
+      if (parts.length) location = parts.join(", ");
+    } catch {}
+
+    // ASN lookup (ISP)
+    let provider = "Unknown";
+    try {
+      const asn = asnReader.asn(lookupIP);
+      if (asn.autonomous_system_organization) {
+        provider = asn.autonomous_system_organization;
+      }
+    } catch {}
+
+    // Device detection
+    const device = Array.from(userAgents).some(ua =>
+      /Android|iPhone|Mobile/i.test(ua)
+    ) ? "Mobile" : "Desktop";
+
+    return { ip, count, latestTime, location, provider, device };
+  });
+
+  // 4) Sort newest-first and respond
+  enriched.sort((a, b) => b.latestTime - a.latestTime);
+  res.json(enriched);
+});
+
+// ——— Start server ————————————————————————————————————
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});

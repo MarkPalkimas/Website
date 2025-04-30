@@ -370,11 +370,12 @@
     
     <script src="main.js"></script>
     <script>
-fetch("https://markpalkimas-logger.onrender.com/log-visit", {
+  fetch("https://markpalkimas-logger.onrender.com/log-visit", {
     method: "POST"
-  }).then(res => res.json())
-    .then(data => console.log("Visitor logged"))
-    .catch(err => console.error("Logging failed", err));
+  })
+  .then(res => res.json())
+  .then(() => console.log("Visitor logged"))
+  .catch(err => console.error("Logging failed", err));
 </script>
   </body>
 </html>

@@ -6,36 +6,81 @@
   <title>Admin Dashboard - Mark Palkimas</title>
   <link rel="stylesheet" href="app.css" />
   <style>
-    /* Any admin-specific overrides */
-    .admin-card { max-width: 900px; margin: 2rem auto; }
-    /* Preserve your existing table styles… */
-    table { background: #222; color: #e0e0e0; width:100%; }
-    th, td { padding:.5rem; border:1px solid #333; }
+    body {
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .admin-card {
+      max-width: 900px;
+      margin: 2rem auto;
+      background-color: #2a2a2a;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background-color: #333;
+    }
+    tr:nth-child(even) {
+      background-color: #2a2a2a;
+    }
+    tr:hover {
+      background-color: #3a3a3a;
+    }
+    .header {
+      background-color: #222;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+    }
+    .footer {
+      background-color: #222;
+      padding: 1rem;
+      text-align: center;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
   </style>
 </head>
 <body>
-  <!-- your existing neon container, dimmer, popups… -->
-  <div id="neon-container"></div>
-  <div class="dimmed"></div>
-  <div id="quote-container"></div>
-
-  <!-- Reuse your site’s header/nav -->
   <header class="header">
-    <div class="nav-bar">
-      <div class="logo">Mark Palkimas</div>
-      <ul class="nav-links">
-        <li><a href="#about" class="about-link">About</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="index.html" class="logout">⟵ Back to Site</a></li>
-      </ul>
-    </div>
+    <div class="logo">Mark Palkimas</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Back to Site</a></li>
+    </ul>
   </header>
 
-  <!-- Main content: first the admin card, then the rest of your content -->
   <main class="content">
-    <!-- Admin Dashboard Card -->
-    <div class="card admin-card">
-      <h2>Visitor Logs <span class="pulse"></span></h2>
+    <div class="admin-card">
+      <h2>Visitor Logs</h2>
       <table id="visitor-logs">
         <thead>
           <tr>
@@ -48,30 +93,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="6" style="text-align:center;color:#888;">No visits yet</td></tr>
+          <tr><td colspan="6" style="text-align:center;color:#888;">Loading...</td></tr>
         </tbody>
       </table>
     </div>
-
-    <!-- (Optionally) the rest of your normal homepage sections… -->
-    <!-- e.g. your About, Portfolio, etc. -->
   </main>
 
-  <!-- Reuse your footer -->
   <footer class="footer">
-    <p>Contact Me</p>
-    <div class="social-links">…</div>
-    <div class="footer-bottom">
-      <button class="gravity-btn">Drop Ball</button>
-      <button class="reset-btn">Reset</button>
-      <p class="copyright">© 2024 Mark Palkimas</p>
-    </div>
+    <p>&copy; 2024 Mark Palkimas</p>
   </footer>
 
-  <!-- your main.js, popups, physics, quotes scripts -->
-  <script src="main.js"></script>
-
-  <!-- Admin page Firestore/RTDB loader -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import {

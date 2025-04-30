@@ -1,5 +1,5 @@
 /* public/admin.js
- * Dashboard: one row per IP with latest info and visit count
+ * Dashboard: one row per IP with latest info and visit count 
  */
 import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getDatabase, ref, onValue, query, orderByChild }

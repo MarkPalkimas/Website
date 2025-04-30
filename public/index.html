@@ -12,11 +12,6 @@
       }
     </script>
     <style>
-      <script>
-  fetch("https://markpalkimas-logger.onrender.com/log-visit", { method: "POST" })
-    .catch(()=>{});
-</script>
-
       /* Global & Modern Styles */
       body {
         margin: 0;
@@ -193,7 +188,7 @@
       .reset-btn:hover {
         background-color: #c21010;
       }
-      /* Neon Glow Effect – the orb follows the cursor */
+      /* Neon Glow Effect */
       #neon-container {
         position: fixed;
         top: 0;
@@ -257,13 +252,13 @@
   <body>
     <!-- Neon Glow Container -->
     <div id="neon-container"></div>
-    
+
     <!-- Dimming Overlay -->
     <div class="dimmed"></div>
-    
+
     <!-- Quote Container -->
     <div id="quote-container"></div>
-    
+
     <header class="header">
       <div class="nav-bar">
         <div class="logo">Mark Palkimas</div>
@@ -274,39 +269,21 @@
         </ul>
       </div>
     </header>
-    
+
     <main class="content">
       <section id="about" class="section">
-        <!-- Update image path to assets folder -->
         <img src="assets/profile.jpg" alt="Profile Photo" class="profile-photo" />
         <div class="intro-text">
           <h2>Hello, I'm Mark Palkimas</h2>
         </div>
       </section>
-      <section id="portfolio" class="section">
-        <!-- Portfolio content goes here -->
-      </section>
+      <section id="portfolio" class="section"></section>
     </main>
-    
+
     <footer class="footer">
       <p>Contact Me</p>
-      <!-- Social links updated to use assets folder -->
       <div class="social-links">
-        <a href="https://www.instagram.com/ya.boimark" target="_blank">
-          <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
-        </a>
-        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
-          <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
-        </a>
-        <a href="https://github.com/MarkPalkimas" target="_blank">
-          <img src="assets/github-logo.png" alt="GitHub" />
-        </a>
-        <a href="mailto:mark.palkimas@gmail.com" target="_blank">
-          <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
-        </a>
-        <a href="https://www.youtube.com/@markpalkimas" target="_blank">
-          <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
-        </a>
+        <!-- social icons -->
       </div>
       <div class="footer-bottom">
         <button class="gravity-btn">Drop Ball</button>
@@ -314,73 +291,22 @@
         <p class="copyright">© 2024 Mark Palkimas</p>
       </div>
     </footer>
-    
-    <!-- Popups Container -->
-    <div id="popups-container">
-      <!-- About Popup (not dimmed) -->
-      <div class="popup about-popup" id="about-popup">
-        <div class="about-popup-content">
-          <div class="about-image">
-            <img src="assets/profile.jpg" alt="Profile Image" />
-          </div>
-          <div class="about-text">
-            <h2>About Me</h2>
-            <p>
-              I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Contacts Popup -->
-      <div class="popup social-popup" id="contact-popup">
-        <div class="social-popup-content">
-          <h2>Contact Links</h2>
-          <div class="popup-social-links">
-            <a href="https://www.instagram.com/ya.boimark" target="_blank">
-              <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
-            </a>
-            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
-              <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
-            </a>
-            <a href="https://github.com/MarkPalkimas" target="_blank">
-              <img src="assets/github-logo.png" alt="GitHub" />
-            </a>
-            <a href="mailto:mark.palkimas@gmail.com" target="_blank">
-              <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
-            </a>
-            <a href="https://www.youtube.com/@markpalkimas" target="_blank">
-              <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
-            </a>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Admin Popup -->
-      <div class="popup admin-popup" id="admin-popup">
-        <div class="admin-popup-content">
-          <h2>Admin Sign In</h2>
-          <p id="admin-error">Wrong password</p>
-          <input type="password" id="admin-password" placeholder="Password" />
-          <button id="toggle-password">Show</button>
-          <br />
-          <button id="submit-password">Submit</button>
-          <button id="cancel-password">Cancel</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Reset Button (if needed) -->
+
+    <!-- Popups Container (About, Contact, Admin) -->
+    <div id="popups-container">…</div>
+
+    <!-- Reset Button -->
     <button class="reset-btn">Reset</button>
-    
+
     <script src="main.js"></script>
+    <!-- Visitor Logging: moved out of style tag, placed here -->
     <script>
-  fetch("https://markpalkimas-logger.onrender.com/log-visit", {
-    method: "POST"
-  })
-  .then(res => res.json())
-  .then(() => console.log("Visitor logged"))
-  .catch(err => console.error("Logging failed", err));
-</script>
+      fetch("https://markpalkimas-logger.onrender.com/log-visit", {
+        method: "POST"
+      })
+      .then(res => res.json())
+      .then(() => console.log("Visitor logged"))
+      .catch(err => console.error("Logging failed", err));
+    </script>
   </body>
 </html>

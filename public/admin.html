@@ -1,9 +1,10 @@
+<!-- public/admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Admin Dashboard – Mark Palkimas</title>
+  <title>Admin Dashboard - Mark Palkimas</title>
   <style>
     /* Basic Reset */
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -37,6 +38,7 @@
       background:#1f1f1f;
       border-radius:8px;
       padding:1rem;
+      margin-bottom:1rem;
       box-shadow:0 2px 8px rgba(0,0,0,0.5);
     }
     .card h2 { margin-bottom:.5rem; }
@@ -50,9 +52,9 @@
       margin-left:.5rem;
     }
     @keyframes pulse {
-      0%   { box-shadow:0 0 0 0    rgba(255,204,0,0.7); }
-      70%  { box-shadow:0 0 0 10px rgba(255,204,0,0); }
-      100% { box-shadow:0 0 0 0    rgba(255,204,0,0); }
+      0% { box-shadow:0 0 0 0 rgba(255,204,0,0.7); }
+      70% { box-shadow:0 0 0 10px rgba(255,204,0,0); }
+      100% { box-shadow:0 0 0 0 rgba(255,204,0,0); }
     }
     table {
       width:100%;
@@ -65,16 +67,12 @@
       padding:.5rem;
       text-align:left;
       border:1px solid #333;
-      vertical-align: top;
     }
-    table th { background:#2a2a2a; }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo">
-      Admin Dashboard <span class="pulse"></span>
-    </div>
+    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
     <a href="index.html" class="logout">⟵ Back to Site</a>
   </header>
   <div class="container">
@@ -86,43 +84,42 @@
             <th>Latest Visit</th>
             <th>IP Address</th>
             <th>Location</th>
-            <th>Provider</th>
             <th>Device</th>
             <th>Count</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Filled dynamically -->
+          <!-- Populated by script -->
         </tbody>
       </table>
     </div>
   </div>
-
   <script>
-    fetch("/api/getVisitorLogs")
-      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-      .then(rows => {
-        const tbody = document.querySelector("#visitor-logs tbody");
-        tbody.innerHTML = "";
-        rows.forEach(({ latestTime, ip, location, provider, device, count }) => {
-          const dateStr = new Date(latestTime).toLocaleString();
-          tbody.insertAdjacentHTML("beforeend", `
-            <tr>
-              <td>${dateStr}</td>
-              <td>${ip}</td>
-              <td>${location}</td>
-              <td>${provider}</td>
-              <td>${device}</td>
-              <td>${count}</td>
-            </tr>`);
-        });
-      })
-      .catch(() => {
-        document.querySelector("#visitor-logs tbody").innerHTML =
-          `<tr><td colspan="6" style="text-align:center;color:#f55;">
-             Error loading logs
-           </td></tr>`;
+    function getLogs() {
+      const obj = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+      return Object.entries(obj)
+        .map(([ip, d]) => ({ ip, ...d }))
+        .sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
+    }
+    function populateTable() {
+      const tbody = document.querySelector("#visitor-logs tbody");
+      tbody.innerHTML = "";
+      getLogs().forEach(({ ip, location, device, count, latestTime }) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(latestTime).toLocaleString()}</td>
+          <td>${ip}</td>
+          <td>${location}</td>
+          <td>${device || "Unknown"}</td>
+          <td>${count}</td>
+        `;
+        tbody.appendChild(tr);
       });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      populateTable();
+      setInterval(populateTable, 10000);
+    });
   </script>
 </body>
 </html>

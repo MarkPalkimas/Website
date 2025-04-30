@@ -11,8 +11,11 @@ const app  = express();
 const port = process.env.PORT || 3000;
 
 // ——— Initialize Firebase Admin SDK —————————————————————————
-// Put your service account JSON at ./secrets/firebase-sa.json (never commit this file!)
-const serviceAccount = require("./secrets/firebase-sa.json");
+// Read service account from base64 env variable
+const serviceAccount = JSON.parse(
+  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf-8")
+);
+
 adminSDK.initializeApp({
   credential: adminSDK.credential.cert(serviceAccount),
   databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
@@ -31,7 +34,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // ——— Log visitor ———————————————————————————————————————
-// Frontend calls this instead of using Firebase client.
 app.post("/api/logVisitor", (req, res) => {
   const ip        = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown";
   const userAgent = req.headers["user-agent"] || "Unknown";

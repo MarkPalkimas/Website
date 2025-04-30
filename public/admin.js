@@ -16,39 +16,32 @@ const tbody = document.getElementById("visits");
 
 const q = query(ref(db, "visits"), orderByChild("ts"));
 onValue(q, snap => {
-  const byIp = new Map();       // ip → aggregate record
+  const byIp = new Map(); // ip → aggregate
 
   snap.forEach(c => {
     const {
       page="index", ip="?", location="—", provider="—",
       lat=null, lon=null, ts=0
     } = c.val();
-
     const device = page === "mobile" ? "mobile" : "desktop";
 
     if (!byIp.has(ip)) {
-      byIp.set(ip,{
-        latestTs: ts, count: 1, device,
-        location, provider, lat, lon
-      });
+      byIp.set(ip,{ latestTs:ts,count:1,device,location,provider,lat,lon });
     } else {
       const r = byIp.get(ip);
       r.count += 1;
-      if (ts > r.latestTs) {
-        Object.assign(r,{ latestTs:ts, device, location, provider, lat, lon });
-      }
+      if (ts > r.latestTs) Object.assign(r,{ latestTs:ts,device,location,provider,lat,lon });
     }
   });
 
   const rows = Array.from(byIp.entries())
-                    .map(([ip,r]) => ({ ip, ...r }))
+                    .map(([ip,d])=>({ ip, ...d }))
                     .sort((a,b) => b.latestTs - a.latestTs);
 
   tbody.innerHTML = "";
   for (const r of rows) {
-    /* turn IP into a map link only when coords exist */
-    const ipCell = (r.lat !== null && r.lon !== null)
-      ? `<a href="https://maps.google.com/?q=${r.lat},${r.lon}"
+    const ipCell = (r.lat!==null && r.lon!==null)
+      ? `<a class="ip-link" href="https://maps.google.com/?q=${r.lat},${r.lon}"
             target="_blank" rel="noopener">${r.ip}</a>`
       : r.ip;
 

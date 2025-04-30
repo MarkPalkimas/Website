@@ -1,5 +1,5 @@
 /* public/logger.js
- * Logs { page, ip, location, provider, ts } ➜ /visits
+ * Logs { page, ip, location, provider, lat (number), lon (number), ts }.
  */
 
 import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -29,30 +29,38 @@ async function getIp () {
   } catch { return "?"; }
 }
 
-/* geo + provider */
+/* geo + provider + coords (numbers or null) */
 async function getInfo (ip) {
-  if (ip === "?") return { location:"—", provider:"—" };
+  if (ip === "?") return { location:"—", provider:"—", lat:null, lon:null };
+
   try {
-    const r    = await fetch(`https://ipapi.co/${ip}/json/`);
-    const d    = await r.json();
-    if (d.error) return { location:"—", provider:"—" };
+    const r = await fetch(`https://ipapi.co/${ip}/json/`);   // <— full payload
+    const d = await r.json();
+    if (d.error) throw new Error(d.reason || "ipapi error");
 
     const locParts = [d.city, d.region, d.country_name].filter(Boolean);
+    const latNum   = d.latitude  !== undefined ? Number(d.latitude)  : null;
+    const lonNum   = d.longitude !== undefined ? Number(d.longitude) : null;
+
     return {
       location : locParts.join(", ") || d.country_name || "—",
-      provider : d.org || d.asn || "—"
+      provider : d.org || d.asn || "—",
+      lat      : isFinite(latNum) ? latNum : null,
+      lon      : isFinite(lonNum) ? lonNum : null
     };
-  } catch { return { location:"—", provider:"—" }; }
+  } catch {
+    return { location:"—", provider:"—", lat:null, lon:null };
+  }
 }
 
-/* write one visit */
+/* write a visit */
 export async function logVisit (page) {
   const ip         = await getIp();
-  const { location, provider } = await getInfo(ip);
+  const info       = await getInfo(ip);
   await set(push(ref(db, "visits")), {
-    page, ip, location, provider, ts: serverTimestamp()
+    page, ip, ...info, ts: serverTimestamp()
   });
 }
 
-/* auto-log */
+/* auto-log immediately */
 logVisit(document.body.dataset.page || "unknown");

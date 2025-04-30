@@ -5,74 +5,76 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Admin Dashboard - Mark Palkimas</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #e0e0e0;
-      overflow-x: hidden;
-      padding-bottom: 2rem;
-    }
-    header {
-      background: #1f1f1f;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffcc00;
-    }
-    header a.logout {
-      color: #e0e0e0;
-      text-decoration: none;
-      font-size: 1.1rem;
-    }
-    header a.logout:hover { color: #ffcc00; }
-    .container { padding: 2rem; }
-    .card {
-      background: #1f1f1f;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-    .card h2 { margin-bottom: .5rem; }
-    .pulse {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: #ffcc00;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-      margin-left: .5rem;
-    }
-    @keyframes pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
-      70%  { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #222;
-      color: #e0e0e0;
-      margin-top: 1rem;
-    }
-    table th, table td {
-      padding: .5rem;
-      text-align: left;
-      border: 1px solid #333;
-    }
+    /* (same styles as before) */
   </style>
+  <!-- RTDB client SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      get
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // 1) Init your Firebase client for RTDB
+    const app = initializeApp({
+      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
+      authDomain: "mark-palkimas-visits.firebaseapp.com",
+      databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
+    });
+    const db = getDatabase(app);
+
+    // 2) Fetch, group, and render
+    async function loadLogs() {
+      const snap = await get(ref(db, 'visitors'));
+      const data = snap.val() || {};
+      const grouped = {};
+      Object.values(data).forEach(d => {
+        const ip = d.ip || 'Unknown';
+        const city = (d.location && (d.location.city || d.location.country_name)) || 'Unknown';
+        const prov = (d.location && (d.location.org || d.location.isp)) || 'Unknown';
+        const dev = d.deviceType || 'Unknown';
+        const ts = d.timestamp || 0;
+
+        if (!grouped[ip]) {
+          grouped[ip] = { ip, count:0, latest: ts, city, prov, dev };
+        }
+        grouped[ip].count++;
+        if (ts > grouped[ip].latest) grouped[ip].latest = ts;
+      });
+
+      const rows = Object.values(grouped)
+        .sort((a,b)=> b.latest - a.latest);
+      
+      // render
+      const tbody = document.querySelector('#visitor-logs tbody');
+      tbody.innerHTML = '';
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#888;">No visits yet</td></tr>`;
+        return;
+      }
+      rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(r.latest).toLocaleString()}</td>
+          <td>${r.ip}</td>
+          <td>${r.city}</td>
+          <td>${r.prov}</td>
+          <td>${r.dev}</td>
+          <td>${r.count}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadLogs();
+      setInterval(loadLogs, 15000);
+    });
+  </script>
 </head>
 <body>
-  <header>
-    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
-    <a href="index.html" class="logout">⟵ Back to Site</a>
-  </header>
+  <header>…</header>
   <div class="container">
     <div class="card">
       <h2>Visitor Logs</h2>
@@ -88,102 +90,10 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Populated by script -->
+          <tr><td colspan="6" style="text-align:center;color:#888;">Loading…</td></tr>
         </tbody>
       </table>
     </div>
   </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-    // 1) Init Firebase
-    const app = initializeApp({
-      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
-      authDomain: "mark-palkimas-visits.firebaseapp.com",
-      projectId: "mark-palkimas-visits"
-    });
-    const db = getFirestore(app);
-
-    // 2) Fetch and group logs
-    async function getLogsGroupedByIP() {
-      const snap = await getDocs(collection(db, "visitors"));
-      console.log("[admin.html] raw snapshot size:", snap.size);
-
-      const grouped = {};
-      snap.forEach(doc => {
-        const d = doc.data();
-        const ip = d.ip || "Unknown";
-        const loc = d.location || {};
-        const city =
-          loc.city ||
-          loc.region ||
-          loc.country_name ||
-          loc.country ||
-          "Unknown";
-        const provider = loc.org || loc.isp || "Unknown";
-        const device = d.deviceType || "Unknown";
-        const ts = d.timestamp || "1970-01-01T00:00:00Z";
-
-        if (!grouped[ip]) {
-          grouped[ip] = {
-            ip,
-            count: 0,
-            latest: ts,
-            city,
-            provider,
-            device
-          };
-        }
-        grouped[ip].count++;
-        if (new Date(ts) > new Date(grouped[ip].latest)) {
-          grouped[ip].latest = ts;
-        }
-      });
-
-      const arr = Object.values(grouped).sort(
-        (a, b) => new Date(b.latest) - new Date(a.latest)
-      );
-      console.log("[admin.html] Logs loaded:", arr);
-      return arr;
-    }
-
-    // 3) Render into table
-    function populateTable(logs) {
-      const tbody = document.querySelector("#visitor-logs tbody");
-      tbody.innerHTML = "";
-      logs.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${new Date(r.latest).toLocaleString()}</td>
-          <td>${r.ip}</td>
-          <td>${r.city}</td>
-          <td>${r.provider}</td>
-          <td>${r.device}</td>
-          <td>${r.count}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // 4) Kick it off
-    document.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const logs = await getLogsGroupedByIP();
-        populateTable(logs);
-        // refresh every 15s
-        setInterval(async () => {
-          populateTable(await getLogsGroupedByIP());
-        }, 15000);
-      } catch (e) {
-        console.error("Failed to load visitor logs:", e);
-      }
-    });
-  </script>
 </body>
 </html>

@@ -1,14 +1,16 @@
 {
-  "name": "mark-palkimas-website",
-  "version": "1.0.0",
-  "description": "Mark Palkimas personal website with server-side visitor logging.",
+  "name": "ip-logger-flat",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^4.18.2",
-    "firebase-admin": "^11.10.1"
+    "cors": "^2.8.5",
+    "firebase-admin": "^11.9.0",
+    "node-fetch": "^3.3.2",
+    "request-ip": "^3.3.0",
+    "express-useragent": "^1.0.17"
   }
 }

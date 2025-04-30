@@ -1,5 +1,5 @@
 /* public/logger.js
- * Logs { page, ip, location, provider, lat, lon, ts } ➜ /visits
+ * Logs { page, ip, location, provider, ts } ➜ /visits
  */
 
 import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -29,32 +29,28 @@ async function getIp () {
   } catch { return "?"; }
 }
 
-/* geo + provider + coords */
+/* geo + provider */
 async function getInfo (ip) {
-  if (ip === "?") return { location:"—", provider:"—", lat:null, lon:null };
+  if (ip === "?") return { location:"—", provider:"—" };
   try {
-    const r = await fetch(`https://ipapi.co/${ip}/json/`);
-    const d = await r.json();
-    if (d.error) return { location:"—", provider:"—", lat:null, lon:null };
+    const r    = await fetch(`https://ipapi.co/${ip}/json/`);
+    const d    = await r.json();
+    if (d.error) return { location:"—", provider:"—" };
 
     const locParts = [d.city, d.region, d.country_name].filter(Boolean);
     return {
       location : locParts.join(", ") || d.country_name || "—",
-      provider : d.org || d.asn || "—",
-      lat      : d.latitude  ?? null,
-      lon      : d.longitude ?? null
+      provider : d.org || d.asn || "—"
     };
-  } catch {
-    return { location:"—", provider:"—", lat:null, lon:null };
-  }
+  } catch { return { location:"—", provider:"—" }; }
 }
 
-/* write visit */
+/* write one visit */
 export async function logVisit (page) {
   const ip         = await getIp();
-  const info       = await getInfo(ip);
+  const { location, provider } = await getInfo(ip);
   await set(push(ref(db, "visits")), {
-    page, ip, ...info, ts: serverTimestamp()
+    page, ip, location, provider, ts: serverTimestamp()
   });
 }
 

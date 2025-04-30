@@ -15,24 +15,25 @@ app.use(useragent.express());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files
+// 1) Serve your static site:
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Load and decode Firebase Admin credentials
+// 2) Decode your Base64‐encoded service account JSON:
 const serviceAccount = JSON.parse(
   Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8')
 );
 
+// 3) Initialize Admin SDK—**no databaseURL**, so Firestore is the default:
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
 const db = admin.firestore();
 
-// Log visit
+// 4) Log visits into Firestore:
 app.post('/log-visit', async (req, res) => {
   const ip = requestIp.getClientIp(req);
   const ua = req.useragent;
@@ -42,12 +43,12 @@ app.post('/log-visit', async (req, res) => {
   try {
     const geo = await fetch(`https://ipapi.co/${ip}/json/`);
     location = await geo.json();
-  } catch (err) {
-    location = { error: 'Geo lookup failed', detail: err.message };
+  } catch {
+    location = { error: 'Geo lookup failed' };
   }
 
   try {
-    console.log("Logging visit from", ip); // ✅ Debug log
+    console.log("📥 Writing visit to Firestore:", ip);
     await db.collection("visitors").add({
       ip,
       userAgent: ua.source,
@@ -55,13 +56,13 @@ app.post('/log-visit', async (req, res) => {
       location,
       timestamp: new Date().toISOString()
     });
-
-    res.json({ status: "logged", ip, deviceType, location });
+    res.json({ status: "logged" });
   } catch (err) {
-    console.error("Error logging visit:", err);
-    res.status(500).json({ status: "error", message: "Failed to log visit", error: err.message });
+    console.error("❌ Firestore write failed:", err);
+    res.status(500).json({ status: "error" });
   }
 });
 
+// 5) Start the server:
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

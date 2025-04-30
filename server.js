@@ -1,53 +1,47 @@
-const path = require("path");
-const express = require("express");
-const cors = require("cors");
-const adminSDK = require("firebase-admin");
+import express from 'express';
+import cors from 'cors';
+import admin from 'firebase-admin';
+import fetch from 'node-fetch';
+import requestIp from 'request-ip';
+import useragent from 'express-useragent';
 
 const app = express();
-const port = process.env.PORT || 3000;
-
-const serviceAccount = JSON.parse(
-  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf8")
-);
-adminSDK.initializeApp({
-  credential: adminSDK.credential.cert(serviceAccount),
-  databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
-});
-const dbRef = adminSDK.database().ref("visits");
-
-// ——— Middleware ————————————————————————————————————————
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(useragent.express());
 
-// ——— Log visitor —————————————————————————————————————————
-app.post("/api/logVisitor", (req, res) => {
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown";
-  const userAgent = req.headers["user-agent"] || "Unknown";
-  const timestamp = Date.now();
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
-  dbRef.push({ ip, userAgent, timestamp })
-    .then(() => res.json({ message: "Logged successfully" }))
-    .catch(err => res.status(500).json({ error: err.message }));
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
 });
 
-// ——— Return raw visitor logs ———————————————————————————
-app.get("/api/getVisitorLogs", async (req, res) => {
-  const snapshot = await dbRef.once("value");
-  const raw = snapshot.val() || {};
+const db = admin.firestore();
 
-  const logs = Object.entries(raw).map(([_, { ip, userAgent, timestamp }]) => ({
+app.post('/log-visit', async (req, res) => {
+  const ip = requestIp.getClientIp(req);
+  const ua = req.useragent;
+  const deviceType = ua.isMobile ? 'Mobile' : 'Desktop';
+
+  let location = {};
+  try {
+    const geo = await fetch(`https://ipapi.co/${ip}/json/`);
+    location = await geo.json();
+  } catch {
+    location.error = 'Geo lookup failed';
+  }
+
+  await db.collection("visitors").add({
     ip,
-    userAgent,
-    timestamp
-  }));
+    userAgent: ua.source,
+    deviceType,
+    location,
+    timestamp: new Date().toISOString()
+  });
 
-  // Sort by latest first
-  logs.sort((a, b) => b.timestamp - a.timestamp);
-  res.json(logs);
+  res.json({ status: "logged" });
 });
 
-// ——— Start server ——————————————————————————————————————
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

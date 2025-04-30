@@ -21,48 +21,47 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 2) Decode your Base64‐encoded service account JSON:
-const serviceAccount = JSON.parse(
-  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8')
-);
+// 2) Decode Base64 service account JSON from Render:
+const serviceAccountJson = Buffer
+  .from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64')
+  .toString('utf-8');
+const serviceAccount = JSON.parse(serviceAccountJson);
 
-// 3) Initialize Admin SDK—**no databaseURL**, so Firestore is the default:
+// 3) Initialize Admin SDK (Firestore only):
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-
 const db = admin.firestore();
 
-// 4) Log visits into Firestore:
+// 4) Log visits to Firestore:
 app.post('/log-visit', async (req, res) => {
-  const ip = requestIp.getClientIp(req);
-  const ua = req.useragent;
+  const ip = requestIp.getClientIp(req) || 'unknown';
+  const ua = req.useragent || {};
   const deviceType = ua.isMobile ? 'Mobile' : 'Desktop';
 
   let location = {};
   try {
-    const geo = await fetch(`https://ipapi.co/${ip}/json/`);
-    location = await geo.json();
+    const r = await fetch(`https://ipapi.co/${ip}/json/`);
+    location = await r.json();
   } catch {
     location = { error: 'Geo lookup failed' };
   }
 
   try {
-    console.log("📥 Writing visit to Firestore:", ip);
-    await db.collection("visitors").add({
+    await db.collection('visitors').add({
       ip,
-      userAgent: ua.source,
       deviceType,
+      userAgent: ua.source || 'unknown',
       location,
       timestamp: new Date().toISOString()
     });
-    res.json({ status: "logged" });
+    res.json({ status: 'logged' });
   } catch (err) {
-    console.error("❌ Firestore write failed:", err);
-    res.status(500).json({ status: "error" });
+    console.error('Firestore write failed:', err);
+    res.status(500).json({ status: 'error' });
   }
 });
 
-// 5) Start the server:
+// 5) Start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

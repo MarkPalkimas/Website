@@ -1,4 +1,3 @@
-
 // public/main.js
 document.addEventListener("DOMContentLoaded", function () {
   // --- Neon Glow & Pulse-on-Click Setup ---

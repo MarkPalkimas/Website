@@ -59,7 +59,6 @@
     <div class="logo">Admin Dashboard <span class="pulse"></span></div>
     <a href="index.html" class="logout">⟵ Back to Site</a>
   </header>
-
   <div class="container">
     <div class="card">
       <h2>Visitor Logs</h2>
@@ -68,7 +67,7 @@
           <tr>
             <th>Latest Visit</th>
             <th>IP Address</th>
-            <th>User Agent / Location</th>
+            <th>Location</th>
             <th>Count</th>
           </tr>
         </thead>
@@ -78,57 +77,18 @@
       </table>
     </div>
   </div>
-
   <script>
-    // 1. LocalStorage-based logs (old code)
-    function getLocalLogs() {
-      const obj = JSON.parse(localStorage.getItem("visitorLogs") || "{}");
+    function getLogs() {
+      const obj = JSON.parse(localStorage.getItem("visitorLogs")||"{}");
       return Object.entries(obj)
-        .map(([ip, d]) => ({
-          ip,
-          location: d.location || d.userAgent || '—',
-          count: d.count || 1,
-          latestTime: d.latestTime
-        }));
+        .map(([ip,d]) => ({ ip, ...d }))
+        .sort((a,b)=> new Date(b.latestTime)-new Date(a.latestTime));
     }
 
-    // 2. Fetch from new server API
-    async function getServerLogs() {
-      try {
-        const res = await fetch('/api/getVisitorLogs');
-        if (!res.ok) throw new Error(res.statusText);
-        const logs = await res.json();
-        return logs.map(log => ({
-          latestTime: log.timestamp,
-          ip: log.ip,
-          location: log.userAgent || '—',
-          count: 1
-        }));
-      } catch (err) {
-        console.error("Failed to fetch server logs:", err);
-        return [];
-      }
-    }
-
-    // 3. Unified loader
-    async function loadLogs() {
-      let entries = [];
-      if (localStorage.getItem("visitorLogs")) {
-        entries = getLocalLogs();
-      } else {
-        entries = await getServerLogs();
-      }
-      // sort descending by date
-      entries.sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
-      return entries;
-    }
-
-    // 4. Render table
-    async function populateTable() {
+    function populateTable() {
       const tbody = document.querySelector("#visitor-logs tbody");
       tbody.innerHTML = "";
-      const logs = await loadLogs();
-      logs.forEach(({ ip, location, count, latestTime }) => {
+      getLogs().forEach(({ ip, location, count, latestTime }) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${new Date(latestTime).toLocaleString()}</td>
@@ -142,7 +102,6 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       populateTable();
-      // refresh every 10s
       setInterval(populateTable, 10000);
     });
   </script>

@@ -2,6 +2,7 @@
  * Logs { page, ip, location, ts } to Realtime DB  ➜  /visits
  * Add once per page: <script type="module" src="./logger.js"></script>
  * Put data-page="index" or "mobile" on <body>.
+ WORKING
  */
 
 import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";

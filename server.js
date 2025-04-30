@@ -15,25 +15,23 @@ app.use(useragent.express());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 1) Serve your static site:
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
-// 2) Decode Base64 service account JSON from Render:
-const serviceAccountJson = Buffer
-  .from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64')
-  .toString('utf-8');
-const serviceAccount = JSON.parse(serviceAccountJson);
+// Decode and parse your base64 service account JSON
+const serviceAccount = JSON.parse(
+  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8')
+);
 
-// 3) Initialize Admin SDK (Firestore only):
+// Initialize Admin SDK for **Realtime Database**
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
 });
-const db = admin.firestore();
 
-// 4) Log visits to Firestore:
+const db = admin.database();
+
+// Log visit
 app.post('/log-visit', async (req, res) => {
   const ip = requestIp.getClientIp(req) || 'unknown';
   const ua = req.useragent || {};
@@ -48,20 +46,20 @@ app.post('/log-visit', async (req, res) => {
   }
 
   try {
-    await db.collection('visitors').add({
+    // Push a new visitor record
+    await db.ref('visitors').push({
       ip,
+      userAgent: ua.source || '',
       deviceType,
-      userAgent: ua.source || 'unknown',
       location,
-      timestamp: new Date().toISOString()
+      timestamp: Date.now()
     });
     res.json({ status: 'logged' });
   } catch (err) {
-    console.error('Firestore write failed:', err);
+    console.error('RTDB write failed:', err);
     res.status(500).json({ status: 'error' });
   }
 });
 
-// 5) Start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

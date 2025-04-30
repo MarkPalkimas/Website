@@ -6,17 +6,43 @@
   <title>Admin Dashboard – Mark Palkimas</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',sans-serif;background:#121212;color:#e0e0e0;padding-bottom:2rem}
-    header{background:#1f1f1f;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+    body{
+      font-family:'Segoe UI',sans-serif;
+      background:#121212;
+      color:#e0e0e0;
+      padding-bottom:2rem;
+    }
+    header{
+      background:#1f1f1f;
+      padding:1rem 2rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
     header .logo{font-size:1.5rem;font-weight:bold;color:#ffcc00}
     header a{color:#e0e0e0;text-decoration:none;font-size:1.1rem}
     header a:hover{color:#ffcc00}
-    .pulse{display:inline-block;width:10px;height:10px;background:#ffcc00;border-radius:50%;animation:pulse 2s infinite;margin-left:.5rem}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,204,0,.7)}70%{box-shadow:0 0 0 10px rgba(255,204,0,0)}100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}}
+    .pulse{
+      display:inline-block;width:10px;height:10px;
+      background:#ffcc00;border-radius:50%;
+      animation:pulse 2s infinite;margin-left:.5rem;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(255,204,0,.7)}
+      70%{box-shadow:0 0 0 10px rgba(255,204,0,0)}
+      100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}
+    }
     .container{padding:2rem}
-    .card{background:#1f1f1f;border-radius:8px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.5)}
-    table{width:100%;border-collapse:collapse;background:#222;margin-top:1rem}
+    .card{
+      background:#1f1f1f;border-radius:8px;
+      padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.5);
+    }
+    table{
+      width:100%;border-collapse:collapse;
+      background:#222;margin-top:1rem;
+    }
     th,td{padding:.6rem;border:1px solid #333;text-align:left}
+    th{white-space:nowrap}
   </style>
 </head>
 <body>
@@ -31,11 +57,12 @@
       <table>
         <thead>
           <tr>
-            <th>IP Address</th>
+            <th>IP&nbsp;Address<br>(click ⇢ maps)</th>
             <th>Device</th>
+            <th>Provider</th>
             <th>Location</th>
-            <th>Latest Visit</th>
-            <th>Visits</th>   <!-- count — last column -->
+            <th>Latest&nbsp;Visit</th>
+            <th>Visits</th>
           </tr>
         </thead>
         <tbody id="visits"></tbody>

@@ -2,82 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Mark Palkimas</title>
+  <link rel="stylesheet" href="app.css" />
   <style>
-    /* (same styles as before) */
+    /* Any admin-specific overrides */
+    .admin-card { max-width: 900px; margin: 2rem auto; }
+    /* Preserve your existing table styles… */
+    table { background: #222; color: #e0e0e0; width:100%; }
+    th, td { padding:.5rem; border:1px solid #333; }
   </style>
-  <!-- RTDB client SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import {
-      getDatabase,
-      ref,
-      get
-    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-    // 1) Init your Firebase client for RTDB
-    const app = initializeApp({
-      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
-      authDomain: "mark-palkimas-visits.firebaseapp.com",
-      databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com"
-    });
-    const db = getDatabase(app);
-
-    // 2) Fetch, group, and render
-    async function loadLogs() {
-      const snap = await get(ref(db, 'visitors'));
-      const data = snap.val() || {};
-      const grouped = {};
-      Object.values(data).forEach(d => {
-        const ip = d.ip || 'Unknown';
-        const city = (d.location && (d.location.city || d.location.country_name)) || 'Unknown';
-        const prov = (d.location && (d.location.org || d.location.isp)) || 'Unknown';
-        const dev = d.deviceType || 'Unknown';
-        const ts = d.timestamp || 0;
-
-        if (!grouped[ip]) {
-          grouped[ip] = { ip, count:0, latest: ts, city, prov, dev };
-        }
-        grouped[ip].count++;
-        if (ts > grouped[ip].latest) grouped[ip].latest = ts;
-      });
-
-      const rows = Object.values(grouped)
-        .sort((a,b)=> b.latest - a.latest);
-      
-      // render
-      const tbody = document.querySelector('#visitor-logs tbody');
-      tbody.innerHTML = '';
-      if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#888;">No visits yet</td></tr>`;
-        return;
-      }
-      rows.forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${new Date(r.latest).toLocaleString()}</td>
-          <td>${r.ip}</td>
-          <td>${r.city}</td>
-          <td>${r.prov}</td>
-          <td>${r.dev}</td>
-          <td>${r.count}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadLogs();
-      setInterval(loadLogs, 15000);
-    });
-  </script>
 </head>
 <body>
-  <header>…</header>
-  <div class="container">
-    <div class="card">
-      <h2>Visitor Logs</h2>
+  <!-- your existing neon container, dimmer, popups… -->
+  <div id="neon-container"></div>
+  <div class="dimmed"></div>
+  <div id="quote-container"></div>
+
+  <!-- Reuse your site’s header/nav -->
+  <header class="header">
+    <div class="nav-bar">
+      <div class="logo">Mark Palkimas</div>
+      <ul class="nav-links">
+        <li><a href="#about" class="about-link">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="index.html" class="logout">⟵ Back to Site</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main content: first the admin card, then the rest of your content -->
+  <main class="content">
+    <!-- Admin Dashboard Card -->
+    <div class="card admin-card">
+      <h2>Visitor Logs <span class="pulse"></span></h2>
       <table id="visitor-logs">
         <thead>
           <tr>
@@ -90,10 +48,89 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="6" style="text-align:center;color:#888;">Loading…</td></tr>
+          <tr><td colspan="6" style="text-align:center;color:#888;">No visits yet</td></tr>
         </tbody>
       </table>
     </div>
-  </div>
+
+    <!-- (Optionally) the rest of your normal homepage sections… -->
+    <!-- e.g. your About, Portfolio, etc. -->
+  </main>
+
+  <!-- Reuse your footer -->
+  <footer class="footer">
+    <p>Contact Me</p>
+    <div class="social-links">…</div>
+    <div class="footer-bottom">
+      <button class="gravity-btn">Drop Ball</button>
+      <button class="reset-btn">Reset</button>
+      <p class="copyright">© 2024 Mark Palkimas</p>
+    </div>
+  </footer>
+
+  <!-- your main.js, popups, physics, quotes scripts -->
+  <script src="main.js"></script>
+
+  <!-- Admin page Firestore/RTDB loader -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const app = initializeApp({
+      apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
+      authDomain: "mark-palkimas-visits.firebaseapp.com",
+      projectId: "mark-palkimas-visits"
+    });
+    const db = getFirestore(app);
+
+    async function getLogs() {
+      const snap = await getDocs(collection(db, "visitors"));
+      const grouped = {};
+      snap.forEach(doc => {
+        const d = doc.data();
+        const ip = d.ip || "Unknown";
+        const city = d.location?.city || d.location?.country_name || "Unknown";
+        const prov = d.location?.org || "Unknown";
+        const dev = d.deviceType || "Unknown";
+        const ts = d.timestamp || "1970-01-01T00:00:00Z";
+        if (!grouped[ip]) grouped[ip] = { ip, count:0, latest:ts, city, prov, dev };
+        grouped[ip].count++;
+        if (new Date(ts) > new Date(grouped[ip].latest)) grouped[ip].latest = ts;
+      });
+      return Object.values(grouped)
+        .sort((a,b)=>new Date(b.latest)-new Date(a.latest));
+    }
+
+    function renderLogs(rows) {
+      const tbody = document.querySelector("#visitor-logs tbody");
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">No visits yet</td></tr>';
+        return;
+      }
+      rows.forEach(r=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(r.latest).toLocaleString()}</td>
+          <td>${r.ip}</td>
+          <td>${r.city}</td>
+          <td>${r.prov}</td>
+          <td>${r.dev}</td>
+          <td>${r.count}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", async ()=>{
+      const rows = await getLogs();
+      renderLogs(rows);
+      setInterval(async()=>{
+        renderLogs(await getLogs());
+      }, 10000);
+    });
+  </script>
 </body>
 </html>

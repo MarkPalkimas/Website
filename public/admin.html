@@ -84,16 +84,13 @@
       <table id="visitor-logs">
         <thead>
           <tr>
-            <th>Latest Visit</th>
+            <th>Timestamp</th>
             <th>IP Address</th>
-            <th>Location</th>
-            <th>Provider</th>
-            <th>Device</th>
-            <th>Visits</th>
+            <th>Page</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="6" style="text-align:center;color:#888;">Loading...</td></tr>
+          <tr><td colspan="3" style="text-align:center;color:#888;">Loading...</td></tr>
         </tbody>
       </table>
     </div>
@@ -103,64 +100,48 @@
     <p>&copy; 2024 Mark Palkimas</p>
   </footer>
 
+  <!-- Firebase Realtime Database Loader -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs
-    } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    const app = initializeApp({
+    const firebaseConfig = {
       apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
       authDomain: "mark-palkimas-visits.firebaseapp.com",
-      projectId: "mark-palkimas-visits"
-    });
-    const db = getFirestore(app);
+      databaseURL: "https://mark-palkimas-visits-default-rtdb.firebaseio.com",
+      projectId: "mark-palkimas-visits",
+      appId: "1:1062485579247:web:c5b8797f515b33d5a0521a"
+    };
 
-    async function getLogs() {
-      const snap = await getDocs(collection(db, "visitors"));
-      const grouped = {};
-      snap.forEach(doc => {
-        const d = doc.data();
-        const ip = d.ip || "Unknown";
-        const city = d.location?.city || d.location?.country_name || "Unknown";
-        const prov = d.location?.org || "Unknown";
-        const dev = d.deviceType || "Unknown";
-        const ts = d.timestamp || "1970-01-01T00:00:00Z";
-        if (!grouped[ip]) grouped[ip] = { ip, count:0, latest:ts, city, prov, dev };
-        grouped[ip].count++;
-        if (new Date(ts) > new Date(grouped[ip].latest)) grouped[ip].latest = ts;
-      });
-      return Object.values(grouped)
-        .sort((a,b)=>new Date(b.latest)-new Date(a.latest));
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const visitsRef = ref(db, "visits");
 
-    function renderLogs(rows) {
+    function renderLogs(data) {
       const tbody = document.querySelector("#visitor-logs tbody");
       tbody.innerHTML = "";
-      if (!rows.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">No visits yet</td></tr>';
+
+      if (!data) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">No visits yet</td></tr>';
         return;
       }
-      rows.forEach(r=>{
+
+      const rows = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+      rows.forEach(entry => {
         const tr = document.createElement("tr");
+        const date = new Date(entry.timestamp).toLocaleString();
         tr.innerHTML = `
-          <td>${new Date(r.latest).toLocaleString()}</td>
-          <td>${r.ip}</td>
-          <td>${r.city}</td>
-          <td>${r.prov}</td>
-          <td>${r.dev}</td>
-          <td>${r.count}</td>
+          <td>${date}</td>
+          <td>${entry.ip}</td>
+          <td>${entry.page}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    document.addEventListener("DOMContentLoaded", async ()=>{
-      const rows = await getLogs();
-      renderLogs(rows);
-      setInterval(async()=>{
-        renderLogs(await getLogs());
-      }, 10000);
+    onValue(visitsRef, (snapshot) => {
+      const data = snapshot.val();
+      renderLogs(data);
     });
   </script>
 </body>

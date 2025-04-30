@@ -1,159 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Admin Dashboard - Mark Palkimas</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #e0e0e0;
-      overflow-x: hidden;
-      padding-bottom: 2rem;
-    }
-    header {
-      background: #1f1f1f;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffcc00;
-    }
-    header a.logout {
-      color: #e0e0e0;
-      text-decoration: none;
-      font-size: 1.1rem;
-    }
-    header a.logout:hover { color: #ffcc00; }
-    .container { padding: 2rem; }
-    .card {
-      background: #1f1f1f;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-    .card h2 { margin-bottom: .5rem; }
-    .pulse {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: #ffcc00;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-      margin-left: .5rem;
-    }
-    @keyframes pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
-      70%  { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #222;
-      color: #e0e0e0;
-      margin-top: 1rem;
-    }
-    table th, table td {
-      padding: .5rem;
-      text-align: left;
-      border: 1px solid #333;
-    }
-  </style>
-</head>
+<head>…</head>
 <body>
-  <header>
-    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
-    <a href="index.html" class="logout">⟵ Back to Site</a>
-  </header>
-  <div class="container">
-    <div class="card">
-      <h2>Visitor Logs</h2>
-      <table id="visitor-logs">
-        <thead>
-          <tr>
-            <th>Latest Visit</th>
-            <th>IP Address</th>
-            <th>Location</th>
-            <th>Provider</th>
-            <th>Device</th>
-            <th>Visits</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Filled by JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
+  …
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const app = initializeApp({
       apiKey: "AIzaSyDds9UCMOcaoGT753uMNcT0y9847jN0oEI",
       authDomain: "mark-palkimas-visits.firebaseapp.com",
       projectId: "mark-palkimas-visits"
-    };
-
-    const app = initializeApp(firebaseConfig);
+    });
     const db = getFirestore(app);
 
     async function getLogsGroupedByIP() {
-      const snapshot = await getDocs(collection(db, "visitors"));
+      const snap = await getDocs(collection(db, "visitors"));
+      console.log("[admin.html] raw snapshot size:", snap.size);
       const grouped = {};
-
-      snapshot.forEach(doc => {
+      snap.forEach(doc => {
         const d = doc.data();
-        const ip = d.ip || "Unknown";
-        const location = d.location || {};
-        const city = location.city || location.region || location.country_name || "Unknown";
-        const provider = location.org || location.isp || "Unknown";
-        const deviceType = d.deviceType || "Unknown";
-        const timestamp = d.timestamp || "1970-01-01T00:00:00Z";
-
-        const prev = grouped[ip] || {
-          ip,
-          count: 0,
-          latestTime: timestamp,
-          location: city,
-          provider,
-          deviceType
-        };
-
-        grouped[ip] = {
-          ...prev,
-          count: prev.count + 1,
-          latestTime: new Date(timestamp) > new Date(prev.latestTime) ? timestamp : prev.latestTime
-        };
+        // …grouping logic…
       });
-
-      return Object.values(grouped).sort((a, b) => new Date(b.latestTime) - new Date(a.latestTime));
+      const arr = Object.values(grouped)
+        .sort((a,b)=>new Date(b.latestTime)-new Date(a.latestTime));
+      console.log("[admin.html] Logs loaded:", arr);
+      return arr;
     }
 
     function populateTable(logs) {
-      const tbody = document.querySelector("#visitor-logs tbody");
-      tbody.innerHTML = "";
-      logs.forEach(log => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${new Date(log.latestTime).toLocaleString()}</td>
-          <td>${log.ip}</td>
-          <td>${log.location}</td>
-          <td>${log.provider}</td>
-          <td>${log.deviceType}</td>
-          <td>${log.count}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+      … // your existing code
     }
 
     document.addEventListener("DOMContentLoaded", async () => {

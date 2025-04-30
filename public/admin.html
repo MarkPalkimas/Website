@@ -22,7 +22,7 @@
 <body>
   <header>
     <div class="logo">Admin Dashboard <span class="pulse"></span></div>
-    <a href="index.html">⟵ Back to Site</a>
+    <a href="index.html">⟵&nbsp;Back&nbsp;to&nbsp;Site</a>
   </header>
 
   <div class="container">
@@ -30,4 +30,14 @@
       <h2>Visitor Logs</h2>
       <table>
         <thead>
-          <tr><th>Page</th><th>IP Address</th
+          <tr><th>Page</th><th>IP&nbsp;Address</th><th>Location</th><th>Date&nbsp;/&nbsp;Time</th></tr>
+        </thead>
+        <tbody id="visits"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- live Firebase feed -->
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>

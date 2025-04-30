@@ -1,3 +1,4 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,262 +6,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mark Palkimas' Personal Website</title>
   <link rel="stylesheet" href="app.css" />
-
   <script>
     // Redirect to mobile version if on a mobile device
     if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       window.location.href = "mobile.html";
     }
   </script>
-
   <style>
-    /* Global & Modern Styles */
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #1a1a1a;
-      color: #eee;
-      font-family: 'Poppins', sans-serif;
-    }
+    /* General Reset and Global Styles */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Roboto',sans-serif; scroll-behavior:smooth; }
+    html, body { height:100%; background:linear-gradient(to bottom, #ffffff,171,171,171,0.5); color:#000; font-size:16px; line-height:1.6; }
+    body { display:flex; flex-direction:column; min-height:100vh; }
+
     /* Header & Navigation */
-    .header {
-      position: relative;
-      z-index: 2;
-    }
-    .nav-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .nav-links {
-      list-style: none;
-      display: flex;
-      gap: 20px;
-    }
-    .nav-links a {
-      text-decoration: none;
-      color: #eee;
-    }
+    .header { background-color:rgba(0,0,0,0.85); padding:15px 0; width:100%; position:fixed; top:0; z-index:1000; }
+    .content { padding-top:70px; flex:1; }
+    .nav-bar { display:flex; justify-content:space-between; align-items:center; width:90%; max-width:1200px; margin:auto; }
+    .logo { font-size:24px; color:#fff; cursor:pointer; transition:color .3s; }
+    .logo:hover { color:#ffcc00; }
+    .nav-links { display:flex; list-style:none; gap:20px; }
+    .nav-links a { text-decoration:none; color:#fff; font-weight:bold; transition:color .3s; }
+    .nav-links a:hover { color:#ffcc00; }
 
-    /* Dimmed Background Overlay */
-    .dimmed {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 1005;
-      display: none;
-    }
+    /* Profile Photo */
+    .profile-photo { margin:140px 0 140px 280px; width:280px; height:380px; border-radius:50%; border:8px solid #000; cursor:pointer; transition:transform .3s,box-shadow .3s; }
+    .profile-photo:hover { box-shadow:0 0 20px #00d084; transform:scale(1.05); }
+    .intro-text { margin:280px 0 0 30px; display:inline-block; vertical-align:top; max-width:500px; }
+    .intro-text h2 { font-size:2em; color:#333; }
+    .intro-text p { font-size:1.2em; color:#555; }
 
-    /* Popups Container – ensures popups are above the overlay */
-    #popups-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2000;
-      pointer-events: none;
-    }
-
-    /* Common Popup Styles */
-    .popup {
-      display: none;
-      pointer-events: auto;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 600px;
-      width: 90%;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 30px;
-    }
-
-    /* About Popup */
-    .about-popup {
-      background: #fff;
-      color: #333;
-    }
-    .about-popup .about-popup-content {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .about-popup .about-image img {
-      width: 200px;
-      border-radius: 8px;
-    }
-    .about-popup .about-text {
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    /* Social (Contacts) Popup */
-    .social-popup {
-      background: linear-gradient(135deg, #ffffff, #f0f0f0);
-      color: #333;
-      text-align: center;
-    }
-    .social-popup .social-popup-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-      width: 100%;
-    }
-    .popup-social-links {
-      display: flex;
-      width: 100%;
-      justify-content: space-evenly;
-      align-items: center;
-    }
-    .popup-social-links img {
-      width: 50px;
-      height: 50px;
-      display: block;
-      margin: 0 auto;
-    }
-
-    /* Admin Popup */
-    .admin-popup {
-      background: #f9f9f9;
-      color: #333;
-      text-align: center;
-    }
-    .admin-popup .admin-popup-content input {
-      width: 80%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    .admin-popup .admin-popup-content button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-    }
-    .admin-popup .admin-popup-content #admin-error {
-      color: red;
-      margin-bottom: 10px;
-      font-size: 14px;
-      display: none;
-    }
+    /* Popups */
+    .about-popup, .social-popup, .admin-popup { display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); border-radius:8px; padding:30px; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+    .about-popup { background:#fff; color:#333; }
+    .social-popup { background:linear-gradient(135deg,#fff,#f0f0f0); color:#333; text-align:center; }
+    .admin-popup { background:#f9f9f9; color:#333; text-align:center; }
+    .dimmed { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1005; }
 
     /* Footer */
-    .footer {
-      background-color: #222;
-      padding: 20px;
-      text-align: center;
-      position: relative;
-      z-index: 2;
-    }
-    .footer p {
-      margin: 0;
-    }
-    .social-links img {
-      width: 40px;
-      height: 40px;
-      margin: 0 10px;
-    }
+    .footer { background-color:rgba(171,171,171,0.5); padding:15px 0; text-align:center; width:100%; }
+    .social-links { display:flex; justify-content:center; gap:20px; margin-bottom:0; }
+    .social-links img { width:36px; height:36px; transition:transform .3s,filter .3s; }
+    .social-links img:hover { transform:scale(1.2); filter:brightness(1.2); }
+    .footer-bottom { display:flex; justify-content:center; align-items:center; gap:10px; padding-top:15px; flex-wrap:wrap; }
+    .gravity-btn, .admin-btn { padding:10px 20px; cursor:pointer; background-color:#0073e6; color:#fff; border:none; border-radius:5px; transition:background-color .3s; }
+    .gravity-btn:hover, .admin-btn:hover { background-color:#005bb5; }
+    .reset-btn { display:none; position:fixed; bottom:20px; left:20px; z-index:1020; background-color:#ff2222; color:#fff; padding:10px 20px; font-size:20px; border:none; border-radius:5px; }
+    .reset-btn:hover { background-color:#c21010; }
 
-    /* Reset Button */
-    .reset-btn {
-      display: none;
-      background-color: #ff2222;
-      color: white;
-      padding: 10px 20px;
-      font-size: 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1020;
-    }
-    .reset-btn:hover {
-      background-color: #c21010;
-    }
-
-    /* Neon Glow Effect – the orb follows the cursor */
-    #neon-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -2;
-      transition: background 2s ease;
-    }
-
-    /* Content */
-    .content {
-      position: relative;
-      z-index: 2;
-      padding: 40px;
-    }
-    .section {
-      margin-bottom: 60px;
-    }
-    .profile-photo {
-      max-width: 100%;
-      border-radius: 50%;
-      transition: box-shadow 0.3s, transform 0.3s;
-      cursor: pointer;
-    }
-    .profile-photo:hover {
-      box-shadow: 0 0 20px #00d084;
-      transform: scale(1.05);
-    }
+    /* Neon & Balls */
+    #neon-container { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-2; transition:background 2s ease; }
+    .ball { position:absolute; border-radius:50%; box-shadow:0 0 10px rgba(255,255,255,0.8); pointer-events:none; z-index:1000; }
 
     /* Falling Quotes */
-    #quote-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .falling-quote {
-      position: absolute;
-      font-size: 1.5rem;
-      color: rgba(255, 255, 255, 0.8);
-      white-space: nowrap;
-      transition: transform 0.3s;
-    }
-    @keyframes fall {
-      from { top: -50px; }
-      to { top: 110vh; }
-    }
-
-    /* Ball style */
-    .ball {
-      position: absolute;
-      border-radius: 50%;
-      z-index: 1000;
-      pointer-events: none;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    }
+    #quote-container { position:fixed; top:0; left:0; width:100%; height:100vh; overflow:hidden; pointer-events:none; z-index:1; }
+    .falling-quote { position:absolute; white-space:nowrap; font-size:1.5rem; color:rgba(255,255,255,0.9); animation:fall 20s linear forwards; }
+    @keyframes fall { from{top:-50px;} to{top:100vh;} }
   </style>
 </head>
 <body>
   <!-- Neon Glow Container -->
   <div id="neon-container"></div>
-
-  <!-- Dimming Overlay -->
+  <!-- Dimmed Overlay -->
   <div class="dimmed"></div>
-
   <!-- Quote Container -->
   <div id="quote-container"></div>
 
@@ -283,7 +90,7 @@
       </div>
     </section>
     <section id="portfolio" class="section">
-      <!-- Portfolio content goes here -->
+      <!-- Portfolio content -->
     </section>
   </main>
 
@@ -305,17 +112,12 @@
 
   <!-- Popups Container -->
   <div id="popups-container">
-    <!-- About Popup -->
     <div class="popup about-popup" id="about-popup">
       <div class="about-popup-content">
         <div class="about-image"><img src="assets/profile.jpg" alt="Profile Image" /></div>
-        <div class="about-text">
-          <h2>About Me</h2>
-          <p>I'm Mark Palkimas, an ambitious student with a passion for technology and innovation.</p>
-        </div>
+        <div class="about-text"><h2>About Me</h2><p>I'm Mark Palkimas, an ambitious student with a passion for technology and innovation.</p></div>
       </div>
     </div>
-    <!-- Contacts Popup -->
     <div class="popup social-popup" id="contact-popup">
       <div class="social-popup-content">
         <h2>Contact Links</h2>
@@ -328,57 +130,40 @@
         </div>
       </div>
     </div>
-    <!-- Admin Popup -->
     <div class="popup admin-popup" id="admin-popup">
       <div class="admin-popup-content">
         <h2>Admin Sign In</h2>
         <p id="admin-error">Wrong password</p>
         <input type="password" id="admin-password" placeholder="Password" />
-        <button id="toggle-password">Show</button><br />
+        <button id="toggle-password">Show</button><br/>
         <button id="submit-password">Submit</button>
         <button id="cancel-password">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Reset Button -->
   <button class="reset-btn">Reset</button>
 
-  <!-- Firebase & Env Config -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID,
-      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-
-    fetch('https://api.ipify.org?format=json')
-      .then(res => res.json())
-      .then(({ ip }) => {
-        const db = getDatabase(app);
-        const visitsRef = ref(db, 'visits');
-        push(visitsRef, {
-          ip,
-          timestamp: Date.now(),
-          page: window.location.pathname
-        });
+  <!-- Visitor‐Logging via ipapi.co -->
+  <script>
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        const ip       = data.ip;
+        const loc      = `${data.city}, ${data.region}, ${data.country_name}`;
+        const now      = new Date().toISOString();
+        const logs     = JSON.parse(localStorage.getItem('visitorLogs')||'{}');
+        if (!logs[ip]) {
+          logs[ip] = { firstSeen:now, lastSeen:now, visits:1, location:loc };
+        } else {
+          logs[ip].visits++;
+          logs[ip].lastSeen = now;
+        }
+        localStorage.setItem('visitorLogs', JSON.stringify(logs));
       })
-      .catch(err => console.error('IP fetch failed', err));
+      .catch(console.error);
   </script>
 
-  <!-- Your main.js (neon, popups, balls, physics, encryptPassword) -->
-  <script type="module" src="main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>

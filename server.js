@@ -1,17 +1,49 @@
+// server.js
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
+const fs      = require('fs');
+const https   = require('https');
 const maxmind = require('@maxmind/geoip2-node');
 
 const app  = express();
 const port = process.env.PORT || 3000;
 
-/* ── GeoLite2 database: loaded once at startup ─────────────────────── */
-const DB_PATH = path.join(__dirname, 'GeoLite2-City.mmdb'); // curl writes here
-let cityReader;
-maxmind.Reader.open(DB_PATH).then(reader => (cityReader = reader));
+// where we'll store the DB at runtime
+const DB_PATH = path.join('/tmp', 'GeoLite2-City.mmdb');
 
-/* ── Middleware ─────────────────────────────────────────────────────── */
+let cityReader;
+
+// 1) download the DB if missing, then open it
+async function setupGeoDB() {
+  if (!fs.existsSync(DB_PATH)) {
+    console.log('Downloading GeoLite2 database...');
+    await new Promise((resolve, reject) => {
+      const auth = `${process.env.MAXMIND_ACCOUNT_ID}:${process.env.MAXMIND_LICENSE_KEY}`;
+      const url  = 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&suffix=mmdb';
+      const req  = https.get(url, { auth }, res => {
+        if (res.statusCode !== 200) {
+          return reject(new Error(`GeoDB download failed: ${res.statusCode}`));
+        }
+        const file = fs.createWriteStream(DB_PATH);
+        res.pipe(file);
+        file.on('finish', () => file.close(resolve));
+      });
+      req.on('error', reject);
+    });
+    console.log('GeoLite2 database downloaded.');
+  }
+  cityReader = await maxmind.Reader.open(DB_PATH);
+  console.log('GeoLite2 database loaded.');
+}
+
+// Immediately start DB setup, then the server
+setupGeoDB().catch(err => {
+  console.error('Error setting up GeoDB:', err);
+  process.exit(1);
+});
+
+/* ── Middleware ──────────────────────────────────────────────────────── */
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,7 +66,7 @@ app.post('/api/logVisitor', (req, res) => {
       location = [g?.city?.names?.en, g?.country?.names?.en]
                    .filter(Boolean)
                    .join(', ');
-    } catch {/* private or unroutable IP */}
+    } catch { /* ignore private/unroutable IPs */ }
   }
 
   // aggregate stats

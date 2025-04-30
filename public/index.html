@@ -300,13 +300,13 @@
 
     <script src="main.js"></script>
     <!-- Visitor Logging: moved out of style tag, placed here -->
-    <script>
-      fetch("https://markpalkimas-logger.onrender.com/log-visit", {
-  method: "POST"
-});
-      .then(res => res.json())
-      .then(() => console.log("Visitor logged"))
-      .catch(err => console.error("Logging failed", err));
-    </script>
+   <script>
+  fetch("https://markpalkimas-logger.onrender.com/log-visit", {
+    method: "POST"
+  })
+  .then(res => res.json())
+  .then(() => console.log("Visitor logged"))
+  .catch(err => console.error("Logging failed", err));
+</script>
   </body>
 </html>

@@ -3,375 +3,358 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mark Palkimas' Personal Website</title>
+    <title>Mark Palkimas | Software Developer</title>
+    <meta
+      name="description"
+      content="Mark Palkimas - Computer Science student building practical software, AI tools, and interactive web products."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="app.css" />
-    <script>
-      // Redirect to mobile version if on a mobile device
-      if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        window.location.href = "mobile.html";
-      }
-    </script>
-    <style>
-      /* Global & Modern Styles */
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #1a1a1a;
-        color: #eee;
-        font-family: 'Poppins', sans-serif;
-      }
-      /* Header & Navigation */
-      .header {
-        position: relative;
-        z-index: 2;
-      }
-      .nav-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-      }
-      .logo {
-        font-size: 24px;
-        font-weight: bold;
-      }
-      .nav-links {
-        list-style: none;
-        display: flex;
-        gap: 20px;
-      }
-      .nav-links a {
-        text-decoration: none;
-        color: #eee;
-      }
-      /* Dimmed Background Overlay */
-      .dimmed {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 1005;
-        display: none;
-      }
-      /* Popups Container – ensures popups are above the overlay */
-      #popups-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 2000;
-        pointer-events: none;
-      }
-      /* Common Popup Styles */
-      .popup {
-        display: none;
-        pointer-events: auto;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        max-width: 600px;
-        width: 90%;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 30px;
-      }
-      /* About Popup */
-      .about-popup {
-        background: #fff;
-        color: #333;
-      }
-      .about-popup .about-popup-content {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
-      .about-popup .about-image {
-        flex-shrink: 0;
-      }
-      .about-popup .about-image img {
-        width: 200px;
-        border-radius: 8px;
-      }
-      .about-popup .about-text {
-        flex: 1;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-      /* Social (Contacts) Popup */
-      .social-popup {
-        background: linear-gradient(135deg, #ffffff, #f0f0f0);
-        color: #333;
-        text-align: center;
-      }
-      .social-popup .social-popup-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
-        width: 100%;
-      }
-      .social-popup h2 {
-        margin: 0;
-      }
-      .popup-social-links {
-        display: flex;
-        width: 100%;
-        justify-content: space-evenly;
-        align-items: center;
-      }
-      .popup-social-links a {
-        flex: 1;
-      }
-      .popup-social-links img {
-        width: 50px;
-        height: 50px;
-        display: block;
-        margin: 0 auto;
-      }
-      /* Admin Popup */
-      .admin-popup {
-        background: #f9f9f9;
-        color: #333;
-        text-align: center;
-      }
-      .admin-popup .admin-popup-content input {
-        width: 80%;
-        padding: 10px;
-        margin: 10px 0;
-        font-size: 16px;
-      }
-      .admin-popup .admin-popup-content button {
-        padding: 10px 20px;
-        margin: 5px;
-        font-size: 16px;
-      }
-      .admin-popup .admin-popup-content #admin-error {
-        color: red;
-        margin-bottom: 10px;
-        font-size: 14px;
-        display: none;
-      }
-      /* Footer */
-      .footer {
-        background-color: #222;
-        padding: 20px;
-        text-align: center;
-        position: relative;
-        z-index: 2;
-      }
-      .footer p {
-        margin: 0;
-      }
-      .social-links img {
-        width: 40px;
-        height: 40px;
-        margin: 0 10px;
-      }
-      .reset-btn {
-        display: none;
-        background-color: #ff2222;
-        color: white;
-        padding: 10px 20px;
-        font-size: 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        z-index: 1020;
-      }
-      .reset-btn:hover {
-        background-color: #c21010;
-      }
-      /* Neon Glow Effect – the orb follows the cursor */
-      #neon-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -2;
-        transition: background 2s ease;
-      }
-      /* Content */
-      .content {
-        position: relative;
-        z-index: 2;
-        padding: 40px;
-      }
-      .section {
-        margin-bottom: 60px;
-      }
-      .profile-photo {
-        max-width: 100%;
-        border-radius: 50%;
-        transition: box-shadow 0.3s, transform 0.3s;
-        cursor: pointer;
-      }
-      .profile-photo:hover {
-        box-shadow: 0 0 20px #00d084;
-        transform: scale(1.05);
-      }
-      /* Falling Quotes */
-      #quote-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        pointer-events: none;
-        z-index: 1;
-        overflow: hidden;
-      }
-      .falling-quote {
-        position: absolute;
-        font-size: 1.5rem;
-        color: rgba(255, 255, 255, 0.8);
-        white-space: nowrap;
-        transition: transform 0.3s;
-      }
-      @keyframes fall {
-        from { top: -50px; }
-        to { top: 110vh; }
-      }
-      /* Ball style */
-      .ball {
-        position: absolute;
-        border-radius: 50%;
-        z-index: 1000;
-        pointer-events: none;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-      }
-    </style>
   </head>
+  <body>
+    <div class="background-shell" aria-hidden="true">
+      <div class="orb orb-one"></div>
+      <div class="orb orb-two"></div>
+      <div class="mesh"></div>
+    </div>
 
-  <!-- ✨ NEW attribute tells logger which page this is -->
-  <body data-page="index">
-    <!-- Neon Glow Container -->
-    <div id="neon-container"></div>
-    
-    <!-- Dimming Overlay -->
-    <div class="dimmed"></div>
-    
-    <!-- Quote Container -->
-    <div id="quote-container"></div>
-    
-    <header class="header">
-      <div class="nav-bar">
-        <div class="logo">Mark Palkimas</div>
-        <ul class="nav-links">
-          <li><a href="#about" class="about-link">About</a></li>
-          <li><a href="projects.html">Projects</a></li>
-          <li><a href="#contact" class="contact-link">Contact</a></li>
+    <header class="site-header">
+      <nav class="site-nav">
+        <a class="brand" href="#home">Mark Palkimas</a>
+
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+          Menu
+        </button>
+
+        <ul id="nav-links" class="nav-links">
+          <li><a href="#about" data-link="about">About</a></li>
+          <li><a href="#skills" data-link="skills">Skills</a></li>
+          <li><a href="#projects" data-link="projects">Projects</a></li>
+          <li><a href="#experience" data-link="experience">Experience</a></li>
+          <li><a href="#education" data-link="education">Education</a></li>
+          <li><a href="#contact" data-link="contact">Contact</a></li>
         </ul>
-      </div>
+
+        <a class="resume-btn" href="assets/mark-palkimas-resume.pdf" target="_blank" rel="noopener">
+          Resume
+        </a>
+      </nav>
     </header>
-    
-    <main class="content">
-      <section id="about" class="section">
-        <!-- Update image path to assets folder -->
-        <img src="assets/profile.jpg" alt="Profile Photo" class="profile-photo" />
-        <div class="intro-text">
-          <h2>Hello, I'm Mark Palkimas</h2>
+
+    <main>
+      <section id="home" class="section hero">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Computer Science Student | UCF</p>
+          <h1>
+            I build software that solves real problems,
+            <span>from AI tools to production-ready web apps.</span>
+          </h1>
+          <p class="hero-text">
+            I am pursuing a BA in Computer Science and focus on practical engineering: clean architecture,
+            measurable outcomes, and products people actually use.
+          </p>
+
+          <div class="focus-row">
+            <span class="focus-label">Current focus</span>
+            <span id="focus-rotator" class="focus-value">Python automation</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projects">View Projects</a>
+            <a class="btn btn-secondary" href="assets/mark-palkimas-resume.pdf" target="_blank" rel="noopener">
+              Download Resume
+            </a>
+          </div>
+
+          <ul class="impact-list">
+            <li>
+              <strong>~40%</strong>
+              <span>Efficiency increase in a food bank inventory workflow</span>
+            </li>
+            <li>
+              <strong>~92%</strong>
+              <span>Accuracy in a custom plagiarism detection tool</span>
+            </li>
+            <li>
+              <strong>300+</strong>
+              <span>Volunteer hours across education, church, and sports analytics events</span>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="hero-card reveal">
+          <img src="assets/profile.jpg" alt="Portrait of Mark Palkimas" class="profile-image" />
+          <div class="hero-card-body">
+            <h2>Mark Palkimas</h2>
+            <p>
+              Product-minded developer with experience across web apps, AI systems, and smart contract projects.
+            </p>
+            <div class="hero-tags">
+              <span>Python</span>
+              <span>JavaScript</span>
+              <span>Solidity</span>
+              <span>C</span>
+            </div>
+            <a href="#contact" class="inline-link">Open to software internships and builder roles</a>
+          </div>
+        </aside>
+      </section>
+
+      <section id="about" class="section reveal">
+        <div class="section-heading">
+          <p class="eyebrow">About</p>
+          <h2>My Journey</h2>
+        </div>
+
+        <div class="split-grid">
+          <article class="panel">
+            <p>
+              I am an ambitious builder who likes taking messy real-world problems and turning them into software
+              systems that are clean, measurable, and maintainable.
+            </p>
+            <p>
+              My projects range from AI-driven tools and smart contracts to interactive web experiences. I care about
+              impact, not just shipping code.
+            </p>
+          </article>
+
+          <article class="panel">
+            <h3>What I bring to teams</h3>
+            <ul class="simple-list">
+              <li>Analytical problem solving under pressure</li>
+              <li>Clear communication and cross-team collaboration</li>
+              <li>Strong execution from idea to working product</li>
+              <li>Bias toward measurable outcomes and iteration</li>
+            </ul>
+          </article>
         </div>
       </section>
-      <section id="portfolio" class="section">
-        <!-- Portfolio content goes here -->
+
+      <section id="skills" class="section reveal">
+        <div class="section-heading">
+          <p class="eyebrow">Skills</p>
+          <h2>Skill Stack</h2>
+        </div>
+
+        <div class="skill-grid">
+          <article class="skill-card">
+            <h3>Languages</h3>
+            <p>Python, C, JavaScript, HTML, CSS, Solidity</p>
+          </article>
+          <article class="skill-card">
+            <h3>Engineering</h3>
+            <p>Web development, AI tooling, automation, smart contracts</p>
+          </article>
+          <article class="skill-card">
+            <h3>Collaboration</h3>
+            <p>Effective communication, team collaboration, mentoring</p>
+          </article>
+          <article class="skill-card">
+            <h3>Mindset</h3>
+            <p>Creative problem solving, fast iteration, reliability</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="projects" class="section reveal">
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2>Selected Work</h2>
+        </div>
+
+        <div class="project-grid">
+          <article class="project-card">
+            <h3>Plagiarism Detection Tool</h3>
+            <p>
+              Built an AI-powered plagiarism detection system in Python with roughly 92% accuracy for textual
+              similarity analysis.
+            </p>
+            <div class="chip-row">
+              <span>Python</span>
+              <span>AI</span>
+              <span>92% accuracy</span>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <h3>Food Bank Log System</h3>
+            <p>
+              Designed a C-based inventory management workflow that improved process efficiency by around 40% for
+              local operations.
+            </p>
+            <div class="chip-row">
+              <span>C</span>
+              <span>Operations</span>
+              <span>~40% efficiency</span>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <h3>Health Monitoring App</h3>
+            <p>
+              Developed a Python application to track and visualize user health metrics, improving data visibility and
+              usability.
+            </p>
+            <div class="chip-row">
+              <span>Python</span>
+              <span>Data Visualization</span>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <h3>Emotion Recognition AI</h3>
+            <p>
+              Created an interactive model that detects and responds to user emotion signals in real time.
+            </p>
+            <div class="chip-row">
+              <span>HTML</span>
+              <span>JavaScript</span>
+              <span>CSS</span>
+            </div>
+            <a href="https://github.com/MarkPalkimas/Emotion-Recognition-AI" target="_blank" rel="noopener">
+              View repository
+            </a>
+          </article>
+
+          <article class="project-card">
+            <h3>Personal Website</h3>
+            <p>
+              Built and iterated on this site with custom interaction design and animated elements for storytelling.
+            </p>
+            <div class="chip-row">
+              <span>HTML</span>
+              <span>JavaScript</span>
+              <span>CSS</span>
+            </div>
+            <a href="https://github.com/MarkPalkimas/Website" target="_blank" rel="noopener">View repository</a>
+          </article>
+
+          <article class="project-card">
+            <h3>Smart Contract Systems</h3>
+            <p>
+              Engineered secure smart contract workflows to streamline digital transactions with high reliability.
+            </p>
+            <div class="chip-row">
+              <span>Solidity</span>
+              <span>Web3</span>
+              <span>~99% success rate</span>
+            </div>
+            <a
+              href="https://github.com/MarkPalkimas/MonOP_SmartContracts_V1-V5"
+              target="_blank"
+              rel="noopener"
+            >
+              View repository
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section id="experience" class="section reveal">
+        <div class="section-heading">
+          <p class="eyebrow">Experience</p>
+          <h2>Work + Community</h2>
+        </div>
+
+        <div class="timeline">
+          <article class="timeline-item">
+            <h3>Menchie's Frozen Yogurt - Team Member</h3>
+            <p class="meta">Boca Raton, USA | 10/2022 - 07/2024</p>
+            <p>
+              Opened and closed store operations, supported customer experience improvements, and helped train new team
+              members while maintaining reliable cash handling and workflow execution.
+            </p>
+          </article>
+
+          <article class="timeline-item">
+            <h3>Grace Community Church - Volunteer</h3>
+            <p class="meta">100+ service hours</p>
+            <p>Supported faith-based initiatives, outreach programs, and event coordination.</p>
+          </article>
+
+          <article class="timeline-item">
+            <h3>Park Ridge Elementary - Volunteer</h3>
+            <p class="meta">50+ service hours</p>
+            <p>Provided academic support and mentorship to students in an underserved community.</p>
+          </article>
+
+          <article class="timeline-item">
+            <h3>The Honda Classic Shot Link - Volunteer</h3>
+            <p class="meta">150+ service hours</p>
+            <p>Assisted with live statistical analysis for broadcast quality and sports data accuracy.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="education" class="section reveal">
+        <div class="section-heading">
+          <p class="eyebrow">Education</p>
+          <h2>Academic Background</h2>
+        </div>
+
+        <div class="edu-grid">
+          <article class="edu-card">
+            <h3>University of Central Florida</h3>
+            <p>Bachelor of Arts in Computer Science</p>
+            <p class="meta">Orlando, FL | GPA: 3.0</p>
+          </article>
+
+          <article class="edu-card">
+            <h3>Florida Atlantic University</h3>
+            <p>Dual Enrollment - Programming in Python and C</p>
+            <p class="meta">Boca Raton, FL</p>
+          </article>
+
+          <article class="edu-card">
+            <h3>Boca Raton Community High School</h3>
+            <p>High School Diploma</p>
+            <p class="meta">GPA: 4.6</p>
+          </article>
+        </div>
+
+        <article class="panel achievements">
+          <h3>Highlights</h3>
+          <ul class="simple-list">
+            <li>AP Capstone Diploma</li>
+            <li>AP Scholar</li>
+            <li>AICE Diploma</li>
+            <li>DECA Business Advocate - 1st Place District</li>
+            <li>Capstone research on electric vehicle misconceptions and environmental impacts</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="contact" class="section reveal">
+        <div class="section-heading">
+          <p class="eyebrow">Contact</p>
+          <h2>Let's Build Something Useful</h2>
+        </div>
+
+        <div class="contact-panel">
+          <p>
+            I am looking for opportunities where I can ship meaningful software, learn fast, and help teams execute.
+          </p>
+          <div class="contact-links">
+            <a href="mailto:Mark.Palkimas@gmail.com">Mark.Palkimas@gmail.com</a>
+            <a href="tel:+15616095325">(561) 609-5325</a>
+            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank" rel="noopener">
+              LinkedIn
+            </a>
+            <a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
       </section>
     </main>
-    
-    <footer class="footer">
-      <p>Contact Me</p>
-      <!-- Social links updated to use assets folder -->
-      <div class="social-links">
-        <a href="https://www.instagram.com/ya.boimark" target="_blank">
-          <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
-        </a>
-        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
-          <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
-        </a>
-        <a href="https://github.com/MarkPalkimas" target="_blank">
-          <img src="assets/github-logo.png" alt="GitHub" />
-        </a>
-        <a href="mailto:mark.palkimas@gmail.com" target="_blank">
-          <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
-        </a>
-        <a href="https://www.youtube.com/@markpalkimas" target="_blank">
-          <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
-        </a>
-      </div>
-      <div class="footer-bottom">
-        <button class="gravity-btn">Drop Ball</button>
-        <button class="admin-btn">Admin</button>
-        <p class="copyright">© 2024 Mark Palkimas</p>
-      </div>
+
+    <footer class="site-footer">
+      <p>Copyright <span id="year"></span> Mark Palkimas. All rights reserved.</p>
     </footer>
-    
-    <!-- Popups Container -->
-    <div id="popups-container">
-      <!-- About Popup (not dimmed) -->
-      <div class="popup about-popup" id="about-popup">
-        <div class="about-popup-content">
-          <div class="about-image">
-            <img src="assets/profile.jpg" alt="Profile Image" />
-          </div>
-          <div class="about-text">
-            <h2>About Me</h2>
-            <p>
-              I'm Mark Palkimas, an ambitious student with a passion for technology and innovation. I thrive on learning, tackling complex challenges, and exploring diverse areas in the tech world to build creative, user-friendly solutions.
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Contacts Popup -->
-      <div class="popup social-popup" id="contact-popup">
-        <div class="social-popup-content">
-          <h2>Contact Links</h2>
-          <div class="popup-social-links">
-            <a href="https://www.instagram.com/ya.boimark" target="_blank">
-              <img src="assets/iconmonstr-instagram-11-240.png" alt="Instagram" />
-            </a>
-            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank">
-              <img src="assets/iconmonstr-linkedin-1-240.png" alt="LinkedIn" />
-            </a>
-            <a href="https://github.com/MarkPalkimas" target="_blank">
-              <img src="assets/github-logo.png" alt="GitHub" />
-            </a>
-            <a href="mailto:mark.palkimas@gmail.com" target="_blank">
-              <img src="assets/iconmonstr-gmail-1-240.png" alt="Gmail" />
-            </a>
-            <a href="https://www.youtube.com/@markpalkimas" target="_blank">
-              <img src="assets/iconmonstr-youtube-6-240.png" alt="YouTube" />
-            </a>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Admin Popup -->
-      <div class="popup admin-popup" id="admin-popup">
-        <div class="admin-popup-content">
-          <h2>Admin Sign In</h2>
-          <p id="admin-error">Wrong password</p>
-          <input type="password" id="admin-password" placeholder="Password" />
-          <button id="toggle-password">Show</button>
-          <br />
-          <button id="submit-password">Submit</button>
-          <button id="cancel-password">Cancel</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Reset Button (if needed) -->
-    <button class="reset-btn">Reset</button>
-    
-    <!-- ✨ NEW: log this visit (loads first so it fires ASAP) -->
-<script type="module" src="./logger.js"></script>
-    <script src="main.js"></script>
+
+    <script src="main.js" defer></script>
   </body>
 </html>

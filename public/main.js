@@ -22,41 +22,66 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const focusRotator = document.getElementById("focus-rotator");
-  const focusItems = [
-    "Python automation",
-    "AI-driven tooling",
-    "high-impact web experiences",
-    "smart contract systems"
+  const typewriterEl = document.getElementById("typewriter");
+  const typePhrases = [
+    "Python automation and AI tooling",
+    "interactive web product development",
+    "smart contract engineering",
+    "shipping software with measurable impact"
   ];
 
-  if (focusRotator) {
-    let index = 0;
-    setInterval(() => {
-      focusRotator.style.opacity = "0";
+  if (typewriterEl) {
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
 
-      setTimeout(() => {
-        index = (index + 1) % focusItems.length;
-        focusRotator.textContent = focusItems[index];
-        focusRotator.style.opacity = "1";
-      }, 180);
-    }, 2200);
+    const tick = () => {
+      const phrase = typePhrases[phraseIndex];
+
+      if (deleting) {
+        charIndex = Math.max(charIndex - 1, 0);
+      } else {
+        charIndex = Math.min(charIndex + 1, phrase.length);
+      }
+
+      typewriterEl.textContent = phrase.slice(0, charIndex);
+
+      let delay = deleting ? 32 : 58;
+
+      if (!deleting && charIndex === phrase.length) {
+        delay = 1250;
+        deleting = true;
+      } else if (deleting && charIndex === 0) {
+        deleting = false;
+        phraseIndex = (phraseIndex + 1) % typePhrases.length;
+        delay = 280;
+      }
+
+      window.setTimeout(tick, delay);
+    };
+
+    tick();
   }
 
-  const revealItems = document.querySelectorAll(".reveal");
+  const revealItems = Array.from(document.querySelectorAll(".reveal"));
+
   const revealObserver = new IntersectionObserver(
-    (entries, obs) => {
+    (entries, observer) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) {
           return;
         }
 
-        entry.target.classList.add("in-view");
-        obs.unobserve(entry.target);
+        const delay = Number(entry.target.getAttribute("data-delay") || 0);
+        window.setTimeout(() => {
+          entry.target.classList.add("in-view");
+        }, delay);
+
+        observer.unobserve(entry.target);
       });
     },
     {
-      threshold: 0.18,
+      threshold: 0.15,
       rootMargin: "0px 0px -8% 0px"
     }
   );
@@ -64,34 +89,32 @@ document.addEventListener("DOMContentLoaded", () => {
   revealItems.forEach((item) => revealObserver.observe(item));
 
   const sections = Array.from(document.querySelectorAll("section[id]"));
-  const linkBySection = new Map(
+  const linkById = new Map(
     navLinks.map((link) => {
-      const targetId = link.getAttribute("href")?.replace("#", "") || "";
-      return [targetId, link];
+      const id = link.getAttribute("href")?.replace("#", "") || "";
+      return [id, link];
     })
   );
 
-  const sectionObserver = new IntersectionObserver(
+  const activeObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) {
           return;
         }
 
-        const activeId = entry.target.id;
         navLinks.forEach((link) => link.classList.remove("active"));
-
-        const activeLink = linkBySection.get(activeId);
+        const activeLink = linkById.get(entry.target.id);
         if (activeLink) {
           activeLink.classList.add("active");
         }
       });
     },
     {
-      rootMargin: "-45% 0px -45% 0px",
-      threshold: 0.01
+      threshold: 0.22,
+      rootMargin: "-40% 0px -45% 0px"
     }
   );
 
-  sections.forEach((section) => sectionObserver.observe(section));
+  sections.forEach((section) => activeObserver.observe(section));
 });

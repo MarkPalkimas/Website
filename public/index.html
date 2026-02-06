@@ -6,17 +6,19 @@
     <title>Mark Palkimas | Software Developer</title>
     <meta
       name="description"
-      content="Mark Palkimas - Computer Science student building practical software, AI tools, and production web products."
+      content="Mark Palkimas - Computer Science student building AI tools, web products, and reliable software systems."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="app.css" />
   </head>
   <body>
+    <div class="bg-aurora" aria-hidden="true"></div>
+
     <header class="site-header">
       <nav class="site-nav">
         <a class="brand" href="#home">Mark Palkimas</a>
@@ -38,143 +40,179 @@
     </header>
 
     <main>
-      <section id="home" class="section hero reveal">
-        <div class="hero-copy">
-          <p class="eyebrow">Computer Science Student | UCF</p>
-          <h1>Building reliable software with clean execution.</h1>
+      <section id="home" class="section hero">
+        <div class="hero-copy reveal" data-delay="0">
+          <p class="eyebrow">Software Developer | UCF Computer Science</p>
+          <h1>
+            Hi, I'm <span>Mark Palkimas</span>
+            <br />
+            I build software that solves real problems.
+          </h1>
+
+          <p class="type-row">
+            <span class="type-label">Focus:</span>
+            <span id="typewriter" class="typewriter"></span>
+          </p>
+
           <p class="hero-text">
-            I focus on practical engineering: Python systems, web products, and AI-driven tools with measurable impact.
+            I design and ship practical software across AI tooling, automation, web platforms, and smart contract
+            systems with measurable outcomes.
           </p>
 
           <div class="hero-actions">
             <a class="btn btn-primary" href="#projects">View Projects</a>
-            <a class="btn btn-ghost" href="assets/mark-palkimas-resume.pdf" target="_blank" rel="noopener">
-              Download Resume
-            </a>
+            <a class="btn btn-secondary" href="#contact">Get In Touch</a>
           </div>
 
-          <ul class="quick-metrics">
-            <li><strong>~40%</strong><span>Process efficiency gain in inventory workflow</span></li>
-            <li><strong>~92%</strong><span>Accuracy in plagiarism detection model</span></li>
-            <li><strong>300+</strong><span>Community service and analytics support hours</span></li>
-          </ul>
+          <div class="hero-metrics">
+            <article>
+              <h3>~40%</h3>
+              <p>Operational efficiency gain in inventory workflow</p>
+            </article>
+            <article>
+              <h3>~92%</h3>
+              <p>Plagiarism detection model accuracy</p>
+            </article>
+            <article>
+              <h3>300+</h3>
+              <p>Volunteer and community impact hours</p>
+            </article>
+          </div>
         </div>
 
-        <aside class="hero-card">
+        <aside class="hero-photo reveal" data-delay="100">
+          <div class="photo-glow" aria-hidden="true"></div>
           <img src="assets/profile-suit.jpg" alt="Mark Palkimas business portrait" class="profile-image" />
-          <div class="hero-card-body">
+          <div class="photo-meta">
             <h2>Mark Palkimas</h2>
-            <p>Software builder focused on product quality, speed, and business value.</p>
-            <a href="#contact" class="inline-link">Open to internships and software roles</a>
+            <p>AI + Web + Product-minded execution</p>
           </div>
         </aside>
       </section>
 
-      <section id="about" class="section reveal">
-        <div class="section-heading">
+      <section id="about" class="section">
+        <div class="section-heading reveal" data-delay="0">
           <p class="eyebrow">About</p>
-          <h2>Direct, practical, and impact-focused.</h2>
+          <h2>My Journey</h2>
         </div>
-        <div class="panel">
-          <p>
-            I like taking unclear problems and turning them into usable products. My work spans web interfaces, AI
-            tooling, and systems that improve operational speed and reliability.
-          </p>
+
+        <div class="about-grid">
+          <article class="panel reveal" data-delay="60">
+            <p>
+              I am a Computer Science student focused on turning real-world problems into clean, maintainable software.
+              I prefer practical products over theory-only demos and prioritize systems that create measurable business
+              impact.
+            </p>
+          </article>
+
+          <article class="panel reveal" data-delay="120">
+            <h3>What I bring</h3>
+            <ul>
+              <li>Analytical problem-solving with execution speed</li>
+              <li>Clear communication and collaborative team delivery</li>
+              <li>End-to-end ownership from idea to shipped product</li>
+            </ul>
+          </article>
         </div>
       </section>
 
-      <section id="skills" class="section reveal">
-        <div class="section-heading">
+      <section id="skills" class="section">
+        <div class="section-heading reveal" data-delay="0">
           <p class="eyebrow">Skills</p>
           <h2>Core Stack</h2>
         </div>
-        <div class="skill-grid">
-          <article class="skill-card"><h3>Languages</h3><p>Python, C, JavaScript, HTML, CSS, Solidity</p></article>
-          <article class="skill-card"><h3>Focus</h3><p>Automation, AI tools, web engineering, smart contracts</p></article>
-          <article class="skill-card"><h3>Execution</h3><p>Analytical thinking, team communication, fast iteration</p></article>
+
+        <div class="skills-grid">
+          <article class="skill-card reveal" data-delay="40"><h3>Python</h3><p>Automation and applied AI systems</p></article>
+          <article class="skill-card reveal" data-delay="80"><h3>JavaScript</h3><p>Interactive web products and UX behavior</p></article>
+          <article class="skill-card reveal" data-delay="120"><h3>C</h3><p>Performance-minded system workflows</p></article>
+          <article class="skill-card reveal" data-delay="160"><h3>HTML/CSS</h3><p>Clean responsive interface architecture</p></article>
+          <article class="skill-card reveal" data-delay="200"><h3>Solidity</h3><p>Smart contract logic and reliability</p></article>
+          <article class="skill-card reveal" data-delay="240"><h3>Team Delivery</h3><p>Communication, onboarding, collaboration</p></article>
         </div>
       </section>
 
-      <section id="projects" class="section reveal">
-        <div class="section-heading">
+      <section id="projects" class="section">
+        <div class="section-heading reveal" data-delay="0">
           <p class="eyebrow">Projects</p>
           <h2>Selected Work</h2>
         </div>
 
-        <div class="project-grid">
-          <article class="project-card">
+        <div class="projects-grid">
+          <article class="project-card reveal" data-delay="40">
             <h3>Plagiarism Detection Tool</h3>
-            <p>Python-based detection pipeline with roughly 92% accuracy for text similarity detection.</p>
+            <p>Built a Python solution for textual plagiarism detection with approximately 92% accuracy.</p>
           </article>
 
-          <article class="project-card">
+          <article class="project-card reveal" data-delay="80">
             <h3>Food Bank Log System</h3>
-            <p>C-based inventory workflow that improved operational efficiency by around 40%.</p>
+            <p>Designed an inventory system in C that improved operational efficiency by around 40%.</p>
           </article>
 
-          <article class="project-card">
+          <article class="project-card reveal" data-delay="120">
+            <h3>Health Monitoring App</h3>
+            <p>Developed a Python application to track and visualize health metrics for improved accessibility.</p>
+          </article>
+
+          <article class="project-card reveal" data-delay="160">
             <h3>Emotion Recognition AI</h3>
-            <p>Interactive model responding to user emotion signals in real time.</p>
-            <a href="https://github.com/MarkPalkimas/Emotion-Recognition-AI" target="_blank" rel="noopener">
-              View repository
-            </a>
+            <p>Created an interactive model that responds to user emotional cues in real time.</p>
+            <a href="https://github.com/MarkPalkimas/Emotion-Recognition-AI" target="_blank" rel="noopener">View repository</a>
           </article>
 
-          <article class="project-card">
+          <article class="project-card reveal" data-delay="200">
             <h3>Personal Website</h3>
-            <p>Modernized personal site with cleaner UX and production-ready deployment through Vercel.</p>
+            <p>Built and iterated this portfolio with production deployment and modern interaction design.</p>
             <a href="https://github.com/MarkPalkimas/Website" target="_blank" rel="noopener">View repository</a>
           </article>
 
-          <article class="project-card">
-            <h3>Solidity Smart Contracts</h3>
-            <p>Secure contract workflows designed to streamline digital transactions.</p>
-            <a
-              href="https://github.com/MarkPalkimas/MonOP_SmartContracts_V1-V5"
-              target="_blank"
-              rel="noopener"
-            >
-              View repository
-            </a>
+          <article class="project-card reveal" data-delay="240">
+            <h3>Smart Contract Systems</h3>
+            <p>Engineered Solidity contracts to streamline digital transactions with high reliability.</p>
+            <a href="https://github.com/MarkPalkimas/MonOP_SmartContracts_V1-V5" target="_blank" rel="noopener">View repository</a>
           </article>
         </div>
       </section>
 
-      <section id="experience" class="section reveal">
-        <div class="section-heading">
+      <section id="experience" class="section">
+        <div class="section-heading reveal" data-delay="0">
           <p class="eyebrow">Experience</p>
           <h2>Work + Leadership</h2>
         </div>
 
         <div class="timeline">
-          <article class="timeline-item">
-            <h3>Menchie's Frozen Yogurt | Team Member</h3>
-            <p class="meta">Boca Raton | 10/2022 - 07/2024</p>
-            <p>Managed open/close operations, team onboarding, and customer flow execution.</p>
+          <article class="timeline-item reveal" data-delay="60">
+            <h3>Menchie's Frozen Yogurt - Team Member</h3>
+            <p class="meta">Boca Raton, FL | 10/2022 - 07/2024</p>
+            <p>Managed open/close operations, trained new hires, and improved customer flow execution.</p>
           </article>
 
-          <article class="timeline-item">
-            <h3>Volunteer Service</h3>
-            <p class="meta">300+ combined hours</p>
-            <p>Grace Community Church, Park Ridge Elementary, and Honda Classic Shot Link analytics.</p>
+          <article class="timeline-item reveal" data-delay="120">
+            <h3>Volunteer Service (300+ hours)</h3>
+            <p class="meta">Grace Community Church, Park Ridge Elementary, Honda Classic Shot Link</p>
+            <p>Supported community programs, mentorship, and live sports analytics operations.</p>
+          </article>
+
+          <article class="timeline-item reveal" data-delay="180">
+            <h3>Education</h3>
+            <p class="meta">UCF BA in Computer Science | FAU Dual Enrollment | Boca Raton Community High</p>
+            <p>GPA 3.0 at UCF, with strong foundation in software engineering and practical systems development.</p>
           </article>
         </div>
       </section>
 
-      <section id="contact" class="section reveal">
-        <div class="section-heading">
+      <section id="contact" class="section">
+        <div class="section-heading reveal" data-delay="0">
           <p class="eyebrow">Contact</p>
-          <h2>Let's Connect</h2>
+          <h2>Let's Build Something Great</h2>
         </div>
 
-        <div class="contact-panel">
-          <p>I am open to internships and software roles where I can build and ship meaningful products.</p>
+        <div class="contact-card reveal" data-delay="80">
+          <p>I am open to internships and software opportunities where I can ship meaningful products.</p>
           <div class="contact-links">
             <a href="mailto:Mark.Palkimas@gmail.com">Mark.Palkimas@gmail.com</a>
             <a href="tel:+15616095325">(561) 609-5325</a>
-            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank" rel="noopener">
-              LinkedIn
-            </a>
+            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank" rel="noopener">LinkedIn</a>
             <a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub</a>
           </div>
         </div>

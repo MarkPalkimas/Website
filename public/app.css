@@ -262,6 +262,67 @@ main {
   gap: 10px;
 }
 
+.hero-flow {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.flow-chip {
+  --flow-progress: 0;
+  --flow-x: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #2f3948;
+  padding: 7px 11px;
+  font-size: 0.78rem;
+  font-weight: 560;
+  letter-spacing: 0.01em;
+  opacity: calc(0.2 + var(--flow-progress) * 0.8);
+  transform: translate3d(
+      calc((1 - var(--flow-progress)) * var(--flow-x)),
+      calc((1 - var(--flow-progress)) * 14px),
+      0
+    )
+    scale(calc(0.97 + var(--flow-progress) * 0.03));
+  transition: transform var(--dur-base) var(--ease-standard), opacity var(--dur-base) var(--ease-standard),
+    border-color var(--dur-base) var(--ease-standard);
+  will-change: transform, opacity;
+}
+
+.flow-chip:nth-child(2),
+.flow-chip:nth-child(4) {
+  --flow-x: -26px;
+}
+
+.flow-chip:nth-child(3) {
+  --flow-x: 36px;
+}
+
+.flow-chip:nth-child(5) {
+  --flow-x: -34px;
+}
+
+.flow-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 102, 255, 0.22);
+  background: rgba(10, 102, 255, 0.08);
+  color: #0a66ff;
+  font-size: 0.65rem;
+  font-weight: 620;
+  letter-spacing: 0.01em;
+}
+
 .btn {
   text-decoration: none;
   border-radius: 999px;
@@ -826,11 +887,16 @@ body.modal-open {
   .project-card:hover,
   .btn:hover,
   .resume-btn:hover,
+  .flow-chip,
   .contact-links a:hover,
   .footer-links a:hover,
   .project-links a:hover,
   .project-actions button:hover,
   .modal-close:hover {
     transform: none;
+  }
+
+  .flow-chip {
+    opacity: 1;
   }
 }

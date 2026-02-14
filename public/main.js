@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const ENABLE_HERO_EFFECT = true;
-  const ENABLE_PROJECT_TILT_EFFECT = true;
-  const ENABLE_BUTTON_SHINE_EFFECT = true;
   const ENABLE_DYNAMIC_PROJECTS = true;
+  const ENABLE_PROJECT_MODAL = true;
 
   const PROJECTS_DATA_URL = "data/projects.json";
   const AVAILABILITY = {
@@ -12,10 +11,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if (ENABLE_BUTTON_SHINE_EFFECT) {
-    document.body.classList.add("enable-shine");
-  }
-
   const yearEl = document.getElementById("year");
   if (yearEl) {
     yearEl.textContent = String(new Date().getFullYear());
@@ -23,8 +18,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const availabilityPill = document.getElementById("availability-pill");
   if (availabilityPill) {
-    availabilityPill.textContent = AVAILABILITY.text;
     availabilityPill.dataset.state = AVAILABILITY.state;
+    availabilityPill.textContent = AVAILABILITY.text;
   }
 
   const nav = document.querySelector(".site-nav");
@@ -44,9 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     navLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        closeMenu();
-      });
+      link.addEventListener("click", closeMenu);
     });
 
     document.addEventListener("click", (event) => {
@@ -61,51 +54,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         closeMenu();
       }
     });
-  }
-
-  const typewriterEl = document.getElementById("typewriter");
-  const typePhrases = [
-    "AI tutoring systems with production guardrails",
-    "interactive web products with clean UX",
-    "smart contract workflows with reliability in mind",
-    "shipping features quickly without sacrificing quality"
-  ];
-
-  if (typewriterEl) {
-    if (prefersReducedMotion) {
-      typewriterEl.textContent = typePhrases[0];
-    } else {
-      let phraseIndex = 0;
-      let charIndex = 0;
-      let deleting = false;
-
-      const tick = () => {
-        const phrase = typePhrases[phraseIndex];
-
-        if (deleting) {
-          charIndex = Math.max(charIndex - 1, 0);
-        } else {
-          charIndex = Math.min(charIndex + 1, phrase.length);
-        }
-
-        typewriterEl.textContent = phrase.slice(0, charIndex);
-
-        let delay = deleting ? 30 : 48;
-
-        if (!deleting && charIndex === phrase.length) {
-          delay = 1300;
-          deleting = true;
-        } else if (deleting && charIndex === 0) {
-          deleting = false;
-          phraseIndex = (phraseIndex + 1) % typePhrases.length;
-          delay = 280;
-        }
-
-        window.setTimeout(tick, delay);
-      };
-
-      tick();
-    }
   }
 
   const revealObserver =
@@ -125,16 +73,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           },
           {
             threshold: 0.15,
-            rootMargin: "0px 0px -8% 0px"
+            rootMargin: "0px 0px -9% 0px"
           }
         )
       : null;
 
   const registerRevealItems = (items) => {
     Array.from(items || []).forEach((item) => {
-      if (!(item instanceof Element)) return;
-
-      if (!item.classList.contains("reveal")) {
+      if (!(item instanceof Element) || !item.classList.contains("reveal")) {
         return;
       }
 
@@ -148,15 +94,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   registerRevealItems(document.querySelectorAll(".reveal"));
 
-  const sections = Array.from(document.querySelectorAll("section[id]"));
-  const linkById = new Map(
-    navLinks.map((link) => {
-      const id = link.getAttribute("href")?.replace("#", "") || "";
-      return [id, link];
-    })
-  );
-
   if (typeof IntersectionObserver !== "undefined") {
+    const sections = Array.from(document.querySelectorAll("section[id]"));
+    const linkById = new Map(
+      navLinks.map((link) => {
+        const id = link.getAttribute("href")?.replace("#", "") || "";
+        return [id, link];
+      })
+    );
+
     const activeObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -170,70 +116,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
       },
       {
-        threshold: 0.35,
-        rootMargin: "-40% 0px -45% 0px"
+        threshold: 0.42,
+        rootMargin: "-42% 0px -45% 0px"
       }
     );
 
     sections.forEach((section) => activeObserver.observe(section));
   }
 
-  const bindDetailsToggles = (root = document) => {
-    const buttons = Array.from(root.querySelectorAll(".details-toggle"));
-
-    buttons.forEach((button) => {
-      const panelId = button.getAttribute("aria-controls");
-      if (!panelId) return;
-
-      const panel = document.getElementById(panelId);
-      if (!panel) return;
-
-      const openLabel = button.dataset.openLabel || button.textContent.trim() || "Details";
-      const closeLabel = "Hide details";
-
-      button.textContent = openLabel;
-
-      button.addEventListener("click", () => {
-        const expanded = button.getAttribute("aria-expanded") === "true";
-        button.setAttribute("aria-expanded", String(!expanded));
-        button.textContent = expanded ? openLabel : closeLabel;
-        panel.hidden = expanded;
-      });
-    });
-  };
-
   const createProjectCard = (project, index) => {
     const card = document.createElement("article");
     card.className = "project-card reveal";
-    card.dataset.delay = String(Math.min(40 + index * 40, 240));
-    card.dataset.reactbitsTilt = "true";
+    card.dataset.delay = String(Math.min(index * 45, 180));
 
     const media = document.createElement("figure");
     media.className = "project-media";
+
     const image = document.createElement("img");
     image.src = project.image?.src || "assets/project1.jpg";
     image.alt = project.image?.alt || `${project.title} preview`;
     image.loading = "lazy";
     image.decoding = "async";
     media.appendChild(image);
-    card.appendChild(media);
 
     const headerRow = document.createElement("div");
     headerRow.className = "project-header-row";
 
     const title = document.createElement("h3");
     title.textContent = project.title;
-    headerRow.appendChild(title);
 
     const kind = document.createElement("span");
     kind.className = "project-kind";
     kind.textContent = project.kind;
-    headerRow.appendChild(kind);
 
-    card.appendChild(headerRow);
+    headerRow.appendChild(title);
+    headerRow.appendChild(kind);
 
     const summary = document.createElement("p");
     summary.textContent = project.summary;
+
+    card.appendChild(media);
+    card.appendChild(headerRow);
     card.appendChild(summary);
 
     if (Array.isArray(project.techBadges) && project.techBadges.length > 0) {
@@ -251,52 +174,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (project.badgeNote) {
-      const note = document.createElement("p");
-      note.className = "badge-note";
-      note.textContent = project.badgeNote;
-      card.appendChild(note);
+      const badgeNote = document.createElement("p");
+      badgeNote.className = "badge-note";
+      badgeNote.textContent = project.badgeNote;
+      card.appendChild(badgeNote);
     }
 
-    if (Array.isArray(project.links) && project.links.length > 0) {
-      const linksWrap = document.createElement("div");
-      linksWrap.className = "project-links";
+    const actions = document.createElement("div");
+    actions.className = "project-actions";
 
-      project.links.forEach((link) => {
-        const anchor = document.createElement("a");
-        anchor.href = link.url;
-        anchor.target = "_blank";
-        anchor.rel = "noopener";
-        anchor.textContent = link.label;
-        linksWrap.appendChild(anchor);
-      });
+    const linksWrap = document.createElement("div");
+    linksWrap.className = "project-links";
 
-      card.appendChild(linksWrap);
-    }
-
-    const detailsId = `project-details-${index + 1}`;
-    const detailsButton = document.createElement("button");
-    detailsButton.className = "details-toggle";
-    detailsButton.type = "button";
-    detailsButton.setAttribute("aria-expanded", "false");
-    detailsButton.setAttribute("aria-controls", detailsId);
-    detailsButton.dataset.openLabel = "Details";
-    detailsButton.textContent = "Details";
-    card.appendChild(detailsButton);
-
-    const detailsPanel = document.createElement("div");
-    detailsPanel.id = detailsId;
-    detailsPanel.className = "project-details";
-    detailsPanel.hidden = true;
-
-    const detailsList = document.createElement("ul");
-    (project.details || []).forEach((detail) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = detail;
-      detailsList.appendChild(listItem);
+    (project.links || []).forEach((link) => {
+      const anchor = document.createElement("a");
+      anchor.href = link.url;
+      anchor.target = "_blank";
+      anchor.rel = "noopener";
+      anchor.textContent = link.label;
+      linksWrap.appendChild(anchor);
     });
 
-    detailsPanel.appendChild(detailsList);
-    card.appendChild(detailsPanel);
+    const detailsBtn = document.createElement("button");
+    detailsBtn.type = "button";
+    detailsBtn.className = "project-open";
+    detailsBtn.textContent = "Details";
+    detailsBtn.dataset.projectIndex = String(index);
+
+    actions.appendChild(linksWrap);
+    actions.appendChild(detailsBtn);
+    card.appendChild(actions);
 
     return card;
   };
@@ -304,20 +211,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const hydrateProjectsFromJson = async () => {
     const projectsGrid = document.getElementById("projects-grid");
     if (!projectsGrid || !ENABLE_DYNAMIC_PROJECTS) {
-      return projectsGrid;
+      return { projectsGrid, projects: [] };
     }
 
     const source = projectsGrid.dataset.projectSource || PROJECTS_DATA_URL;
 
     try {
       const response = await fetch(source, {
-        headers: {
-          Accept: "application/json"
-        }
+        headers: { Accept: "application/json" }
       });
 
       if (!response.ok) {
-        throw new Error(`Projects request failed with ${response.status}`);
+        throw new Error(`Projects request failed: ${response.status}`);
       }
 
       const projects = await response.json();
@@ -332,46 +237,123 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       projectsGrid.innerHTML = "";
       projectsGrid.appendChild(fragment);
-
       registerRevealItems(projectsGrid.querySelectorAll(".reveal"));
+
+      return { projectsGrid, projects };
     } catch (error) {
-      console.warn("Project JSON load failed", error);
-      if (!projectsGrid.querySelector(".project-card")) {
-        projectsGrid.innerHTML =
-          '<article class="project-card project-loading in-view"><h3>Unable to load projects.</h3><p>Please refresh this page or visit my GitHub profile directly.</p><div class="project-links"><a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub Profile</a></div></article>';
-      }
+      console.warn("Unable to load projects JSON", error);
+      projectsGrid.innerHTML =
+        '<article class="project-card project-loading in-view"><h3>Unable to load projects.</h3><p>Please refresh this page or view GitHub directly.</p><div class="project-links"><a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub Profile</a></div></article>';
+      return { projectsGrid, projects: [] };
     }
-
-    return projectsGrid;
   };
 
-  const mountProjectTilt = () => {
-    const supportsFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!ENABLE_PROJECT_TILT_EFFECT || prefersReducedMotion || !supportsFinePointer || !window.ReactBitsCardTilt?.mount) {
+  const bindProjectModal = (projects) => {
+    if (!ENABLE_PROJECT_MODAL) {
       return;
     }
 
-    const cards = document.querySelectorAll("[data-reactbits-tilt]");
-    if (cards.length === 0) {
+    const modal = document.getElementById("project-modal");
+    const modalClose = document.getElementById("project-modal-close");
+    const modalBackdrop = modal?.querySelector("[data-modal-close]");
+    const modalTitle = document.getElementById("project-modal-title");
+    const modalKind = document.getElementById("project-modal-kind");
+    const modalSummary = document.getElementById("project-modal-summary");
+    const modalBadges = document.getElementById("project-modal-badges");
+    const modalLinks = document.getElementById("project-modal-links");
+    const modalDetails = document.getElementById("project-modal-details");
+
+    if (!modal || !modalClose || !modalBackdrop || !modalTitle || !modalKind || !modalSummary || !modalBadges || !modalLinks || !modalDetails) {
       return;
     }
 
-    window.ReactBitsCardTilt.mount(cards, { maxTilt: 4.5, lift: 5 });
-  };
+    let currentIndex = -1;
 
-  const projectsGrid = await hydrateProjectsFromJson();
-  bindDetailsToggles(projectsGrid || document);
-  mountProjectTilt();
+    const openModal = (index) => {
+      const project = projects[index];
+      if (!project) return;
 
-  const footerWink = document.getElementById("footer-wink");
-  if (footerWink) {
-    footerWink.addEventListener("click", () => {
-      footerWink.classList.remove("active");
-      window.requestAnimationFrame(() => {
-        footerWink.classList.add("active");
+      currentIndex = index;
+      modalKind.textContent = project.kind || "Project";
+      modalTitle.textContent = project.title || "Project Details";
+      modalSummary.textContent = project.summary || "";
+
+      modalBadges.innerHTML = "";
+      (project.techBadges || []).forEach((badge) => {
+        const badgeItem = document.createElement("li");
+        badgeItem.textContent = badge;
+        modalBadges.appendChild(badgeItem);
       });
+
+      if ((project.techBadges || []).length === 0) {
+        modalBadges.innerHTML = "";
+      }
+
+      modalLinks.innerHTML = "";
+      (project.links || []).forEach((link) => {
+        const anchor = document.createElement("a");
+        anchor.href = link.url;
+        anchor.target = "_blank";
+        anchor.rel = "noopener";
+        anchor.textContent = link.label;
+        modalLinks.appendChild(anchor);
+      });
+
+      modalDetails.innerHTML = "";
+      (project.details || []).forEach((detail) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = detail;
+        modalDetails.appendChild(listItem);
+      });
+
+      modal.hidden = false;
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      window.requestAnimationFrame(() => {
+        modal.classList.add("is-open");
+      });
+    };
+
+    const closeModal = () => {
+      if (modal.hidden) return;
+
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      currentIndex = -1;
+
+      window.setTimeout(() => {
+        if (!modal.classList.contains("is-open")) {
+          modal.hidden = true;
+        }
+      }, prefersReducedMotion ? 0 : 280);
+    };
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const trigger = target.closest(".project-open");
+      if (trigger) {
+        const index = Number(trigger.getAttribute("data-project-index"));
+        if (!Number.isNaN(index)) {
+          openModal(index);
+        }
+      }
     });
-  }
+
+    modalClose.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && currentIndex >= 0) {
+        closeModal();
+      }
+    });
+  };
+
+  const { projects } = await hydrateProjectsFromJson();
+  bindProjectModal(projects);
 
   const heroAccent = document.getElementById("hero-accent");
   if (ENABLE_HERO_EFFECT && heroAccent && window.ReactBitsHeroAccent?.mount) {

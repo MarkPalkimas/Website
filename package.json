@@ -1,0 +1,13 @@
+{
+  "name": "mark-palkimas-website",
+  "version": "2.0.0",
+  "description": "Personal website for Mark Palkimas, configured for local Node serving and Vercel deployment.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Admin Dashboard – Mark Palkimas</title>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Segoe UI',sans-serif;
+      background:#121212;color:#e0e0e0;
+      padding-bottom:2rem;
+    }
+    header{
+      background:#1f1f1f;padding:1rem 2rem;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    header .logo{font-size:1.5rem;font-weight:bold;color:#ffcc00}
+    header a{color:#e0e0e0;text-decoration:none;font-size:1.1rem}
+    header a:hover{color:#ffcc00}
+    .pulse{
+      display:inline-block;width:10px;height:10px;
+      background:#ffcc00;border-radius:50%;
+      animation:pulse 2s infinite;margin-left:.5rem;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(255,204,0,.7)}
+      70%{box-shadow:0 0 0 10px rgba(255,204,0,0)}
+      100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}
+    }
+    .container{padding:2rem}
+    .card{
+      background:#1f1f1f;border-radius:8px;
+      padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.5);
+    }
+    table{
+      width:100%;border-collapse:collapse;
+      background:#222;margin-top:1rem;
+    }
+    th,td{padding:.6rem;border:1px solid #333;text-align:left}
+    th{white-space:nowrap}
+
+    /* subtle hover effect for clickable IPs */
+    a.ip-link{
+      color:#4ea9ff;text-decoration:none;
+      transition:color .25s ease;
+    }
+    a.ip-link:hover{
+      color:#ffd64e;text-decoration:underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Admin Dashboard <span class="pulse"></span></div>
+    <a href="index.html">⟵ Back to Site</a>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Visitor Logs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>IP&nbsp;Address</th>
+            <th>Device</th>
+            <th>Provider</th>
+            <th>Location</th>
+            <th>Latest&nbsp;Visit</th>
+            <th>Visits</th>
+          </tr>
+        </thead>
+        <tbody id="visits"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- live Firebase feed -->
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>

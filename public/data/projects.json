@@ -1,0 +1,77 @@
+[
+  {
+    "title": "StudyGuideAI / AISCHOOL3",
+    "kind": "AI Tutor Platform",
+    "summary": "I built a classroom AI tutor where teachers upload materials and students can ask course-specific questions any time.",
+    "techBadges": ["React", "Vite", "Tailwind CSS", "Clerk", "OpenAI API"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/AISCHOOL3" },
+      { "label": "Live", "url": "https://mystudyguideai.com" }
+    ],
+    "details": [
+      "Includes protected API endpoints for chat and OCR.",
+      "Uses role-aware routing for teachers, students, and admin users.",
+      "Structured for deployment through Vercel-hosted APIs."
+    ],
+    "image": {
+      "src": "assets/project1.jpg",
+      "alt": "StudyGuideAI interface preview"
+    }
+  },
+  {
+    "title": "Smart Contracts (MonOP V1-V5)",
+    "kind": "Blockchain Engineering",
+    "summary": "I iterated through five smart contract versions to tighten transaction logic and make behavior more predictable.",
+    "techBadges": ["Solidity"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/MonOP_SmartContracts_V1-V5" }
+    ],
+    "details": [
+      "Versioned contract iterations (V1-V5) to improve maintainability over time.",
+      "Focused on dependable execution paths for digital agreement workflows.",
+      "Used the project to study contract reliability from both implementation and research angles."
+    ],
+    "image": {
+      "src": "assets/project2.png",
+      "alt": "Smart contracts project preview"
+    }
+  },
+  {
+    "title": "Emotion Recognition AI",
+    "kind": "Applied AI",
+    "summary": "I built an interactive model that reacts to emotional cues in real time.",
+    "techBadges": [],
+    "badgeNote": "Stack badges are intentionally omitted until the repository includes clear stack documentation.",
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/Emotion-Recognition-AI" }
+    ],
+    "details": [
+      "Centered on real-time emotional signal interpretation.",
+      "Built to make interactions respond to a user's emotional state.",
+      "Repository-linked project with additional implementation details in source."
+    ],
+    "image": {
+      "src": "assets/project3.png",
+      "alt": "Emotion recognition AI project preview"
+    }
+  },
+  {
+    "title": "Real Estate Information AI Scraper/Aggregator",
+    "kind": "Data + AI Pipeline",
+    "summary": "I worked on scraping and organizing real-estate information into one pipeline for easier downstream analysis.",
+    "techBadges": [],
+    "badgeNote": "A public repo link is not listed in this codebase yet, so stack badges are withheld for accuracy.",
+    "links": [
+      { "label": "GitHub Profile", "url": "https://github.com/MarkPalkimas" }
+    ],
+    "details": [
+      "Project direction is centered on scraping and aggregation workflows.",
+      "Set up to support ranking/filtering once data quality is validated.",
+      "Add the exact repository URL to unlock full stack badges on this card."
+    ],
+    "image": {
+      "src": "assets/project-real-estate.svg",
+      "alt": "Real estate data pipeline concept card"
+    }
+  }
+]

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mark Palkimas | Software Developer Portfolio</title>
+    <meta
+      name="description"
+      content="Mark Palkimas builds reliable AI tools, web products, and smart contract systems with a product-minded engineering approach."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body data-page="index">
+    <header class="site-header">
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a class="brand" href="#home">Mark Palkimas</a>
+
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+          Menu
+        </button>
+
+        <ul id="nav-links" class="nav-links">
+          <li><a href="#home" data-link="home">Home</a></li>
+          <li><a href="#projects" data-link="projects">Projects</a></li>
+          <li><a href="#skills" data-link="skills">Skills</a></li>
+          <li><a href="#about" data-link="about">About</a></li>
+          <li><a href="#contact" data-link="contact">Contact</a></li>
+        </ul>
+
+        <a class="resume-btn" href="assets/mark-palkimas-resume.pdf" target="_blank" rel="noopener">Resume</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="home" class="section hero">
+        <div class="hero-copy reveal" data-delay="0">
+          <p class="eyebrow">Software Developer • UCF Computer Science</p>
+          <h1>I build reliable AI and product software that feels premium to use.</h1>
+
+          <p id="availability-pill" class="availability-pill" role="status" aria-live="polite">
+            Availability: Updating...
+          </p>
+
+          <ul class="signal-strip" aria-label="Build principles">
+            <li>Reliable by design</li>
+            <li>Fast iteration</li>
+            <li>Enterprise-ready UX</li>
+          </ul>
+
+          <p class="hero-text">
+            I care about building products that feel simple to use and hold up in real-world use. Right now, I am looking for software
+            engineering roles where I can contribute fast and keep quality high.
+          </p>
+
+          <p class="focus-line">Right now I spend most of my time on AI tutoring tools, smart contracts, and practical automation.</p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projects">View Projects</a>
+            <a class="btn btn-secondary" href="#contact">Contact</a>
+          </div>
+
+          <div class="hero-metrics" aria-label="Highlights">
+            <article class="metric">
+              <strong>4+</strong>
+              <span>Live and shipped projects</span>
+            </article>
+            <article class="metric">
+              <strong>3</strong>
+              <span>Focus lanes: AI, web products, smart contracts</span>
+            </article>
+            <article class="metric">
+              <strong>100%</strong>
+              <span>Build quality and user clarity focused</span>
+            </article>
+          </div>
+
+          <div id="hero-flow" class="hero-flow" aria-hidden="true">
+            <article class="flow-chip">
+              <span class="flow-glyph">AI</span>
+              <span>AI Tutors</span>
+            </article>
+            <article class="flow-chip">
+              <span class="flow-glyph">{ }</span>
+              <span>Web Products</span>
+            </article>
+            <article class="flow-chip">
+              <span class="flow-glyph">SC</span>
+              <span>Smart Contracts</span>
+            </article>
+            <article class="flow-chip">
+              <span class="flow-glyph">DB</span>
+              <span>Data Pipelines</span>
+            </article>
+            <article class="flow-chip">
+              <span class="flow-glyph">UX</span>
+              <span>UI Polish</span>
+            </article>
+          </div>
+        </div>
+
+        <aside class="hero-photo reveal" data-delay="70">
+          <div class="hero-accent" id="hero-accent" aria-hidden="true"></div>
+          <img src="assets/profile-suit.jpg" alt="Mark Palkimas business portrait" class="profile-image" />
+          <div class="photo-meta">
+            <h2>Mark Palkimas</h2>
+            <p>AI + Web + Product-minded engineering</p>
+          </div>
+        </aside>
+      </section>
+
+      <section id="projects" class="section">
+        <div class="section-heading reveal" data-delay="0">
+          <p class="eyebrow">Featured Projects</p>
+          <h2>Projects I am genuinely proud to ship.</h2>
+        </div>
+
+        <div id="projects-grid" class="projects-grid" data-project-source="data/projects.json" aria-live="polite">
+          <article class="project-card reveal project-loading in-view">
+            <h3>Loading featured projects...</h3>
+            <p>Project cards are generated from a local JSON source for safe and fast updates.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="skills" class="section">
+        <div class="section-heading reveal" data-delay="0">
+          <p class="eyebrow">Skills</p>
+          <h2>Tools I use to move from idea to production.</h2>
+        </div>
+
+        <div class="skills-grid">
+          <article class="skill-group reveal" data-delay="30">
+            <h3>Languages</h3>
+            <div class="chip-wrap">
+              <span>JavaScript</span>
+              <span>Python</span>
+              <span>C</span>
+              <span>Solidity</span>
+            </div>
+          </article>
+
+          <article class="skill-group reveal" data-delay="60">
+            <h3>Frontend + Product</h3>
+            <div class="chip-wrap">
+              <span>HTML/CSS</span>
+              <span>Responsive UI</span>
+              <span>Interaction Design</span>
+              <span>Accessibility</span>
+            </div>
+          </article>
+
+          <article class="skill-group reveal" data-delay="90">
+            <h3>AI + Platform</h3>
+            <div class="chip-wrap">
+              <span>OpenAI API</span>
+              <span>OCR Flows</span>
+              <span>Auth Workflows</span>
+              <span>Vercel Deployment</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="about" class="section">
+        <div class="section-heading reveal" data-delay="0">
+          <p class="eyebrow">About</p>
+          <h2>I like clear problems, clean systems, and real results.</h2>
+        </div>
+
+        <div class="about-grid">
+          <article class="panel reveal" data-delay="30">
+            <p>
+              I am at my best when I can take something from rough idea to shipped product. I care about sharp UX, maintainable code,
+              and making sure the final result actually helps people.
+            </p>
+          </article>
+
+          <article class="panel reveal" data-delay="60">
+            <h3>What I bring</h3>
+            <ul>
+              <li>Fast iteration without cutting corners</li>
+              <li>Clear communication with product and engineering teams</li>
+              <li>Ownership from first prototype to final release</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="section">
+        <div class="section-heading reveal" data-delay="0">
+          <p class="eyebrow">Contact</p>
+          <h2>If you are building something great, I would love to talk.</h2>
+        </div>
+
+        <div class="contact-card reveal" data-delay="40">
+          <p>The best way to reach me is email. I am open to internships, junior software roles, and strong product teams.</p>
+          <div class="contact-links">
+            <a href="mailto:Mark.Palkimas@gmail.com">Mark.Palkimas@gmail.com</a>
+            <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links" aria-label="Social links">
+        <a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/mark-palkimas-27514a230/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:Mark.Palkimas@gmail.com">Email</a>
+      </div>
+      <p>Copyright <span id="year"></span> Mark Palkimas.</p>
+    </footer>
+
+    <div id="project-modal" class="project-modal" hidden aria-hidden="true">
+      <div class="project-modal-backdrop" data-modal-close></div>
+      <div class="project-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+        <button id="project-modal-close" class="modal-close" type="button" aria-label="Close project details">Close</button>
+
+        <p id="project-modal-kind" class="modal-kind"></p>
+        <h3 id="project-modal-title"></h3>
+        <p id="project-modal-summary" class="modal-summary"></p>
+
+        <ul id="project-modal-badges" class="tech-badges modal-badges" aria-label="Project stack"></ul>
+
+        <div id="project-modal-links" class="project-links modal-links"></div>
+
+        <ul id="project-modal-details" class="modal-details"></ul>
+      </div>
+    </div>
+
+    <script src="components/reactbits/hero-accent.js" defer></script>
+    <script src="components/reactbits/flow-icons.js" defer></script>
+    <script src="main.js" defer></script>
+  </body>
+</html>

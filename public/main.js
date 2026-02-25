@@ -1,13 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const ENABLE_HERO_EFFECT = true;
   const ENABLE_DYNAMIC_PROJECTS = true;
   const ENABLE_PROJECT_MODAL = true;
-  const ENABLE_FLOW_ICONS = true;
 
   const PROJECTS_DATA_URL = "data/projects.json";
   const AVAILABILITY = {
     state: "available",
-    text: "Availability: Open to internships, junior SWE roles, and product teams that move fast."
+    text: "Availability: Open to internships and junior SWE roles."
   };
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -244,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.warn("Unable to load projects JSON", error);
       projectsGrid.innerHTML =
-        '<article class="project-card project-loading in-view"><h3>Unable to load projects right now.</h3><p>Please refresh or check my GitHub profile directly.</p><div class="project-links"><a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub Profile</a></div></article>';
+        '<article class="project-card project-loading in-view"><h3>Unable to load projects.</h3><p>Please refresh and try again.</p><div class="project-links"><a href="https://github.com/MarkPalkimas" target="_blank" rel="noopener">GitHub</a></div></article>';
       return { projectsGrid, projects: [] };
     }
   };
@@ -355,14 +353,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const { projects } = await hydrateProjectsFromJson();
   bindProjectModal(projects);
-
-  const heroAccent = document.getElementById("hero-accent");
-  if (ENABLE_HERO_EFFECT && heroAccent && window.ReactBitsHeroAccent?.mount) {
-    window.ReactBitsHeroAccent.mount(heroAccent, { reducedMotion: prefersReducedMotion });
-  }
-
-  const heroFlow = document.getElementById("hero-flow");
-  if (ENABLE_FLOW_ICONS && heroFlow && window.ReactBitsFlowIcons?.mount) {
-    window.ReactBitsFlowIcons.mount(heroFlow, { reducedMotion: prefersReducedMotion });
-  }
 });

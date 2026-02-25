@@ -2,7 +2,7 @@
   {
     "title": "StudyGuideAI / AISCHOOL3",
     "kind": "AI Tutor Platform",
-    "summary": "I built a classroom AI tutor where teachers upload materials and students can ask course-specific questions any time.",
+    "summary": "Classroom AI tutor for teacher materials, OCR, and course-specific student Q&A.",
     "techBadges": ["React", "Vite", "Tailwind CSS", "Clerk", "OpenAI API"],
     "links": [
       { "label": "GitHub", "url": "https://github.com/MarkPalkimas/AISCHOOL3" },
@@ -21,7 +21,7 @@
   {
     "title": "Smart Contracts (MonOP V1-V5)",
     "kind": "Blockchain Engineering",
-    "summary": "I iterated through five smart contract versions to tighten transaction logic and make behavior more predictable.",
+    "summary": "Five contract iterations focused on predictable execution and maintainable logic.",
     "techBadges": ["Solidity"],
     "links": [
       { "label": "GitHub", "url": "https://github.com/MarkPalkimas/MonOP_SmartContracts_V1-V5" }
@@ -39,7 +39,7 @@
   {
     "title": "Emotion Recognition AI",
     "kind": "Applied AI",
-    "summary": "I built an interactive model that reacts to emotional cues in real time.",
+    "summary": "Interactive model that responds to emotional cues in real time.",
     "techBadges": [],
     "badgeNote": "Stack badges are intentionally omitted until the repository includes clear stack documentation.",
     "links": [
@@ -58,7 +58,7 @@
   {
     "title": "Real Estate Information AI Scraper/Aggregator",
     "kind": "Data + AI Pipeline",
-    "summary": "I worked on scraping and organizing real-estate information into one pipeline for easier downstream analysis.",
+    "summary": "Pipeline for scraping and structuring real-estate data for analysis workflows.",
     "techBadges": [],
     "badgeNote": "A public repo link is not listed in this codebase yet, so stack badges are withheld for accuracy.",
     "links": [

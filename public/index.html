@@ -78,17 +78,20 @@
       </section>
 
       <section id="projects" class="section">
-        <div class="section-heading reveal" data-delay="0">
+        <div class="section-heading projects-heading reveal" data-delay="0">
+          <svg class="projects-text-path" viewBox="0 0 420 160" aria-hidden="true" focusable="false">
+            <defs>
+              <path id="projects-arc" d="M 50 118 A 160 160 0 0 1 370 118" />
+            </defs>
+            <text>
+              <textPath href="#projects-arc" startOffset="50%">Selected Work • Built for Production •</textPath>
+            </text>
+          </svg>
           <p class="eyebrow">Selected Work</p>
           <h2>Built and shipped.</h2>
         </div>
 
-        <div id="projects-grid" class="projects-grid" data-project-source="data/projects.json" aria-live="polite">
-          <article class="project-card reveal project-loading in-view">
-            <h3>Loading projects...</h3>
-            <p>Content will appear in a moment.</p>
-          </article>
-        </div>
+        <div id="projects-showcase" class="projects-showcase reveal" data-delay="30" aria-live="polite"></div>
       </section>
 
       <section id="skills" class="section">
@@ -197,6 +200,7 @@
       </div>
     </div>
 
+    <script src="components/projects-showcase.js" defer></script>
     <script src="main.js" defer></script>
   </body>
 </html>

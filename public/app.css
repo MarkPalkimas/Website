@@ -99,6 +99,26 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+.skip-link {
+  position: absolute;
+  left: 14px;
+  top: -48px;
+  z-index: 200;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: #fff;
+  color: #1c2b40;
+  padding: 8px 12px;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: top var(--dur-fast) var(--ease-standard);
+}
+
+.skip-link:focus-visible {
+  top: 10px;
+}
+
 .site-header {
   position: sticky;
   top: 0;
@@ -446,7 +466,7 @@ main {
   left: -22px;
   width: min(440px, 100%);
   height: auto;
-  opacity: 0.18;
+  opacity: 0.14;
   pointer-events: none;
   z-index: -1;
 }

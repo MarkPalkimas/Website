@@ -2,6 +2,7 @@
   const ENABLE_3D = true;
   const ENABLE_TEXT_PATH_ACCENT = true;
   const ENABLE_MODAL = true;
+  const ENABLE_DEV_CONSOLE_SIGNATURE = true;
 
   const MOBILE_BREAKPOINT = 860;
   const SWIPE_THRESHOLD = 56;
@@ -69,7 +70,7 @@
       details: [
         "Project direction is centered on scraping and aggregation workflows.",
         "Set up to support ranking and filtering once data quality is validated.",
-        "Add the exact repository URL to unlock full stack badges on this card."
+        "Add the exact repository URL to show verified stack badges on this card."
       ],
       image: {
         src: "assets/project-real-estate.svg",
@@ -244,6 +245,7 @@
     const modalBadges = document.getElementById("project-modal-badges");
     const modalLinks = document.getElementById("project-modal-links");
     const modalDetails = document.getElementById("project-modal-details");
+    const modalDialog = modal?.querySelector(".project-modal-dialog");
 
     let activeIndex = 0;
     let dragX = 0;
@@ -252,6 +254,7 @@
     let lastWheelTime = 0;
     let rafId = 0;
     let lastModalTrigger = null;
+    let modalKeyHandler = null;
 
     const isDesktop3D = () => ENABLE_3D && !reducedMotion && window.innerWidth > MOBILE_BREAKPOINT;
 
@@ -416,6 +419,48 @@
         modal.classList.add("is-open");
       });
       modalClose.focus({ preventScroll: true });
+
+      if (modalKeyHandler) {
+        document.removeEventListener("keydown", modalKeyHandler);
+      }
+
+      modalKeyHandler = (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeModal();
+          return;
+        }
+
+        if (event.key !== "Tab" || !modal || modal.hidden) {
+          return;
+        }
+
+        const focusables = Array.from(
+          modal.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((item) => item instanceof HTMLElement && item.offsetParent !== null);
+
+        if (focusables.length === 0) {
+          modalDialog?.focus();
+          event.preventDefault();
+          return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const current = document.activeElement;
+
+        if (event.shiftKey && current === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && current === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+
+      document.addEventListener("keydown", modalKeyHandler);
     };
 
     const closeModal = () => {
@@ -432,6 +477,11 @@
           modal.hidden = true;
         }
       }, reducedMotion ? 0 : 280);
+
+      if (modalKeyHandler) {
+        document.removeEventListener("keydown", modalKeyHandler);
+        modalKeyHandler = null;
+      }
 
       if (lastModalTrigger) {
         lastModalTrigger.focus({ preventScroll: true });
@@ -576,11 +626,6 @@
     if (modalClose && modalBackdrop) {
       modalClose.addEventListener("click", closeModal);
       modalBackdrop.addEventListener("click", closeModal);
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          closeModal();
-        }
-      });
     }
 
     applyMode();

@@ -1,0 +1,5 @@
+Contact: mailto:Mark.Palkimas@gmail.com
+Expires: 2027-02-27T00:00:00.000Z
+Canonical: https://markpalkimas.com/security.txt
+Preferred-Languages: en
+Policy: https://markpalkimas.com/#contact

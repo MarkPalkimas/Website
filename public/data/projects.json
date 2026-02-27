@@ -67,7 +67,7 @@
     "details": [
       "Project direction is centered on scraping and aggregation workflows.",
       "Set up to support ranking/filtering once data quality is validated.",
-      "Add the exact repository URL to unlock full stack badges on this card."
+      "Add the exact repository URL to show verified stack badges on this card."
     ],
     "image": {
       "src": "assets/project-real-estate.svg",

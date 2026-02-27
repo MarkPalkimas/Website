@@ -68,9 +68,9 @@
       badgeNote: "Public repository URL is not listed in this codebase yet.",
       links: [{ label: "GitHub Profile", url: "https://github.com/MarkPalkimas" }],
       details: [
-        "Project direction is centered on scraping and aggregation workflows.",
-        "Set up to support ranking and filtering once data quality is validated.",
-        "Add the exact repository URL to show verified stack badges on this card."
+        "Focused on scraping and aggregation workflows.",
+        "Prepared for ranking and filtering after data validation.",
+        "Add the exact repository URL to show verified stack badges."
       ],
       image: {
         src: "assets/project-real-estate.svg",

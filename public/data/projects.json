@@ -34,7 +34,7 @@
       "Structured for deployment through Vercel-hosted APIs."
     ],
     "image": {
-      "src": "assets/project1.jpg",
+      "src": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop",
       "alt": "StudyGuideAI interface preview"
     }
   },
@@ -52,7 +52,7 @@
       "Used the project to study contract reliability from both implementation and research angles."
     ],
     "image": {
-      "src": "assets/project2.png",
+      "src": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=600&fit=crop",
       "alt": "Smart contracts project preview"
     }
   },
@@ -71,7 +71,7 @@
       "Repository-linked project with additional implementation details in source."
     ],
     "image": {
-      "src": "assets/project3.png",
+      "src": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop",
       "alt": "Emotion recognition AI project preview"
     }
   },
@@ -90,7 +90,7 @@
       "Add the exact repository URL to show verified stack badges."
     ],
     "image": {
-      "src": "assets/project-real-estate.svg",
+      "src": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop",
       "alt": "Real estate data pipeline concept card"
     }
   }

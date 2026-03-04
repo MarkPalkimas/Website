@@ -1,5 +1,25 @@
 [
   {
+    "title": "Portfolio Website",
+    "kind": "Web Platform",
+    "summary": "Apple-inspired portfolio with custom ReactBits components and premium interactions.",
+    "techBadges": ["JavaScript", "CSS", "React Components", "Vercel"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/Website" },
+      { "label": "Live", "url": "https://markpalkimas.com" }
+    ],
+    "details": [
+      "Custom-built ReactBits components for smooth interactions.",
+      "Theme picker with 6 curated color schemes and localStorage persistence.",
+      "Optimized animations with Apple-level easing curves.",
+      "Deployed via GitHub → Vercel → custom domain pipeline."
+    ],
+    "image": {
+      "src": "assets/profile.jpg",
+      "alt": "Portfolio website preview"
+    }
+  },
+  {
     "title": "StudyGuideAI / AISCHOOL3",
     "kind": "AI Tutor Platform",
     "summary": "Classroom AI tutor for teacher materials, OCR, and course-specific student Q&A.",

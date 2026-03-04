@@ -327,93 +327,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Initialize particles in hero section
-  const heroSection = document.querySelector(".hero");
-  if (heroSection && window.ReactBitsParticles?.mount && !prefersReducedMotion) {
-    const particleContainer = document.createElement("div");
-    particleContainer.style.position = "absolute";
-    particleContainer.style.inset = "0";
-    particleContainer.style.pointerEvents = "none";
-    particleContainer.style.zIndex = "0";
-    heroSection.style.position = "relative";
-    heroSection.insertBefore(particleContainer, heroSection.firstChild);
-    window.ReactBitsParticles.mount(particleContainer, { reducedMotion: prefersReducedMotion });
-  }
-
-  // Initialize magnetic cursor
-  if (window.ReactBitsMagneticCursor?.mount && !prefersReducedMotion) {
-    window.ReactBitsMagneticCursor.mount({ reducedMotion: prefersReducedMotion });
-  }
+  // Particles and magnetic cursor disabled for cleaner look
 
   // Initialize scroll progress indicator
   if (window.ReactBitsScrollProgress?.mount) {
     window.ReactBitsScrollProgress.mount({ reducedMotion: prefersReducedMotion });
   }
 
-  // Initialize text shimmer on hero heading
-  if (window.ReactBitsTextShimmer?.mount && !prefersReducedMotion) {
-    const heroHeading = document.querySelector(".hero h1");
-    if (heroHeading) {
-      window.ReactBitsTextShimmer.mount([heroHeading], { reducedMotion: prefersReducedMotion });
-    }
-  }
+  // Text shimmer disabled for cleaner look
 
-  // Initialize floating badges in skills section
-  if (window.ReactBitsFloatingBadges?.mount && !prefersReducedMotion) {
-    const skillsSection = document.getElementById("skills");
-    if (skillsSection) {
-      skillsSection.style.position = "relative";
-      window.ReactBitsFloatingBadges.mount(skillsSection, {
-        reducedMotion: prefersReducedMotion,
-        badges: [
-          { text: "React", x: 10, y: 15 },
-          { text: "TypeScript", x: 85, y: 20 },
-          { text: "Node.js", x: 15, y: 75 },
-          { text: "Python", x: 80, y: 70 },
-          { text: "AI/ML", x: 50, y: 50 },
-        ]
-      });
-    }
-  }
+  // Floating badges and animated grid disabled for cleaner look
 
-  // Initialize animated grid in projects section
-  if (window.ReactBitsAnimatedGrid?.mount && !prefersReducedMotion) {
-    const projectsSection = document.getElementById("projects");
-    if (projectsSection) {
-      projectsSection.style.position = "relative";
-      window.ReactBitsAnimatedGrid.mount(projectsSection, { reducedMotion: prefersReducedMotion });
-    }
-  }
-
-  // Initialize magnetic effect on buttons
-  if (window.ReactBitsMagneticElements?.mount && !prefersReducedMotion) {
-    const buttons = document.querySelectorAll(".btn, .resume-btn, .theme-toggle");
-    window.ReactBitsMagneticElements.mount(buttons, { 
-      reducedMotion: prefersReducedMotion,
-      strength: 0.2
-    });
-  }
-
-  // Add mouse tracking for card hover effects
-  const addMouseTracking = (elements) => {
-    elements.forEach((el) => {
-      el.addEventListener("mousemove", (e) => {
-        const rect = el.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        el.style.setProperty("--mouse-x", `${x}%`);
-        el.style.setProperty("--mouse-y", `${y}%`);
-      });
-    });
-  };
-
-  // Apply to skill groups, panels, and contact cards
-  addMouseTracking(document.querySelectorAll(".skill-group, .panel, .contact-card"));
+  // Magnetic elements disabled for cleaner interactions
 
   // Observer for dynamically added showcase cards
   const cardObserver = new MutationObserver(() => {
-    const showcaseCards = document.querySelectorAll(".showcase-card");
-    addMouseTracking(showcaseCards);
+    // Cards are now simpler without mouse tracking
   });
 
   const projectsShowcase = document.getElementById("projects-showcase");

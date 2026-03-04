@@ -13,20 +13,56 @@
     const card = document.createElement('article');
     card.className = 'compact-project-card';
     card.style.cssText = `
-      padding: 16px;
+      padding: 0;
       border-radius: 12px;
       border: 1px solid var(--line);
       background: var(--surface);
       transition: all 0.32s cubic-bezier(0.28, 0.11, 0.32, 1);
       cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     `;
     
-    // Title with hover preview trigger
+    // Project image
+    const imageContainer = document.createElement('div');
+    imageContainer.style.cssText = `
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+      position: relative;
+    `;
+    
+    const img = document.createElement('img');
+    img.src = project.image.src;
+    img.alt = project.image.alt;
+    img.loading = 'lazy';
+    img.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.52s cubic-bezier(0.28, 0.11, 0.32, 1);
+    `;
+    imageContainer.appendChild(img);
+    card.appendChild(imageContainer);
+    
+    // Content container
+    const content = document.createElement('div');
+    content.style.cssText = `
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    `;
+    
+    // Title
     const title = document.createElement('h3');
     title.style.cssText = `
       font-size: 1rem;
       font-weight: 600;
-      margin: 0 0 4px 0;
+      margin: 0;
       color: var(--text);
     `;
     
@@ -48,7 +84,7 @@
     kind.style.cssText = `
       font-size: 0.75rem;
       color: var(--text-secondary);
-      margin: 0 0 8px 0;
+      margin: 0;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-weight: 600;
@@ -60,9 +96,14 @@
     summary.style.cssText = `
       font-size: 0.88rem;
       color: var(--muted);
-      margin: 0 0 12px 0;
+      margin: 0;
       line-height: 1.5;
+      flex: 1;
     `;
+    
+    content.appendChild(title);
+    content.appendChild(kind);
+    content.appendChild(summary);
     
     // Tech badges
     if (project.techBadges && project.techBadges.length > 0) {
@@ -71,7 +112,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: 12px;
       `;
       
       project.techBadges.forEach(tech => {
@@ -88,14 +128,7 @@
         badges.appendChild(badge);
       });
       
-      card.appendChild(title);
-      card.appendChild(kind);
-      card.appendChild(summary);
-      card.appendChild(badges);
-    } else {
-      card.appendChild(title);
-      card.appendChild(kind);
-      card.appendChild(summary);
+      content.appendChild(badges);
     }
     
     // Links
@@ -103,6 +136,7 @@
     links.style.cssText = `
       display: flex;
       gap: 8px;
+      margin-top: 8px;
     `;
     
     project.links.forEach(link => {
@@ -136,19 +170,22 @@
       links.appendChild(a);
     });
     
-    card.appendChild(links);
+    content.appendChild(links);
+    card.appendChild(content);
     
     // Card hover effect
     card.addEventListener('mouseenter', () => {
-      card.style.transform = 'translateY(-2px)';
+      card.style.transform = 'translateY(-4px)';
       card.style.borderColor = 'var(--line-strong)';
-      card.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+      card.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.15)';
+      img.style.transform = 'scale(1.05)';
     });
     
     card.addEventListener('mouseleave', () => {
       card.style.transform = 'translateY(0)';
       card.style.borderColor = 'var(--line)';
       card.style.boxShadow = 'none';
+      img.style.transform = 'scale(1)';
     });
     
     return card;
@@ -226,23 +263,54 @@
     
     container.appendChild(tabs);
     
-    // Create grid
-    const grid = document.createElement('div');
-    grid.className = 'projects-grid';
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    // Create horizontal scroll container
+    const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'projects-scroll';
+    scrollContainer.style.cssText = `
+      display: flex;
       gap: 16px;
       margin-top: 16px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 8px 0 16px 0;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) var(--surface);
     `;
-    container.appendChild(grid);
+    
+    // Custom scrollbar styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .projects-scroll::-webkit-scrollbar {
+        height: 8px;
+      }
+      .projects-scroll::-webkit-scrollbar-track {
+        background: var(--surface);
+        border-radius: 4px;
+      }
+      .projects-scroll::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 4px;
+      }
+      .projects-scroll::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-bright);
+      }
+    `;
+    document.head.appendChild(style);
+    
+    container.appendChild(scrollContainer);
     
     function updateProjects() {
       const filtered = projects.filter(CATEGORIES[activeCategory].filter);
-      grid.innerHTML = '';
+      scrollContainer.innerHTML = '';
       
       filtered.forEach((project, index) => {
-        grid.appendChild(createProjectCard(project, index));
+        const card = createProjectCard(project, index);
+        card.style.minWidth = '340px';
+        card.style.maxWidth = '340px';
+        card.style.scrollSnapAlign = 'start';
+        scrollContainer.appendChild(card);
       });
     }
     

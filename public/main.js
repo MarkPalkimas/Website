@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Theme management
+  // Theme management with instant, flicker-free switching
   const THEME_KEY = "portfolio-theme";
   const getStoredTheme = () => localStorage.getItem(THEME_KEY);
   const setStoredTheme = (theme) => localStorage.setItem(THEME_KEY, theme);
@@ -26,15 +26,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   };
 
-  const setTheme = (theme) => {
+  const setTheme = (theme, skipTransition = false) => {
+    if (skipTransition) {
+      document.documentElement.style.setProperty("transition", "none");
+    }
     document.documentElement.setAttribute("data-theme", theme);
     setStoredTheme(theme);
+    if (skipTransition) {
+      // Force reflow
+      document.documentElement.offsetHeight;
+      requestAnimationFrame(() => {
+        document.documentElement.style.removeProperty("transition");
+      });
+    }
   };
 
-  // Initialize theme
-  setTheme(getPreferredTheme());
+  // Initialize theme immediately to prevent flash
+  setTheme(getPreferredTheme(), true);
 
-  // Theme toggle button
+  // Theme toggle button with enhanced animation
   const themeToggle = document.querySelector(".theme-toggle");
   if (themeToggle) {
     themeToggle.addEventListener("click", (e) => {
@@ -49,10 +59,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.ReactBitsThemeTransition.createTransition(x, y, newTheme);
       }
       
-      // Small delay to sync with animation
+      // Sync with animation timing
       setTimeout(() => {
         setTheme(newTheme);
-      }, 50);
+      }, 40);
     });
   }
 
@@ -409,5 +419,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const projectsShowcase = document.getElementById("projects-showcase");
   if (projectsShowcase) {
     cardObserver.observe(projectsShowcase, { childList: true, subtree: true });
+  }
+
+  // Initialize page load animation
+  if (window.ReactBitsPageLoad?.mount && !prefersReducedMotion) {
+    window.ReactBitsPageLoad.mount({ reducedMotion: prefersReducedMotion });
+  }
+
+  // Initialize smooth scroll
+  if (window.ReactBitsSmoothScroll?.mount && !prefersReducedMotion) {
+    window.ReactBitsSmoothScroll.mount({ reducedMotion: prefersReducedMotion });
   }
 });

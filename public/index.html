@@ -52,22 +52,7 @@
           <li><a href="#contact" data-link="contact">Contact</a></li>
         </ul>
 
-        <button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle theme">
-          <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
+        <div id="background-picker" class="background-picker-container"></div>
 
         <a class="resume-btn" href="assets/mark-palkimas-resume.pdf" target="_blank" rel="noopener">Resume</a>
       </nav>
@@ -114,20 +99,12 @@
       </section>
 
       <section id="projects" class="section">
-        <div class="section-heading projects-heading reveal" data-delay="0">
-          <svg class="projects-text-path" viewBox="0 0 420 160" aria-hidden="true" focusable="false">
-            <defs>
-              <path id="projects-arc" d="M 50 118 A 160 160 0 0 1 370 118" />
-            </defs>
-            <text>
-              <textPath href="#projects-arc" startOffset="50%">Selected Work • Software Projects •</textPath>
-            </text>
-          </svg>
+        <div class="section-heading reveal" data-delay="0">
           <p class="eyebrow">Selected Work</p>
-          <h2>Built and shipped.</h2>
+          <h2>Projects</h2>
         </div>
 
-        <div id="projects-showcase" class="projects-showcase reveal" data-delay="30" aria-live="polite"></div>
+        <div id="compact-projects" class="reveal" data-delay="30"></div>
       </section>
 
       <section id="skills" class="section">
@@ -177,8 +154,8 @@
 
         <div class="about-grid">
           <article class="panel reveal" data-delay="30">
-            <p>
-              I take products from zero to launch, then tighten architecture and UX for real users.
+            <p id="blur-highlight-text">
+              I take products from zero to launch, then tighten architecture and UX for real users. I focus on reliable systems, clean code, and shipping features that actually work.
             </p>
           </article>
 
@@ -236,17 +213,13 @@
       </div>
     </div>
 
-    <script src="components/reactbits/theme-transition.js" defer></script>
+    <script src="components/reactbits/blur-highlight.js" defer></script>
+    <script src="components/reactbits/background-picker.js" defer></script>
+    <script src="components/reactbits/hover-preview.js" defer></script>
     <script src="components/reactbits/page-load.js" defer></script>
     <script src="components/reactbits/smooth-scroll.js" defer></script>
-    <script src="components/reactbits/text-shimmer.js" defer></script>
     <script src="components/reactbits/scroll-progress.js" defer></script>
-    <script src="components/reactbits/floating-badges.js" defer></script>
-    <script src="components/reactbits/animated-grid.js" defer></script>
-    <script src="components/reactbits/magnetic-elements.js" defer></script>
-    <script src="components/reactbits/particles.js" defer></script>
-    <script src="components/reactbits/magnetic-cursor.js" defer></script>
-    <script src="components/ProjectsShowcase.js" defer></script>
+    <script src="components/CompactProjects.js" defer></script>
     <script src="main.js" defer></script>
   </body>
 </html>

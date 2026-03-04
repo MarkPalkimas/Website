@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const ENABLE_PROJECTS_SHOWCASE = true;
   const ENABLE_DEV_CONSOLE_SIGNATURE = true;
   const ENABLE_WEB_VITALS_CAPTURE = true;
 
@@ -14,64 +13,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.hostname === "0.0.0.0";
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Theme management with instant, flicker-free switching
-  const THEME_KEY = "portfolio-theme";
-  const getStoredTheme = () => localStorage.getItem(THEME_KEY);
-  const setStoredTheme = (theme) => localStorage.setItem(THEME_KEY, theme);
-  
-  const getPreferredTheme = () => {
-    const stored = getStoredTheme();
-    if (stored) return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  };
-
-  const setTheme = (theme, skipTransition = false) => {
-    if (skipTransition) {
-      document.documentElement.style.setProperty("transition", "none");
-    }
-    document.documentElement.setAttribute("data-theme", theme);
-    setStoredTheme(theme);
-    if (skipTransition) {
-      // Force reflow
-      document.documentElement.offsetHeight;
-      requestAnimationFrame(() => {
-        document.documentElement.style.removeProperty("transition");
-      });
-    }
-  };
-
-  // Initialize theme immediately to prevent flash
-  setTheme(getPreferredTheme(), true);
-
-  // Theme toggle button with enhanced animation
-  const themeToggle = document.querySelector(".theme-toggle");
-  if (themeToggle) {
-    themeToggle.addEventListener("click", (e) => {
-      const currentTheme = document.documentElement.getAttribute("data-theme");
-      const newTheme = currentTheme === "dark" ? "light" : "dark";
-      
-      // Create animated transition
-      if (window.ReactBitsThemeTransition?.createTransition) {
-        const rect = themeToggle.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-        window.ReactBitsThemeTransition.createTransition(x, y, newTheme);
-      }
-      
-      // Sync with animation timing
-      setTimeout(() => {
-        setTheme(newTheme);
-      }, 40);
-    });
-  }
-
-  // Listen for system theme changes
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-    if (!getStoredTheme()) {
-      setTheme(e.matches ? "dark" : "light");
-    }
-  });
 
   const defaultBuild = {
     commit: "unknown",
@@ -320,34 +261,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     sections.forEach((section) => activeObserver.observe(section));
   }
 
-  const projectsShowcaseHost = document.getElementById("projects-showcase");
-  if (ENABLE_PROJECTS_SHOWCASE && projectsShowcaseHost && window.ProjectsShowcase?.mount) {
-    window.ProjectsShowcase.mount(projectsShowcaseHost, {
+  // Initialize Background Picker
+  const backgroundPickerContainer = document.getElementById("background-picker");
+  if (backgroundPickerContainer && window.ReactBitsBackgroundPicker?.mount) {
+    window.ReactBitsBackgroundPicker.mount(backgroundPickerContainer, { reducedMotion: prefersReducedMotion });
+  }
+
+  // Initialize Compact Projects
+  const compactProjectsContainer = document.getElementById("compact-projects");
+  if (compactProjectsContainer && window.CompactProjects?.mount) {
+    window.CompactProjects.mount(compactProjectsContainer, { reducedMotion: prefersReducedMotion });
+  }
+
+  // Initialize Blur Highlight
+  const blurHighlightText = document.getElementById("blur-highlight-text");
+  if (blurHighlightText && window.ReactBitsBlurHighlight?.mount && !prefersReducedMotion) {
+    window.ReactBitsBlurHighlight.mount(blurHighlightText, {
+      highlightedBits: ['products', 'launch', 'architecture', 'UX', 'reliable', 'clean', 'shipping'],
+      highlightDirection: 'ltr',
+      highlightDelay: 200,
+      highlightDuration: 600,
+      blurAmount: 3,
+      inactiveOpacity: 0.5,
+      highlightColor: 'var(--accent)',
       reducedMotion: prefersReducedMotion
     });
   }
 
-  // Particles and magnetic cursor disabled for cleaner look
-
   // Initialize scroll progress indicator
   if (window.ReactBitsScrollProgress?.mount) {
     window.ReactBitsScrollProgress.mount({ reducedMotion: prefersReducedMotion });
-  }
-
-  // Text shimmer disabled for cleaner look
-
-  // Floating badges and animated grid disabled for cleaner look
-
-  // Magnetic elements disabled for cleaner interactions
-
-  // Observer for dynamically added showcase cards
-  const cardObserver = new MutationObserver(() => {
-    // Cards are now simpler without mouse tracking
-  });
-
-  const projectsShowcase = document.getElementById("projects-showcase");
-  if (projectsShowcase) {
-    cardObserver.observe(projectsShowcase, { childList: true, subtree: true });
   }
 
   // Initialize page load animation

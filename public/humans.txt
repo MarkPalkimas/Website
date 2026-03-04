@@ -1,0 +1,9 @@
+/* TEAM */
+Developer: Mark Palkimas
+Role: Software Developer
+Site: https://markpalkimas.com
+Contact: Mark.Palkimas@gmail.com
+
+/* SITE */
+Stack: Node.js, Express, HTML, CSS, JavaScript
+Hosting: Vercel

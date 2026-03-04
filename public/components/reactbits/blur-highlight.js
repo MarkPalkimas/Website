@@ -29,10 +29,8 @@
       span.style.cssText = `
         display: inline-block;
         margin-right: 0.3em;
-        opacity: ${inactiveOpacity};
-        filter: blur(${blurAmount}px);
         transition: all ${highlightDuration}ms cubic-bezier(0.28, 0.11, 0.32, 1);
-        will-change: opacity, filter;
+        will-change: color, font-weight;
       `;
       
       // Check if this word should be highlighted
@@ -46,8 +44,6 @@
           : (words.length - index) * 50 + highlightDelay;
         
         setTimeout(() => {
-          span.style.opacity = '1';
-          span.style.filter = 'blur(0px)';
           span.style.color = highlightColor;
           span.style.fontWeight = '600';
         }, delay);

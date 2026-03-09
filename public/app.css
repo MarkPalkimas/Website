@@ -760,10 +760,28 @@ main {
 /* Compact Projects Styles */
 .compact-project-card {
   transition: all 0.32s cubic-bezier(0.28, 0.11, 0.32, 1);
+  flex-shrink: 0;
+}
+
+.compact-project-card h3,
+.compact-project-card p {
+  overflow-wrap: anywhere;
 }
 
 .project-tabs {
   margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.project-tab {
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.projects-scroll {
+  scroll-padding-inline: 4px;
 }
 
 .projects-grid {
@@ -1428,12 +1446,38 @@ body.modal-open {
 }
 
 @media (max-width: 860px) {
+  .site-header {
+    padding: 10px 10px 0;
+  }
+
   .site-nav {
-    grid-template-columns: auto auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    gap: 8px;
+    padding: 9px 10px;
+  }
+
+  .brand {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
   }
 
   .menu-toggle {
     display: inline-flex;
+    justify-self: end;
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+
+  .resume-btn {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+
+  .background-picker-container {
+    justify-self: end;
   }
 
   .nav-links {
@@ -1449,6 +1493,8 @@ body.modal-open {
     display: grid;
     gap: 0;
     overflow: hidden;
+    max-height: min(70vh, 430px);
+    overflow-y: auto;
     opacity: 0;
     transform: translateY(-8px);
     pointer-events: none;
@@ -1490,6 +1536,18 @@ body.modal-open {
     font-size: clamp(2rem, 10vw, 2.72rem);
   }
 
+  .site-nav {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    border-radius: 24px;
+    row-gap: 8px;
+  }
+
+  .resume-btn {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    text-align: center;
+  }
+
   .section,
   .site-footer {
     padding-left: 16px;
@@ -1504,6 +1562,33 @@ body.modal-open {
 
   .hero-metrics {
     grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions .btn {
+    text-align: center;
+  }
+
+  .project-tabs {
+    margin-bottom: 12px;
+  }
+
+  .showcase-actions {
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .showcase-links {
+    width: 100%;
+  }
+
+  .showcase-links a,
+  .showcase-open {
+    text-align: center;
   }
 }
 

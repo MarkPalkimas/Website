@@ -28,7 +28,7 @@
     const imageContainer = document.createElement('div');
     imageContainer.style.cssText = `
       width: 100%;
-      height: 180px;
+      height: clamp(152px, 34vw, 180px);
       overflow: hidden;
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
       position: relative;
@@ -50,7 +50,7 @@
     // Content container
     const content = document.createElement('div');
     content.style.cssText = `
-      padding: 16px;
+      padding: clamp(12px, 3vw, 16px);
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -135,6 +135,7 @@
     const links = document.createElement('div');
     links.style.cssText = `
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       margin-top: 8px;
     `;
@@ -153,6 +154,7 @@
         background: var(--surface-elevated);
         color: var(--text);
         text-decoration: none;
+        white-space: nowrap;
         transition: all 0.18s cubic-bezier(0.28, 0.11, 0.32, 1);
         font-weight: 500;
       `;
@@ -218,12 +220,17 @@
     tabs.className = 'project-tabs';
     tabs.style.cssText = `
       display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
       gap: 8px;
       padding: 6px;
       border-radius: 12px;
       background: var(--surface);
       border: 1px solid var(--line);
-      width: fit-content;
+      width: 100%;
+      max-width: 100%;
     `;
     
     let activeCategory = 'all';
@@ -235,6 +242,8 @@
       tab.className = 'project-tab';
       tab.dataset.category = key;
       tab.style.cssText = `
+        flex: 0 0 auto;
+        white-space: nowrap;
         padding: 8px 16px;
         border-radius: 8px;
         border: none;
@@ -269,10 +278,11 @@
     scrollContainer.style.cssText = `
       display: flex;
       gap: 16px;
-      margin-top: 16px;
+      margin-top: 8px;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 8px 0 16px 0;
+      padding: 8px 2px 16px 2px;
+      scroll-padding-inline: 2px;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
@@ -307,8 +317,10 @@
       
       filtered.forEach((project, index) => {
         const card = createProjectCard(project, index);
-        card.style.minWidth = '340px';
+        card.style.width = 'min(340px, calc(100vw - 72px))';
+        card.style.minWidth = 'min(340px, calc(100vw - 72px))';
         card.style.maxWidth = '340px';
+        card.style.flex = '0 0 min(340px, calc(100vw - 72px))';
         card.style.scrollSnapAlign = 'start';
         scrollContainer.appendChild(card);
       });

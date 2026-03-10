@@ -76,6 +76,26 @@
     }
   },
   {
+    "title": "Therapist AI",
+    "kind": "AI Mental Health Platform",
+    "summary": "Empathetic AI therapist providing supportive conversations with premium UI/UX design.",
+    "techBadges": ["Next.js", "TypeScript", "Tailwind CSS", "OpenAI API", "Vercel"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/Therapist" },
+      { "label": "Live", "url": "https://therapist-lemon.vercel.app" }
+    ],
+    "details": [
+      "Real-time AI chat interface with empathetic response generation.",
+      "Premium design with smooth animations and thoughtful interactions.",
+      "Built with Next.js App Router and TypeScript for type safety.",
+      "Deployed on Vercel with optimized API routes for chat functionality."
+    ],
+    "image": {
+      "src": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=600&fit=crop",
+      "alt": "Therapist AI chat interface preview"
+    }
+  },
+  {
     "title": "Real Estate Information AI Scraper/Aggregator",
     "kind": "Data + AI Pipeline",
     "summary": "Pipeline for scraping and structuring real-estate data for analysis workflows.",

@@ -96,6 +96,24 @@
     }
   },
   {
+    "title": "Outsmart AI",
+    "kind": "AI Learning Game",
+    "summary": "Duolingo-style gamified platform where players learn how AI behaves by beating chat-based puzzle levels.",
+    "techBadges": ["React", "Vite", "Tailwind CSS", "Node.js", "Express", "SQLite", "OpenAI API"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/outsmart-ai" }
+    ],
+    "details": [
+      "Built around chat-based levels where players test prompts, earn XP, and progress through AI behavior challenges.",
+      "Includes account flows, player stats, missions, leaderboards, achievements, and avatar customization.",
+      "Uses a React/Vite frontend with an Express API, SQLite persistence, and an OpenAI provider layer for puzzle interactions."
+    ],
+    "image": {
+      "src": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&h=600&fit=crop",
+      "alt": "Outsmart AI puzzle game preview"
+    }
+  },
+  {
     "title": "Real Estate Information AI Scraper/Aggregator",
     "kind": "Data + AI Pipeline",
     "summary": "Pipeline for scraping and structuring real-estate data for analysis workflows.",

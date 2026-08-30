@@ -193,16 +193,17 @@
         const levels = document.querySelector('.level-stack');
         const avatar = document.querySelector('.avatar-card');
         const outsmartCaption = document.querySelector('.outsmart-caption');
+        const gameWin = document.querySelector('.game-win');
         buildCenteredScene({
           track: outsmartTrack,
           stage: outsmartStage,
           caption: document.querySelector('.outsmart-caption .caption-copy'),
           labels: [
-            [0, 'Open a level and begin a mission'],
-            [.28, 'Progress through AI challenges'],
-            [.58, 'Open the avatar lab'],
-            [.72, 'Save a customized character'],
-            [.86, 'Mission reward unlocked']
+            [0, 'Open Mirror Match and read the goal'],
+            [.28, 'Choose a natural reflection prompt'],
+            [.54, 'Nori gives up the target phrase'],
+            [.7, 'XP and level progress update'],
+            [.86, 'A reward marks the successful duel']
           ],
           animation: timeline => {
             timeline
@@ -210,10 +211,136 @@
               .fromTo(orbit, { opacity: 0, scale: .72 }, { opacity: 1, scale: 1, stagger: .05, duration: .16, ease: 'none' }, .1)
               .fromTo(levels, { x: -28, opacity: 0 }, { x: 0, opacity: 1, duration: .16, ease: 'none' }, .28)
               .fromTo(choices, { x: index => index % 2 ? 20 : -20, opacity: 0 }, { x: 0, opacity: 1, stagger: .04, duration: .16, ease: 'none' }, .43)
-              .fromTo(meter, { scaleX: .2 }, { scaleX: 1, transformOrigin: 'left center', duration: .13, ease: 'none' }, .55)
-              .fromTo(avatar, { x: 36, y: 18, opacity: 0, rotation: 11 }, { x: 0, y: 0, opacity: 1, rotation: 5, duration: .18, ease: 'none' }, .64)
-              .fromTo(chips, { y: index => index ? 28 : -28, opacity: 0 }, { y: 0, opacity: 1, stagger: .05, duration: .16, ease: 'none' }, .73)
+              .to(choices[0], { scale: 1.05, duration: .08, ease: 'none' }, .56)
+              .fromTo(gameWin, { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: .13, ease: 'none' }, .59)
+              .fromTo(meter, { scaleX: .2 }, { scaleX: 1, transformOrigin: 'left center', duration: .13, ease: 'none' }, .67)
+              .fromTo(avatar, { x: 36, y: 18, opacity: 0, rotation: 11 }, { x: 0, y: 0, opacity: 1, rotation: 5, duration: .18, ease: 'none' }, .72)
+              .fromTo(chips, { y: index => index ? 28 : -28, opacity: 0 }, { y: 0, opacity: 1, stagger: .05, duration: .16, ease: 'none' }, .78)
               .fromTo(outsmartCaption, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .12, ease: 'none' }, .86);
+          }
+        });
+
+        const taskTrack = document.querySelector('.task-track');
+        const taskStage = document.querySelector('.task-stage');
+        const taskWindow = document.querySelector('.task-window');
+        const taskRows = document.querySelectorAll('.task-row');
+        const apiPacket = document.querySelector('.api-packet');
+        const taskPipeline = document.querySelector('.task-pipeline');
+        const database = document.querySelector('.database-card');
+        const taskCaption = document.querySelector('.task-caption');
+        buildCenteredScene({
+          track: taskTrack,
+          stage: taskStage,
+          caption: document.querySelector('.task-caption .caption-copy'),
+          labels: [
+            [0, 'Create a task in the Angular workspace'],
+            [.25, 'Validate and send a REST request'],
+            [.48, 'API applies task rules'],
+            [.67, 'Entity Framework persists the task'],
+            [.84, 'The completed task state returns to the UI']
+          ],
+          animation: timeline => {
+            timeline
+              .fromTo(taskWindow, { x: -54, y: 32, opacity: 0, rotation: -8 }, { x: 0, y: 0, opacity: 1, rotation: -4, duration: .2, ease: 'none' }, 0)
+              .fromTo(taskRows, { x: -20, opacity: 0 }, { x: 0, opacity: 1, stagger: .06, duration: .17, ease: 'none' }, .15)
+              .fromTo(apiPacket, { x: -36, y: 18, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: .16, ease: 'none' }, .36)
+              .fromTo(taskPipeline, { y: 38, opacity: 0, scale: .9 }, { y: 0, opacity: 1, scale: 1, duration: .18, ease: 'none' }, .53)
+              .fromTo(database, { x: 44, y: -22, opacity: 0, rotation: 11 }, { x: 0, y: 0, opacity: 1, rotation: 6, duration: .17, ease: 'none' }, .67)
+              .fromTo(taskCaption, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .12, ease: 'none' }, .84);
+          }
+        });
+
+        const mipsTrack = document.querySelector('.mips-track');
+        const mipsStage = document.querySelector('.mips-stage');
+        const instruction = document.querySelector('.instruction-card');
+        const chip = document.querySelector('.processor-chip');
+        const cpuNodes = document.querySelectorAll('.cpu-node');
+        const buses = document.querySelectorAll('.cpu-bus');
+        const memory = document.querySelector('.memory-bank');
+        const pc = document.querySelector('.pc-card');
+        const mipsCaption = document.querySelector('.mips-caption');
+        buildCenteredScene({
+          track: mipsTrack,
+          stage: mipsStage,
+          caption: document.querySelector('.mips-caption .caption-copy'),
+          labels: [
+            [0, 'The program counter selects an instruction'],
+            [.2, 'Fetch pulls the instruction into the processor'],
+            [.43, 'Decode produces control behavior'],
+            [.62, 'The ALU writes a register or accesses memory'],
+            [.82, 'The program counter advances to the next instruction']
+          ],
+          animation: timeline => {
+            timeline
+              .fromTo(chip, { y: 44, opacity: 0, scale: .9, rotateY: -10 }, { y: 0, opacity: 1, scale: 1, rotateY: -5, duration: .2, ease: 'none' }, 0)
+              .fromTo(instruction, { x: -42, y: -18, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: .14, ease: 'none' }, .1)
+              .fromTo(cpuNodes, { y: 20, opacity: 0, scale: .86 }, { y: 0, opacity: 1, scale: 1, stagger: .08, duration: .22, ease: 'none' }, .24)
+              .fromTo(buses, { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, stagger: .05, transformOrigin: 'left center', duration: .16, ease: 'none' }, .48)
+              .fromTo(memory, { x: 34, y: -20, opacity: 0, rotation: 11 }, { x: 0, y: 0, opacity: 1, rotation: 7, duration: .16, ease: 'none' }, .63)
+              .fromTo(pc, { x: 24, y: 15, opacity: 0, rotation: -9 }, { x: 0, y: 0, opacity: 1, rotation: -4, duration: .16, ease: 'none' }, .76)
+              .fromTo(mipsCaption, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .12, ease: 'none' }, .84);
+          }
+        });
+
+        const plagiarismTrack = document.querySelector('.plagiarism-track');
+        const plagiarismStage = document.querySelector('.plagiarism-stage');
+        const documents = document.querySelectorAll('.source-document');
+        const documentMatches = document.querySelectorAll('.source-document .match');
+        const comparisonCore = document.querySelector('.comparison-core');
+        const matchResult = document.querySelector('.match-result');
+        const accuracy = document.querySelector('.accuracy-note');
+        const plagiarismCaption = document.querySelector('.plagiarism-caption');
+        buildCenteredScene({
+          track: plagiarismTrack,
+          stage: plagiarismStage,
+          caption: document.querySelector('.plagiarism-caption .caption-copy'),
+          labels: [
+            [0, 'Two documents enter the comparison view'],
+            [.25, 'Text patterns are scanned side by side'],
+            [.48, 'Matching passages become visible'],
+            [.67, 'Similarity signals are flagged for review'],
+            [.84, 'Testing accuracy stays separate from each comparison']
+          ],
+          animation: timeline => {
+            timeline
+              .fromTo(documents, { y: index => index ? -35 : 35, opacity: 0, scale: .86 }, { y: 0, opacity: 1, scale: 1, stagger: .08, duration: .2, ease: 'none' }, 0)
+              .fromTo(comparisonCore, { scale: .65, opacity: 0 }, { scale: 1, opacity: 1, duration: .18, ease: 'none' }, .25)
+              .fromTo(documentMatches, { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, stagger: .06, transformOrigin: 'left center', duration: .16, ease: 'none' }, .43)
+              .fromTo(matchResult, { y: 26, opacity: 0, rotation: -8 }, { y: 0, opacity: 1, rotation: -3, duration: .17, ease: 'none' }, .62)
+              .fromTo(accuracy, { x: 26, opacity: 0, rotation: 10 }, { x: 0, opacity: 1, rotation: 5, duration: .14, ease: 'none' }, .75)
+              .fromTo(plagiarismCaption, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .12, ease: 'none' }, .84);
+          }
+        });
+
+        const contractTrack = document.querySelector('.contract-track');
+        const contractStage = document.querySelector('.contract-stage');
+        const wallet = document.querySelector('.wallet-card');
+        const transaction = document.querySelector('.transaction-line');
+        const contractWindow = document.querySelector('.contract-window');
+        const contractLines = document.querySelectorAll('.contract-window p');
+        const chainState = document.querySelector('.state-card');
+        const blocks = document.querySelectorAll('.block-stack i');
+        const contractCaption = document.querySelector('.contract-caption');
+        buildCenteredScene({
+          track: contractTrack,
+          stage: contractStage,
+          caption: document.querySelector('.contract-caption .caption-copy'),
+          labels: [
+            [0, 'A wallet creates a transaction request'],
+            [.23, 'The transaction reaches Solidity contract logic'],
+            [.46, 'Contract checks and state rules execute'],
+            [.67, 'The resulting on-chain state is confirmed'],
+            [.84, 'A new block records the outcome']
+          ],
+          animation: timeline => {
+            timeline
+              .fromTo(wallet, { x: -42, y: 20, opacity: 0, rotation: -11 }, { x: 0, y: 0, opacity: 1, rotation: -6, duration: .17, ease: 'none' }, 0)
+              .fromTo(transaction, { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, transformOrigin: 'left center', duration: .16, ease: 'none' }, .18)
+              .fromTo(contractWindow, { y: 38, opacity: 0, scale: .9, rotateY: -9 }, { y: 0, opacity: 1, scale: 1, rotateY: -4, duration: .2, ease: 'none' }, .31)
+              .fromTo(contractLines, { x: -14, opacity: 0 }, { x: 0, opacity: 1, stagger: .06, duration: .15, ease: 'none' }, .48)
+              .fromTo(chainState, { x: 38, y: -17, opacity: 0, rotation: 11 }, { x: 0, y: 0, opacity: 1, rotation: 6, duration: .16, ease: 'none' }, .64)
+              .fromTo(blocks, { x: 26, opacity: 0 }, { x: 0, opacity: 1, stagger: .06, duration: .16, ease: 'none' }, .75)
+              .fromTo(contractCaption, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .12, ease: 'none' }, .84);
           }
         });
 

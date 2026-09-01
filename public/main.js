@@ -183,6 +183,51 @@
           }
         });
 
+        const vibedSection = document.querySelector('.project-vibed');
+        const vibedCopy = document.querySelector('.vibed-copy');
+        const vibedPreview = document.querySelector('.vibed-preview');
+        const vibedBrowser = document.querySelector('.vibed-browser');
+        const vibedProjectParts = document.querySelectorAll('.vibed-project > span, .vibed-project > strong, .vibed-project > p, .vibed-project em');
+        const vibedFooter = document.querySelector('.vibed-browser footer');
+        const vibedRank = document.querySelector('.vibed-rank');
+        const vibedSignals = document.querySelectorAll('.vibed-signal');
+        const vibedPrinciples = document.querySelectorAll('.vibed-principles span');
+        if (vibedSection && vibedPreview && vibedBrowser) {
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: vibedSection,
+              start: 'top 78%',
+              end: 'bottom 28%',
+              scrub: .65,
+              invalidateOnRefresh: true
+            }
+          })
+            .fromTo(vibedCopy, { x: -55, opacity: .2 }, { x: 0, opacity: 1, duration: .24, ease: 'none' }, 0)
+            .fromTo(vibedBrowser, { x: 110, y: 80, scale: .76, rotation: 12, opacity: 0 }, { x: 0, y: 0, scale: 1, rotation: 2.5, opacity: 1, duration: .3, ease: 'none' }, .03)
+            .fromTo(vibedSignals, { scale: .2, opacity: 0 }, { scale: 1, opacity: 1, stagger: .05, duration: .18, ease: 'none' }, .18)
+            .fromTo(vibedProjectParts, { y: 24, opacity: 0 }, { y: 0, opacity: 1, stagger: .035, duration: .2, ease: 'none' }, .28)
+            .fromTo(vibedFooter, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: .14, ease: 'none' }, .52)
+            .fromTo(vibedRank, { x: 85, y: 55, scale: .7, rotation: 12, opacity: 0 }, { x: 0, y: 0, scale: 1, rotation: -5, opacity: 1, duration: .2, ease: 'none' }, .6)
+            .fromTo(vibedPrinciples, { y: 24, opacity: 0 }, { y: 0, opacity: 1, stagger: .05, duration: .18, ease: 'none' }, .76);
+
+          if (window.matchMedia('(pointer:fine)').matches) {
+            const moveBrowserX = gsap.quickTo(vibedBrowser, 'x', { duration: .55, ease: 'power3.out' });
+            const moveBrowserY = gsap.quickTo(vibedBrowser, 'y', { duration: .55, ease: 'power3.out' });
+            const moveRankX = vibedRank ? gsap.quickTo(vibedRank, 'x', { duration: .7, ease: 'power3.out' }) : null;
+            const moveRankY = vibedRank ? gsap.quickTo(vibedRank, 'y', { duration: .7, ease: 'power3.out' }) : null;
+            vibedPreview.addEventListener('pointermove', event => {
+              const rect = vibedPreview.getBoundingClientRect();
+              const x = (event.clientX - rect.left) / rect.width - .5;
+              const y = (event.clientY - rect.top) / rect.height - .5;
+              moveBrowserX(x * 16); moveBrowserY(y * 12);
+              moveRankX?.(x * -22); moveRankY?.(y * -18);
+            });
+            vibedPreview.addEventListener('pointerleave', () => {
+              moveBrowserX(0); moveBrowserY(0); moveRankX?.(0); moveRankY?.(0);
+            });
+          }
+        }
+
         const outsmartTrack = document.querySelector('.outsmart-track');
         const outsmartStage = document.querySelector('.outsmart-stage');
         const phone = document.querySelector('.phone-stage .phone');

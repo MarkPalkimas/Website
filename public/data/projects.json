@@ -1,5 +1,25 @@
 [
   {
+    "title": "Vibed",
+    "kind": "Social Discovery Platform",
+    "date": "September 1, 2026",
+    "summary": "A social discovery network where AI-built projects are the content and genuine response—not follower count—creates opportunity.",
+    "techBadges": ["Next.js", "TypeScript", "Cloudflare", "Drizzle"],
+    "links": [
+      { "label": "Open Vibed", "url": "https://vibed-builders.riplegend42021.chatgpt.site" },
+      { "label": "My Profile", "url": "https://vibed-builders.riplegend42021.chatgpt.site/u/markpalkimas" }
+    ],
+    "details": [
+      "Project-first feed, profiles, search, leaderboards, and creator workflows.",
+      "Extensible provider architecture that does not fabricate verified AI usage.",
+      "Built for web first with reusable backend and contract boundaries for future mobile clients."
+    ],
+    "image": {
+      "src": "https://vibed-builders.riplegend42021.chatgpt.site/og.png",
+      "alt": "Vibed social discovery platform preview"
+    }
+  },
+  {
     "title": "Portfolio Website",
     "kind": "Web Platform",
     "summary": "Apple-inspired portfolio with custom ReactBits components and premium interactions.",
@@ -26,7 +46,7 @@
     "techBadges": ["React", "Vite", "Tailwind CSS", "Clerk", "OpenAI API"],
     "links": [
       { "label": "GitHub", "url": "https://github.com/MarkPalkimas/AISCHOOL3" },
-      { "label": "Live", "url": "https://mystudyguideai.com" }
+      { "label": "Live", "url": "https://www.mystudyguideai.com/" }
     ],
     "details": [
       "Includes protected API endpoints for chat and OCR.",
@@ -101,7 +121,7 @@
     "summary": "Duolingo-style gamified platform where players learn how AI behaves by beating chat-based puzzle levels.",
     "techBadges": ["React", "Vite", "Tailwind CSS", "Node.js", "Express", "SQLite", "OpenAI API"],
     "links": [
-      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/outsmart-ai" }
+      { "label": "GitHub", "url": "https://github.com/MarkPalkimas/Outsmart-AI" }
     ],
     "details": [
       "Built around chat-based levels where players test prompts, earn XP, and progress through AI behavior challenges.",
